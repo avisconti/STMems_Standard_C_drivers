@@ -106,12 +106,20 @@ static void bytecpy(uint8_t *target, uint8_t *source)
 
 float_t lps28dfw5_from_fs1260_to_hPa(int32_t lsb)
 {
-  return ((float_t)lsb / 691200.0f);   /* 2700.0f * 256 */
+  float_t hpa = (float_t)lsb /  691200.0f; /* 2700.0f * 256 */
+  float_t p0 = 760.0f;
+
+  return (hpa + 0.000001044f * powf((hpa - p0), 2)
+          + 0.000000000773f * powf((hpa - p0), 3));
 }
 
 float_t lps28dfw5_from_fs5060_to_hPa(int32_t lsb)
 {
-  return ((float_t)lsb /  345600.0f);   /* 1350.0f * 256 */
+  float_t hpa = (float_t)lsb /  345600.0f; /* 1350.0f * 256 */
+  float_t p0 = 760.0f;
+
+  return (hpa + 0.000001638f * powf((hpa - p0), 2)
+          + 0.000000000991f * powf((hpa - p0), 3));
 }
 
 float_t lps28dfw5_from_lsb_to_celsius(int16_t lsb)
