@@ -104,13 +104,20 @@ static void bytecpy(uint8_t *target, uint8_t *source)
   *
   */
 
+static uint8_t pag;
+static int32_t dgain;
+static uint8_t Delta_P0;
+static float knl2;
+static float knl3;
+
 float_t lps28dfw5_from_fs1260_to_hPa(int32_t lsb)
 {
   float_t hpa = (float_t)lsb /  691200.0f; /* 2700.0f * 256 */
   float_t p0 = 760.0f;
 
-  return (hpa + 0.000001044f * powf((hpa - p0), 2)
-          + 0.000000000773f * powf((hpa - p0), 3));
+  return (hpa + (knl2 * Delta_P0 + knl3 * powf(Delta_P0, 2))
+          - knl2 * powf((hpa - p0), 2)
+          - knl3 * powf((hpa - p0), 3));
 }
 
 float_t lps28dfw5_from_fs5060_to_hPa(int32_t lsb)
@@ -118,8 +125,9 @@ float_t lps28dfw5_from_fs5060_to_hPa(int32_t lsb)
   float_t hpa = (float_t)lsb /  345600.0f; /* 1350.0f * 256 */
   float_t p0 = 760.0f;
 
-  return (hpa + 0.000001638f * powf((hpa - p0), 2)
-          + 0.000000000991f * powf((hpa - p0), 3));
+  return (hpa + (knl2 * Delta_P0 + knl3 * powf(Delta_P0, 2))
+          - knl2 * powf((hpa - p0), 2)
+          - knl3 * powf((hpa - p0), 3));
 }
 
 float_t lps28dfw5_from_lsb_to_celsius(int16_t lsb)
@@ -500,6 +508,7 @@ int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
 {
   lps28dfw5_ctrl_reg1_t ctrl_reg1;
   lps28dfw5_ctrl_reg2_t ctrl_reg2;
+  uint8_t rev = 0;
   uint8_t reg[2];
   int32_t ret;
 
@@ -515,6 +524,43 @@ int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
     ctrl_reg2.en_lpfp = (uint8_t)val->lpf & 0x01U;
     ctrl_reg2.lfpf_cfg = ((uint8_t)val->lpf & 0x02U) >> 2;
     ctrl_reg2.fs_mode = (uint8_t)val->fs;
+
+    lps28dfw5_read_reg(ctx, 0x70, &rev, 1);
+    switch (rev & 0x3)
+    {
+      case 0x1: /* bit1 == 0, bit0 == 1 */
+        Delta_P0 = 0;
+        knl2 = (val->fs == LPS28DFW5_1260hPa) ? -0.000001044f : -0.000001638f;
+        knl3 = (val->fs == LPS28DFW5_1260hPa) ? -0.000000000773f : -0.000000000991f;
+        break;
+
+      case 0x3: /* bit1 == 1, bit0 == 1 */
+      default:
+        Delta_P0 = 240;
+        if (val->fs == LPS28DFW5_5060hPa)
+        {
+          uint8_t reg[5] = {0U, 0U, 0U, 0U, 0U}; /* 0x4A - 0x4E */
+          float gain;
+
+          /* calculate pag and dgain */
+          lps28dfw5_read_reg(ctx, 0x4A, reg, 5);
+
+          pag = (reg[4] >> 3) & 0x1F; /* pag = 0x4E[7:3] */
+          dgain = ((reg[3] << 17) & 0x20000) | /* dgain[17] = 0x4D[0]*/
+                  ((reg[2] << 16) & 0x10000) | /* dgain[16] = 0x4C[0]*/
+                  ((reg[1] <<  8) & 0x0FF00) | /* dgain[15:8] = 0x4B[7:0]*/
+                  ((reg[0] <<  0) & 0x000FF);  /* dgain[ 7:0] = 0x4A[7:0]*/
+
+          gain = (12.0f + pag) * dgain * 0.000000004293f * 1350.0f;
+          knl2 = -0.0000004321f * gain + 0.000003764f;
+          knl3 = -0.0000000004234f * gain + 0.000000003720f;
+        } else {
+          knl2 = -0.000001521f;
+          knl3 = -0.00000000007694f;
+        }
+
+        break;
+    }
 
     bytecpy(&reg[0], (uint8_t *)&ctrl_reg1);
     bytecpy(&reg[1], (uint8_t *)&ctrl_reg2);
