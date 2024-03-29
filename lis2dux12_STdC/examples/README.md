@@ -1,4 +1,4 @@
-# Applications
+# Examples
 
 This folder contains application examples. The examples refer to following boards but, since the drivers are platform independent, they can be easily ported to any other platform: 
 
