@@ -12,4 +12,3 @@ The LIS2DUX12 is available in a small thin plastic land grid array package (LGA)
 
 For more info, please visit the device page at [https://www.st.com/en/mems-and-sensors/lis2dux12.html](https://www.st.com/en/mems-and-sensors/lis2dux12.html)
 
-**Copyright (C) 2024 STMicroelectronics**

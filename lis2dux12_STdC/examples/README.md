@@ -55,15 +55,13 @@ Program LIS2DUX12 to receive wakeup from sleep events on INT1:
 
 ## Finite State Machine (FSM)
 
-Program the FSM with ucf file to detect *glance* and *de-glance* gestures typically used in smartphone devices (read more [here](https://github.com/STMicroelectronics/STMems_Finite_State_Machine/blob/master/application_examples/lis2dux12/Glance%20detection/README.md)):
+Program LIS2DUX12 FSM to detect *glance* and *de-glance* gestures typically used in smartphone devices (read more [here](https://github.com/STMicroelectronics/STMems_Finite_State_Machine/blob/master/application_examples/lis2dux12/Glance%20detection/README.md)):
 
   - lis2dux12_fsm_glance.c
 
-## Machine Learning Code (MLC)
+## Machine Learning Core (MLC)
 
-Program the MLC with ucf file to recognize *stationary*, *walking*, *jogging*, *biking* and *driving* activities (read more [here](https://github.com/STMicroelectronics/STMems_Machine_Learning_Core/blob/master/application_examples/lis2dux12/activity_recognition_for_mobile/README.md)):
+Program LIS2DUX12 MLC to recognize user activity optimized for mobile devices (read more [here](https://github.com/STMicroelectronics/STMems_Machine_Learning_Core/blob/master/application_examples/lis2dux12/activity_recognition_for_mobile/README.md)):
 
   - lis2dux12_mlc_activity_mobile.c
 
-
-**Copyright (C) 2024 STMicroelectronics**
