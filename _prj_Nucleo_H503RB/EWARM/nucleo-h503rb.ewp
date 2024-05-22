@@ -357,6 +357,12 @@
                     <state>$PROJ_DIR$/../Drivers/CMSIS/Device/ST/STM32H5xx/Include</state>
                     <state>$PROJ_DIR$/../Drivers/CMSIS/Include</state>
                     <state>C:\Users\visconta\Projects\STdC\lsm6dsv16x_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Finite_State_Machine\application_examples\lsm6dsv16x\FourD position recognition</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Finite_State_Machine\application_examples\lsm6dsv16x\Glance detection</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\lsm6dsv16x\gym_activity_recognition</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\FIFO_Utility_Tool</state>
+                    <state>C:\Users\visconta\Projects\STdC\lis2mdl_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\lps22df_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1101,6 +1107,12 @@
     <group>
         <name>Application</name>
         <group>
+            <name>EWARM</name>
+            <file>
+                <name>$PROJ_DIR$\startup_stm32h503xx.s</name>
+            </file>
+        </group>
+        <group>
             <name>User</name>
             <group>
                 <name>Core</name>
@@ -1121,6 +1133,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\main.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\_resources\FIFO_Utility_Tool\st_fifo.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Core\Src\stm32h5xx_hal_msp.c</name>
@@ -1146,12 +1161,69 @@
             </file>
         </group>
         <group>
+            <name>LIS2MDL</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lis2mdl_STdC\driver\lis2mdl_reg.c</name>
+            </file>
+        </group>
+        <group>
+            <name>LPS22DF</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps22df_STdC\driver\lps22df_reg.c</name>
+            </file>
+        </group>
+        <group>
             <name>LSM6DSV16X</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_compressed_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fifo_irq.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_free_fall.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fsm_fourd.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fsm_glance.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_mlc_gym.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_qvar_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_read_data_irq.c</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_read_data_polling.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\driver\lsm6dsv16x_reg.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_self_test.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_sensor_fusion.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_sensor_hub.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_single_double_tap.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_six_d_position.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_wakeup.c</name>
             </file>
         </group>
         <group>
