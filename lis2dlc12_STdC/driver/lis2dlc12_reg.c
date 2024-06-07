@@ -1,0 +1,2770 @@
+/**
+  ******************************************************************************
+  * @file    lis2dlc12_reg.c
+  * @author  Sensors Software Solution Team
+  * @brief   LIS2DLC12 driver file
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  */
+
+#include "lis2dlc12_reg.h"
+
+/**
+  * @defgroup  LIS2DLC12
+  * @brief     This file provides a set of functions needed to drive the
+  *            lis2dlc12 enhanced inertial module.
+  * @{
+  *
+  */
+
+/**
+  * @defgroup  LIS2DLC12_Interfaces_Functions
+  * @brief     This section provide a set of functions used to read and
+  *            write a generic register of the device.
+  *            MANDATORY: return 0 -> no Error.
+  * @{
+  *
+  */
+
+/**
+  * @brief  Read generic device register
+  *
+  * @param  ctx   read / write interface definitions(ptr)
+  * @param  reg   register to read
+  * @param  data  pointer to buffer that store the data read(ptr)
+  * @param  len   number of consecutive register to read
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t __weak lis2dlc12_read_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+                                 uint8_t *data,
+                                 uint16_t len)
+{
+  int32_t ret;
+
+  if (ctx == NULL) return -1;
+
+  ret = ctx->read_reg(ctx->handle, reg, data, len);
+
+  return ret;
+}
+
+/**
+  * @brief  Write generic device register
+  *
+  * @param  ctx   read / write interface definitions(ptr)
+  * @param  reg   register to write
+  * @param  data  pointer to data to write in register reg(ptr)
+  * @param  len   number of consecutive register to write
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t __weak lis2dlc12_write_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+                                  uint8_t *data,
+                                  uint16_t len)
+{
+  int32_t ret;
+
+  if (ctx == NULL) return -1;
+
+  ret = ctx->write_reg(ctx->handle, reg, data, len);
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup    LIS2DLC12_Sensitivity
+  * @brief       These functions convert raw-data into engineering units.
+  * @{
+  *
+  */
+
+float_t lis2dlc12_from_fs2g_to_mg(int16_t lsb)
+{
+  return ((float_t)lsb * 0.061f);
+}
+
+float_t lis2dlc12_from_fs4g_to_mg(int16_t lsb)
+{
+  return ((float_t)lsb * 0.122f);
+}
+
+float_t lis2dlc12_from_fs8g_to_mg(int16_t lsb)
+{
+  return ((float_t)lsb * 0.244f);
+}
+
+float_t lis2dlc12_from_fs16g_to_mg(int16_t lsb)
+{
+  return ((float_t)lsb * 0.488f);
+}
+
+float_t lis2dlc12_from_lsb_to_celsius(int16_t lsb)
+{
+  return (((float_t)lsb / 256.0f) + 25.0f);
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  Data generation
+  * @brief     This section groups all the functions concerning
+  *            data generation
+  * @{
+  *
+  */
+
+/**
+  * @brief  Read all the interrupt/status flag of the device.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get FIFO_SRC, STATUS_DUP, WAKE_UP_SRC, TAP_SRC,
+  *                6D_SRC, FUNC_CK_GATE, FUNC_SRC.(ptr)
+  *
+  */
+int32_t lis2dlc12_all_sources_get(const stmdev_ctx_t *ctx,
+                                 lis2dlc12_all_sources_t *val)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_SRC,
+                          (uint8_t *) & (val->fifo_src), 1);
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_STATUS_DUP,
+                            (uint8_t *) & (val->status_dup), 1);
+  }
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_SRC,
+                            (uint8_t *) & (val->wake_up_src), 1);
+  }
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_SRC,
+                            (uint8_t *) & (val->tap_src), 1);
+  }
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_6D_SRC,
+                            (uint8_t *) & (val->_6d_src), 1);
+  }
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FUNC_CK_GATE,
+                            (uint8_t *) & (val->func_ck_gate), 1);
+  }
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FUNC_SRC,
+                            (uint8_t *) & (val->func_src), 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Blockdataupdate.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of bdu in reg CTRL1
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_block_data_update_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_ctrl1_t ctrl1;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (ret == 0)
+  {
+    ctrl1.bdu = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Blockdataupdate.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    get the values of bdu in reg CTRL1(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_block_data_update_get(const stmdev_ctx_t *ctx,
+                                       uint8_t *val)
+{
+  lis2dlc12_ctrl1_t ctrl1;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+  *val = ctrl1.bdu;
+
+  return ret;
+}
+
+/**
+  * @brief  Accelerometer full-scale selection.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of fs in reg CTRL1
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_full_scale_set(const stmdev_ctx_t *ctx,
+                                   lis2dlc12_fs_t val)
+{
+  lis2dlc12_ctrl1_t ctrl1;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (ret == 0)
+  {
+    ctrl1.fs = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Accelerometer full-scale selection.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of fs in reg CTRL1(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_full_scale_get(const stmdev_ctx_t *ctx,
+                                   lis2dlc12_fs_t *val)
+{
+  lis2dlc12_ctrl1_t ctrl1;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  switch (ctrl1.fs)
+  {
+    case LIS2DLC12_2g:
+      *val = LIS2DLC12_2g;
+      break;
+
+    case LIS2DLC12_16g:
+      *val = LIS2DLC12_16g;
+      break;
+
+    case LIS2DLC12_4g:
+      *val = LIS2DLC12_4g;
+      break;
+
+    case LIS2DLC12_8g:
+      *val = LIS2DLC12_8g;
+      break;
+
+    default:
+      *val = LIS2DLC12_2g;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Accelerometer data rate selection.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of odr in reg CTRL1
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_data_rate_set(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_odr_t val)
+{
+  lis2dlc12_ctrl1_t ctrl1;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (ret == 0)
+  {
+    ctrl1.odr = (uint8_t)val & 0x0FU;
+    ctrl1.hf_odr = ((uint8_t)val & 0x10U) >> 4;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Accelerometer data rate selection.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of odr in reg CTRL1(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_data_rate_get(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_odr_t *val)
+{
+  lis2dlc12_ctrl1_t ctrl1;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  switch ((ctrl1.hf_odr << 4) + ctrl1.odr)
+  {
+    case LIS2DLC12_XL_ODR_OFF:
+      *val = LIS2DLC12_XL_ODR_OFF;
+      break;
+
+    case LIS2DLC12_XL_ODR_1Hz_LP:
+      *val = LIS2DLC12_XL_ODR_1Hz_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_12Hz5_LP:
+      *val = LIS2DLC12_XL_ODR_12Hz5_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_25Hz_LP:
+      *val = LIS2DLC12_XL_ODR_25Hz_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_50Hz_LP:
+      *val = LIS2DLC12_XL_ODR_50Hz_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_100Hz_LP:
+      *val = LIS2DLC12_XL_ODR_100Hz_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_200Hz_LP:
+      *val = LIS2DLC12_XL_ODR_200Hz_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_400Hz_LP:
+      *val = LIS2DLC12_XL_ODR_400Hz_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_800Hz_LP:
+      *val = LIS2DLC12_XL_ODR_800Hz_LP;
+      break;
+
+    case LIS2DLC12_XL_ODR_12Hz5_HR:
+      *val = LIS2DLC12_XL_ODR_12Hz5_HR;
+      break;
+
+    case LIS2DLC12_XL_ODR_25Hz_HR:
+      *val = LIS2DLC12_XL_ODR_25Hz_HR;
+      break;
+
+    case LIS2DLC12_XL_ODR_50Hz_HR:
+      *val = LIS2DLC12_XL_ODR_50Hz_HR;
+      break;
+
+    case LIS2DLC12_XL_ODR_100Hz_HR:
+      *val = LIS2DLC12_XL_ODR_100Hz_HR;
+      break;
+
+    case LIS2DLC12_XL_ODR_200Hz_HR:
+      *val = LIS2DLC12_XL_ODR_200Hz_HR;
+      break;
+
+    case LIS2DLC12_XL_ODR_400Hz_HR:
+      *val = LIS2DLC12_XL_ODR_400Hz_HR;
+      break;
+
+    case LIS2DLC12_XL_ODR_800Hz_HR:
+      *val = LIS2DLC12_XL_ODR_800Hz_HR;
+      break;
+
+    case LIS2DLC12_XL_ODR_1k6Hz_HF:
+      *val = LIS2DLC12_XL_ODR_1k6Hz_HF;
+      break;
+
+    case LIS2DLC12_XL_ODR_3k2Hz_HF:
+      *val = LIS2DLC12_XL_ODR_3k2Hz_HF;
+      break;
+
+    case LIS2DLC12_XL_ODR_6k4Hz_HF:
+      *val = LIS2DLC12_XL_ODR_6k4Hz_HF;
+      break;
+
+    default:
+      *val = LIS2DLC12_XL_ODR_OFF;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  The STATUS_REG register.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get registers STATUS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_status_reg_get(const stmdev_ctx_t *ctx,
+                                lis2dlc12_status_t *val)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_STATUS, (uint8_t *) val, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  Accelerometer new data available.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    get the values of drdy in reg STATUS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_flag_data_ready_get(const stmdev_ctx_t *ctx,
+                                        uint8_t *val)
+{
+  lis2dlc12_status_t status;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_STATUS, (uint8_t *)&status, 1);
+  *val = status.drdy;
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  Data output
+  * @brief     This section groups all the data output functions.
+  * @{
+  *
+  */
+
+/**
+  * @brief  Module output value (8-bit).[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  buff   buffer that stores data read.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_acceleration_module_raw_get(const stmdev_ctx_t *ctx,
+                                             uint8_t *buff)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_MODULE_8BIT, buff, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  Temperature data output register (r). L and H registers together
+  *         express a 16-bit word in two’s complement.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  buff   buffer that stores data read.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_temperature_raw_get(const stmdev_ctx_t *ctx, uint8_t *buff)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_OUT_T, buff, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  Linear acceleration output register. The value is expressed as a
+  *         16-bit word in two’s complement.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  buff   buffer that stores data read.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_acceleration_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
+{
+  uint8_t buff[6];
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_OUT_X_L, buff, 6);
+  val[0] = (int16_t)buff[1];
+  val[0] = (val[0] * 256) + (int16_t)buff[0];
+  val[1] = (int16_t)buff[3];
+  val[1] = (val[1] * 256) + (int16_t)buff[2];
+  val[2] = (int16_t)buff[5];
+  val[2] = (val[2] * 256) + (int16_t)buff[4];
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  Common
+  * @brief     This section groups common useful functions.
+  * @{
+  *
+  */
+
+/**
+  * @brief  DeviceWhoamI.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  buff   buffer that stores data read.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_device_id_get(const stmdev_ctx_t *ctx, uint8_t *buff)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WHO_AM_I, buff, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  Register address automatically incremented during a multiple byte
+  *         access with a serial interface.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of if_add_inc in reg CTRL2
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_auto_increment_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret == 0)
+  {
+    ctrl2.if_add_inc = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Register address automatically incremented during a multiple byte
+  *         access with a serial interface.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of if_add_inc in reg CTRL2.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_auto_increment_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  *val = ctrl2.if_add_inc;
+
+  return ret;
+}
+
+/**
+  * @brief  Software reset. Restore the default values in
+  *         user registers.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of soft_reset in reg CTRL2
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_reset_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret == 0)
+  {
+    ctrl2.soft_reset = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Software reset. Restore the default values
+  *         in user registers.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    get the values of soft_reset in reg CTRL2.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_reset_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  *val = ctrl2.soft_reset;
+
+  return ret;
+}
+
+/**
+  * @brief  Reboot memory content. Reload the calibration parameters.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of boot in reg CTRL2
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_boot_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret == 0)
+  {
+    ctrl2.boot = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Reboot memory content. Reload the calibration parameters.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    get the values of boot in reg CTRL2.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_boot_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  *val = ctrl2.boot;
+
+  return ret;
+}
+
+/**
+  * @brief  xl_self_test: [set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of st in reg CTRL3
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_self_test_set(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_st_t val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret == 0)
+  {
+    ctrl3.st = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  xl_self_test [get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of st in reg CTRL3.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_self_test_get(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_st_t *val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  switch (ctrl3.st)
+  {
+    case LIS2DLC12_XL_ST_DISABLE:
+      *val = LIS2DLC12_XL_ST_DISABLE;
+      break;
+
+    case LIS2DLC12_XL_ST_POSITIVE:
+      *val = LIS2DLC12_XL_ST_POSITIVE;
+      break;
+
+    case LIS2DLC12_XL_ST_NEGATIVE:
+      *val = LIS2DLC12_XL_ST_NEGATIVE;
+      break;
+
+    default:
+      *val = LIS2DLC12_XL_ST_DISABLE;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  data_ready_mode [set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of drdy_pulsed in reg CTRL5
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_data_ready_mode_set(const stmdev_ctx_t *ctx,
+                                     lis2dlc12_drdy_pulsed_t val)
+{
+  lis2dlc12_ctrl5_t ctrl5;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret == 0)
+  {
+    ctrl5.drdy_pulsed = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  data_ready_mode: [get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of drdy_pulsed in reg CTRL5.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_data_ready_mode_get(const stmdev_ctx_t *ctx,
+                                     lis2dlc12_drdy_pulsed_t *val)
+{
+  lis2dlc12_ctrl5_t ctrl5;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  switch (ctrl5.drdy_pulsed)
+  {
+    case LIS2DLC12_DRDY_LATCHED:
+      *val = LIS2DLC12_DRDY_LATCHED;
+      break;
+
+    case LIS2DLC12_DRDY_PULSED:
+      *val = LIS2DLC12_DRDY_PULSED;
+      break;
+
+    default:
+      *val = LIS2DLC12_DRDY_LATCHED;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  Filters
+  * @brief     This section group all the functions concerning the filters
+  *            configuration.
+  * @{
+  *
+  */
+
+/**
+  * @brief  High-pass filter data selection on output register and FIFO.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of fds_slope in reg CTRL2
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_hp_path_set(const stmdev_ctx_t *ctx,
+                                lis2dlc12_fds_slope_t val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret == 0)
+  {
+    ctrl2.fds_slope = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  High-pass filter data selection on output register and FIFO.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of fds_slope in reg CTRL2.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_xl_hp_path_get(const stmdev_ctx_t *ctx,
+                                lis2dlc12_fds_slope_t *val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  switch (ctrl2.fds_slope)
+  {
+    case LIS2DLC12_HP_INTERNAL_ONLY:
+      *val = LIS2DLC12_HP_INTERNAL_ONLY;
+      break;
+
+    case LIS2DLC12_HP_ON_OUTPUTS:
+      *val = LIS2DLC12_HP_ON_OUTPUTS;
+      break;
+
+    default:
+      *val = LIS2DLC12_HP_INTERNAL_ONLY;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup   Auxiliary_interface
+  * @brief      This section groups all the functions concerning auxiliary
+  *             interface.
+  * @{
+  *
+  */
+
+/**
+  * @brief  SPI Serial Interface Mode selection.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of sim in reg CTRL2
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_spi_mode_set(const stmdev_ctx_t *ctx, lis2dlc12_sim_t val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret == 0)
+  {
+    ctrl2.sim = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  SPI Serial Interface Mode selection.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of sim in reg CTRL2.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_spi_mode_get(const stmdev_ctx_t *ctx, lis2dlc12_sim_t *val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  switch (ctrl2.sim)
+  {
+    case LIS2DLC12_SPI_4_WIRE:
+      *val = LIS2DLC12_SPI_4_WIRE;
+      break;
+
+    case LIS2DLC12_SPI_3_WIRE:
+      *val = LIS2DLC12_SPI_3_WIRE;
+      break;
+
+    default:
+      *val = LIS2DLC12_SPI_4_WIRE;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Disable / Enable I2C interface.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of i2c_disable in reg CTRL2
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_i2c_interface_set(const stmdev_ctx_t *ctx,
+                                   lis2dlc12_i2c_disable_t val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  if (ret == 0)
+  {
+    ctrl2.i2c_disable = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Disable / Enable I2C interface.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of i2c_disable in reg CTRL2.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_i2c_interface_get(const stmdev_ctx_t *ctx,
+                                   lis2dlc12_i2c_disable_t *val)
+{
+  lis2dlc12_ctrl2_t ctrl2;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL2, (uint8_t *)&ctrl2, 1);
+
+  switch (ctrl2.i2c_disable)
+  {
+    case LIS2DLC12_I2C_ENABLE:
+      *val = LIS2DLC12_I2C_ENABLE;
+      break;
+
+    case LIS2DLC12_I2C_DISABLE:
+      *val = LIS2DLC12_I2C_DISABLE;
+      break;
+
+    default:
+      *val = LIS2DLC12_I2C_ENABLE;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Connect/Disconnects pull-up in if_cs pad.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of if_cs_pu_dis in reg FIFO_CTRL
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_cs_mode_set(const stmdev_ctx_t *ctx,
+                             lis2dlc12_if_cs_pu_dis_t val)
+{
+  lis2dlc12_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                          (uint8_t *)&fifo_ctrl, 1);
+
+  if (ret == 0)
+  {
+    fifo_ctrl.if_cs_pu_dis = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                             (uint8_t *)&fifo_ctrl, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Connect/Disconnects pull-up in if_cs pad.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of if_cs_pu_dis in reg FIFO_CTRL.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_cs_mode_get(const stmdev_ctx_t *ctx,
+                             lis2dlc12_if_cs_pu_dis_t *val)
+{
+  lis2dlc12_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                          (uint8_t *)&fifo_ctrl, 1);
+
+  switch (fifo_ctrl.if_cs_pu_dis)
+  {
+    case LIS2DLC12_PULL_UP_CONNECTED:
+      *val = LIS2DLC12_PULL_UP_CONNECTED;
+      break;
+
+    case LIS2DLC12_PULL_UP_DISCONNECTED:
+      *val = LIS2DLC12_PULL_UP_DISCONNECTED;
+      break;
+
+    default:
+      *val = LIS2DLC12_PULL_UP_CONNECTED;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup   Serial Interface
+  * @brief      This section groups all the functions concerning main serial
+  *             interface management (not auxiliary)
+  * @{
+  *
+  */
+
+/**
+  * @brief  Push-pull/open-drain selection on interrupt pad.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of pp_od in reg CTRL3
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_mode_set(const stmdev_ctx_t *ctx, lis2dlc12_pp_od_t val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret == 0)
+  {
+    ctrl3.pp_od = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Push-pull/open-drain selection on interrupt pad.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of pp_od in reg CTRL3.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_mode_get(const stmdev_ctx_t *ctx,
+                              lis2dlc12_pp_od_t *val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  switch (ctrl3.pp_od)
+  {
+    case LIS2DLC12_PUSH_PULL:
+      *val = LIS2DLC12_PUSH_PULL;
+      break;
+
+    case LIS2DLC12_OPEN_DRAIN:
+      *val = LIS2DLC12_OPEN_DRAIN;
+      break;
+
+    default:
+      *val = LIS2DLC12_PUSH_PULL;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  pin_polarity:   Interrupt active-high/low.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of h_lactive in reg CTRL3
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_polarity_set(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_h_lactive_t val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret == 0)
+  {
+    ctrl3.h_lactive = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Interrupt active-high/low.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of h_lactive in reg CTRL3.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_polarity_get(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_h_lactive_t *val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  switch (ctrl3.h_lactive)
+  {
+    case LIS2DLC12_ACTIVE_HIGH:
+      *val = LIS2DLC12_ACTIVE_HIGH;
+      break;
+
+    case LIS2DLC12_ACTIVE_LOW:
+      *val = LIS2DLC12_ACTIVE_LOW;
+      break;
+
+    default:
+      *val = LIS2DLC12_ACTIVE_HIGH;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Latched/pulsed interrupt.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of lir in reg CTRL3
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_int_notification_set(const stmdev_ctx_t *ctx,
+                                      lis2dlc12_lir_t val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret == 0)
+  {
+    ctrl3.lir = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Latched/pulsed interrupt.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of lir in reg CTRL3.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_int_notification_get(const stmdev_ctx_t *ctx,
+                                      lis2dlc12_lir_t *val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  switch (ctrl3.lir)
+  {
+    case LIS2DLC12_INT_PULSED:
+      *val = LIS2DLC12_INT_PULSED;
+      break;
+
+    case LIS2DLC12_INT_LATCHED:
+      *val = LIS2DLC12_INT_LATCHED;
+      break;
+
+    default:
+      *val = LIS2DLC12_INT_PULSED;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Select the signal that need to route on int1 pad.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change union of registers from CTRL4 to
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_int1_route_set(const stmdev_ctx_t *ctx,
+                                    lis2dlc12_pin_int1_route_t val)
+{
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  lis2dlc12_ctrl4_t ctrl4;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  if (ret == 0)
+  {
+    ctrl4.int1_drdy         = (uint8_t)val.int1_drdy;
+    ctrl4.int1_fth          = (uint8_t)val.int1_fth;
+    ctrl4.int1_6d           = (uint8_t)val.int1_6d;
+    ctrl4.int1_tap          = (uint8_t)val.int1_tap;
+    ctrl4.int1_ff           = (uint8_t)val.int1_ff;
+    ctrl4.int1_wu           = (uint8_t)val.int1_wu;
+    ctrl4.int1_s_tap        = (uint8_t)val.int1_s_tap;
+    ctrl4.int1_master_drdy  = (uint8_t)val.int1_master_drdy;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL4, (uint8_t *)&ctrl4, 1);
+  }
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                            (uint8_t *)&wake_up_dur, 1);
+  }
+
+  if (ret == 0)
+  {
+    wake_up_dur.int1_fss7   = (uint8_t)val.int1_fss7;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                             (uint8_t *)&wake_up_dur, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Select the signal that need to route on int1 pad.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get union of registers from CTRL4 to.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_int1_route_get(const stmdev_ctx_t *ctx,
+                                    lis2dlc12_pin_int1_route_t *val)
+{
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  lis2dlc12_ctrl4_t ctrl4;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  if (ret == 0)
+  {
+    val->int1_drdy          = ctrl4.int1_drdy;
+    val->int1_fth           = ctrl4.int1_fth;
+    val->int1_6d            = ctrl4.int1_6d;
+    val->int1_tap           = ctrl4.int1_tap;
+    val->int1_ff            = ctrl4.int1_ff;
+    val->int1_wu            = ctrl4.int1_wu;
+    val->int1_s_tap         = ctrl4.int1_s_tap;
+    val->int1_master_drdy   = ctrl4.int1_master_drdy;
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                            (uint8_t *)&wake_up_dur, 1);
+    val->int1_fss7 = wake_up_dur.int1_fss7;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Select the signal that need to route on int2 pad.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change union of registers from CTRL5 to
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_int2_route_set(const stmdev_ctx_t *ctx,
+                                    lis2dlc12_pin_int2_route_t val)
+{
+  lis2dlc12_ctrl5_t ctrl5;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret == 0)
+  {
+    ctrl5.int2_boot       = val.int2_boot;
+    ctrl5.int2_tilt       = val.int2_tilt;
+    ctrl5.int2_fth        = val.int2_fth;
+    ctrl5.int2_drdy       = val.int2_drdy;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Select the signal that need to route on int2 pad.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get union of registers from CTRL5 to.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_pin_int2_route_get(const stmdev_ctx_t *ctx,
+                                    lis2dlc12_pin_int2_route_t *val)
+{
+  lis2dlc12_ctrl5_t ctrl5;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+  val->int2_boot     = ctrl5.int2_boot;
+  val->int2_tilt     = ctrl5.int2_tilt;
+  val->int2_fth      = ctrl5.int2_fth;
+  val->int2_drdy     = ctrl5.int2_drdy;
+
+  return ret;
+}
+
+/**
+  * @brief  All interrupt signals become available on INT1 pin.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of int2_on_int1 in reg CTRL5
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_all_on_int1_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_ctrl5_t ctrl5;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+
+  if (ret == 0)
+  {
+    ctrl5.int2_on_int1 = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  All interrupt signals become available on INT1 pin.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of int2_on_int1 in reg CTRL5.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_all_on_int1_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_ctrl5_t ctrl5;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL5, (uint8_t *)&ctrl5, 1);
+  *val = ctrl5.int2_on_int1;
+
+  return ret;
+}
+
+/**
+  * @defgroup  Wake_Up_event
+  * @brief     This section groups all the functions that manage the Wake Up
+  *            event generation.
+  * @{
+  *
+  */
+
+/**
+  * @brief  Threshold for wakeup [1 LSb = FS_XL / 64].[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of wu_ths in reg WAKE_UP_THS
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_wkup_threshold_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_wake_up_ths_t wake_up_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                          (uint8_t *)&wake_up_ths, 1);
+
+  if (ret == 0)
+  {
+    wake_up_ths.wu_ths = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                             (uint8_t *)&wake_up_ths, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Threshold for wakeup [1 LSb = FS_XL / 64].[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of wu_ths in reg WAKE_UP_THS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_wkup_threshold_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_wake_up_ths_t wake_up_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                          (uint8_t *)&wake_up_ths, 1);
+  *val = wake_up_ths.wu_ths;
+
+  return ret;
+}
+
+/**
+  * @brief  Wakeup duration [1 LSb = 1 / ODR].[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of wu_dur in reg WAKE_UP_DUR
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_wkup_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                          (uint8_t *)&wake_up_dur, 1);
+
+  if (ret == 0)
+  {
+    wake_up_dur.wu_dur = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                             (uint8_t *)&wake_up_dur, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Wakeup duration [1 LSb = 1 / ODR].[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of wu_dur in reg WAKE_UP_DUR.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_wkup_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                          (uint8_t *)&wake_up_dur, 1);
+  *val = wake_up_dur.wu_dur;
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup   Activity/Inactivity detection
+  * @brief      This section groups all the functions concerning
+  *             activity/inactivity detection.
+  * @{
+  *
+  */
+
+/**
+  * @brief  Enables Sleep mode.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of sleep_on in reg WAKE_UP_THS
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_sleep_mode_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_wake_up_ths_t wake_up_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                          (uint8_t *)&wake_up_ths, 1);
+
+  if (ret == 0)
+  {
+    wake_up_ths.sleep_on = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                             (uint8_t *)&wake_up_ths, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Enables Sleep mode.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of sleep_on in reg WAKE_UP_THS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_sleep_mode_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_wake_up_ths_t wake_up_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                          (uint8_t *)&wake_up_ths, 1);
+  *val = wake_up_ths.sleep_on;
+
+  return ret;
+}
+
+/**
+  * @brief  Duration to go in sleep mode [1 LSb = 512 / ODR].[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of sleep_dur in reg WAKE_UP_DUR
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_act_sleep_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                          (uint8_t *)&wake_up_dur, 1);
+
+  if (ret == 0)
+  {
+    wake_up_dur.sleep_dur = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                             (uint8_t *)&wake_up_dur, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Duration to go in sleep mode [1 LSb = 512 / ODR].[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of sleep_dur in reg WAKE_UP_DUR.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_act_sleep_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                          (uint8_t *)&wake_up_dur, 1);
+  *val = wake_up_dur.sleep_dur;
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  Tap Generator
+  * @brief     This section groups all the functions that manage the tap and
+  *            double tap event generation.
+  * @{
+  *
+  */
+
+/**
+  * @brief  Enable Z direction in tap recognition.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of tap_z_en in reg CTRL3
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_detection_on_z_set(const stmdev_ctx_t *ctx,
+                                        uint8_t val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret == 0)
+  {
+    ctrl3.tap_z_en = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Enable Z direction in tap recognition.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of tap_z_en in reg CTRL3.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_detection_on_z_get(const stmdev_ctx_t *ctx,
+                                        uint8_t *val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  *val = ctrl3.tap_z_en;
+
+  return ret;
+}
+
+/**
+  * @brief  Enable Y direction in tap recognition.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of tap_y_en in reg CTRL3
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_detection_on_y_set(const stmdev_ctx_t *ctx,
+                                        uint8_t val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret == 0)
+  {
+    ctrl3.tap_y_en = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Enable Y direction in tap recognition.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of tap_y_en in reg CTRL3.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_detection_on_y_get(const stmdev_ctx_t *ctx,
+                                        uint8_t *val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  *val = ctrl3.tap_y_en;
+
+  return ret;
+}
+
+/**
+  * @brief  Enable X direction in tap recognition.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of tap_x_en in reg CTRL3
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_detection_on_x_set(const stmdev_ctx_t *ctx,
+                                        uint8_t val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  if (ret == 0)
+  {
+    ctrl3.tap_x_en = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Enable X direction in tap recognition.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of tap_x_en in reg CTRL3.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_detection_on_x_get(const stmdev_ctx_t *ctx,
+                                        uint8_t *val)
+{
+  lis2dlc12_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_CTRL3, (uint8_t *)&ctrl3, 1);
+  *val = ctrl3.tap_x_en;
+
+  return ret;
+}
+
+/**
+  * @brief  Threshold for tap recognition [1 LSb = FS/32].[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of tap_ths in reg TAP_6D_THS
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_threshold_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_tap_6d_ths_t tap_6d_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                          (uint8_t *)&tap_6d_ths, 1);
+
+  if (ret == 0)
+  {
+    tap_6d_ths.tap_ths = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                             (uint8_t *)&tap_6d_ths, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Threshold for tap recognition [1 LSb = FS/32].[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of tap_ths in reg TAP_6D_THS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_threshold_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_tap_6d_ths_t tap_6d_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                          (uint8_t *)&tap_6d_ths, 1);
+  *val = tap_6d_ths.tap_ths;
+
+  return ret;
+}
+
+/**
+  * @brief  Maximum duration is the maximum time of an overthreshold signal
+  *         detection to be recognized as a tap event. The default value of
+  *         these bits is 00b which corresponds to 4*ODR_XL time.
+  *         If the SHOCK[1:0] bits are set to a different value, 1LSB
+  *         corresponds to 8*ODR_XL time.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of shock in reg INT_DUR
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_shock_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_int_dur_t int_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+
+  if (ret == 0)
+  {
+    int_dur.shock = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Maximum duration is the maximum time of an overthreshold signal
+  *         detection to be recognized as a tap event. The default value of
+  *         these bits is 00b which corresponds to 4*ODR_XL time.
+  *         If the SHOCK[1:0] bits are set to a different value, 1LSB
+  *         corresponds to 8*ODR_XL time.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of shock in reg INT_DUR.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_shock_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_int_dur_t int_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+  *val = int_dur.shock;
+
+  return ret;
+}
+
+/**
+  * @brief  Quiet time is the time after the first detected tap in which there
+  *         must not be any overthreshold event. The default value of these
+  *         bits is 00b which corresponds to 2*ODR_XL time.
+  *         If the QUIET[1:0] bits are set to a different value, 1LSB
+  *         corresponds to 4*ODR_XL time.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of quiet in reg INT_DUR
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_quiet_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_int_dur_t int_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+
+  if (ret == 0)
+  {
+    int_dur.quiet = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Quiet time is the time after the first detected tap in which there
+  *         must not be any overthreshold event. The default value of these
+  *         bits is 00b which corresponds to 2*ODR_XL time.
+  *         If the QUIET[1:0] bits are set to a different value, 1LSB
+  *         corresponds to 4*ODR_XL time.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of quiet in reg INT_DUR.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_quiet_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_int_dur_t int_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+  *val = int_dur.quiet;
+
+  return ret;
+}
+
+/**
+  * @brief  When double tap recognition is enabled, this register expresses the
+  *         maximum time between two consecutive detected taps to determine a
+  *         double tap event. The default value of these bits is 0000b which
+  *         corresponds to 16*ODR_XL time. If the DUR[3:0] bits are set to a
+  *         different value, 1LSB corresponds to 32*ODR_XL time.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of lat in reg INT_DUR
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_int_dur_t int_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+
+  if (ret == 0)
+  {
+    int_dur.lat = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  When double tap recognition is enabled, this register expresses the
+  *         maximum time between two consecutive detected taps to determine a
+  *         double tap event. The default value of these bits is 0000b which
+  *         corresponds to 16*ODR_XL time. If the DUR[3:0] bits are set to a
+  *         different value, 1LSB corresponds to 32*ODR_XL time.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of lat in reg INT_DUR.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_int_dur_t int_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_INT_DUR, (uint8_t *)&int_dur, 1);
+  *val = int_dur.lat;
+
+  return ret;
+}
+
+/**
+  * @brief  Single/double-tap event enable/disable.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of single_double_tap in regWAKE_UP_THS
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_mode_set(const stmdev_ctx_t *ctx,
+                              lis2dlc12_single_double_tap_t val)
+{
+  lis2dlc12_wake_up_ths_t wake_up_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                          (uint8_t *)&wake_up_ths, 1);
+
+  if (ret == 0)
+  {
+    wake_up_ths.single_double_tap = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                             (uint8_t *)&wake_up_ths, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Single/double-tap event enable/disable.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of single_double_tap in reg WAKE_UP_THS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_mode_get(const stmdev_ctx_t *ctx,
+                              lis2dlc12_single_double_tap_t *val)
+{
+  lis2dlc12_wake_up_ths_t wake_up_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_THS,
+                          (uint8_t *)&wake_up_ths, 1);
+
+  switch (wake_up_ths.single_double_tap)
+  {
+    case LIS2DLC12_ONLY_SINGLE:
+      *val = LIS2DLC12_ONLY_SINGLE;
+      break;
+
+    case LIS2DLC12_ONLY_DOUBLE:
+      *val = LIS2DLC12_ONLY_DOUBLE;
+      break;
+
+    default:
+      *val = LIS2DLC12_ONLY_SINGLE;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  TAP source register[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get registers TAP_SRC.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tap_src_get(const stmdev_ctx_t *ctx,
+                             lis2dlc12_tap_src_t *val)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_SRC, (uint8_t *) val, 1);
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup   Six_position_detection(6D/4D)
+  * @brief      This section groups all the functions concerning six
+  *             position detection (6D).
+  * @{
+  *
+  */
+
+/**
+  * @brief  Threshold for 4D/6D function.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of 6d_ths in reg TAP_6D_THS
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_6d_threshold_set(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_6d_ths_t val)
+{
+  lis2dlc12_tap_6d_ths_t tap_6d_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                          (uint8_t *)&tap_6d_ths, 1);
+
+  if (ret == 0)
+  {
+    tap_6d_ths._6d_ths = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                             (uint8_t *)&tap_6d_ths, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Threshold for 4D/6D function.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of 6d_ths in reg TAP_6D_THS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_6d_threshold_get(const stmdev_ctx_t *ctx,
+                                  lis2dlc12_6d_ths_t *val)
+{
+  lis2dlc12_tap_6d_ths_t tap_6d_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                          (uint8_t *)&tap_6d_ths, 1);
+
+  switch (tap_6d_ths._6d_ths)
+  {
+    case LIS2DLC12_DEG_80:
+      *val = LIS2DLC12_DEG_80;
+      break;
+
+    case LIS2DLC12_DEG_70:
+      *val = LIS2DLC12_DEG_70;
+      break;
+
+    case LIS2DLC12_DEG_60:
+      *val = LIS2DLC12_DEG_60;
+      break;
+
+    case LIS2DLC12_DEG_50:
+      *val = LIS2DLC12_DEG_50;
+      break;
+
+    default:
+      *val = LIS2DLC12_DEG_80;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  4D orientation detection enable.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of 4d_en in reg TAP_6D_THS
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_4d_mode_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_tap_6d_ths_t tap_6d_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                          (uint8_t *)& tap_6d_ths, 1);
+
+  if (ret == 0)
+  {
+    tap_6d_ths._4d_en = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                             (uint8_t *)& tap_6d_ths, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  4D orientation detection enable.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of 4d_en in reg TAP_6D_THS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_4d_mode_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_tap_6d_ths_t tap_6d_ths;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_TAP_6D_THS,
+                          (uint8_t *)&tap_6d_ths, 1);
+  *val = tap_6d_ths._4d_en;
+
+  return ret;
+}
+
+/**
+  * @brief  6D source register.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get union of registers from 6D_SRC to.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_6d_src_get(const stmdev_ctx_t *ctx, lis2dlc12_6d_src_t *val)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_6D_SRC, (uint8_t *) val, 1);
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  free_fall
+  * @brief     This section group all the functions concerning the
+  *            free fall detection.
+  * @{
+  *
+  */
+
+/**
+  * @brief  Free-fall duration [1 LSb = 1 / ODR].[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of ff_dur in reg WAKE_UP_DUR/FREE_FALL
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_ff_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_free_fall_t free_fall;
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FREE_FALL,
+                          (uint8_t *)&free_fall, 1);
+
+  if (ret == 0)
+  {
+    free_fall.ff_dur =  val & 0x1FU;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FREE_FALL,
+                             (uint8_t *)&free_fall, 1);
+  }
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                            (uint8_t *)&wake_up_dur, 1);
+  }
+
+  if (ret == 0)
+  {
+    wake_up_dur.ff_dur = (val & 0x20U) >> 5;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                             (uint8_t *)&wake_up_dur, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Free-fall duration [1 LSb = 1 / ODR].[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of ff_dur in reg WAKE_UP_DUR/FREE_FALL.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_ff_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_free_fall_t free_fall;
+  lis2dlc12_wake_up_dur_t wake_up_dur;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FREE_FALL,
+                          (uint8_t *)&free_fall, 1);
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_WAKE_UP_DUR,
+                            (uint8_t *)&wake_up_dur, 1);
+    *val = (wake_up_dur.ff_dur << 5) + free_fall.ff_dur;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Free-fall threshold [1 LSB = 31.25 mg].[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of ff_ths in reg FREE_FALL
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_ff_threshold_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_free_fall_t free_fall;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FREE_FALL,
+                          (uint8_t *)&free_fall, 1);
+
+  if (ret == 0)
+  {
+    free_fall.ff_ths = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FREE_FALL,
+                             (uint8_t *)&free_fall, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Free-fall threshold [1 LSB = 31.25 mg].[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of ff_ths in reg FREE_FALL.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_ff_threshold_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_free_fall_t free_fall;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FREE_FALL,
+                          (uint8_t *)&free_fall, 1);
+  *val = free_fall.ff_ths;
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  Fifo
+  * @brief     This section group all the functions concerning the fifo usage
+  * @{
+  *
+  */
+
+/**
+  * @brief  Module routine result is send to FIFO instead of X,Y,Z
+  *         acceleration data[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of module_to_fifo in reg FIFO_CTRL
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_xl_module_batch_set(const stmdev_ctx_t *ctx,
+                                          uint8_t val)
+{
+  lis2dlc12_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                          (uint8_t *)&fifo_ctrl, 1);
+
+  if (ret == 0)
+  {
+    fifo_ctrl.module_to_fifo = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                             (uint8_t *)&fifo_ctrl, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief   Module routine result is send to FIFO instead of X,Y,Z
+  *          acceleration data[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of module_to_fifo in reg FIFO_CTRL.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_xl_module_batch_get(const stmdev_ctx_t *ctx,
+                                          uint8_t *val)
+{
+  lis2dlc12_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                          (uint8_t *)&fifo_ctrl, 1);
+  *val = fifo_ctrl.module_to_fifo;
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO mode selection.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of fmode in reg FIFO_CTRL
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_mode_set(const stmdev_ctx_t *ctx,
+                               lis2dlc12_fmode_t val)
+{
+  lis2dlc12_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                          (uint8_t *)&fifo_ctrl, 1);
+
+  if (ret == 0)
+  {
+    fifo_ctrl.fmode = (uint8_t)val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                             (uint8_t *)&fifo_ctrl, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO mode selection.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of fmode in reg FIFO_CTRL.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_mode_get(const stmdev_ctx_t *ctx,
+                               lis2dlc12_fmode_t *val)
+{
+  lis2dlc12_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_CTRL,
+                          (uint8_t *)&fifo_ctrl, 1);
+
+  switch (fifo_ctrl.fmode)
+  {
+    case LIS2DLC12_BYPASS_MODE:
+      *val = LIS2DLC12_BYPASS_MODE;
+      break;
+
+    case LIS2DLC12_FIFO_MODE:
+      *val = LIS2DLC12_FIFO_MODE;
+      break;
+
+    case LIS2DLC12_STREAM_TO_FIFO_MODE:
+      *val = LIS2DLC12_STREAM_TO_FIFO_MODE;
+      break;
+
+    case LIS2DLC12_BYPASS_TO_STREAM_MODE:
+      *val = LIS2DLC12_BYPASS_TO_STREAM_MODE;
+      break;
+
+    case LIS2DLC12_STREAM_MODE:
+      *val = LIS2DLC12_STREAM_MODE;
+      break;
+
+    default:
+      *val = LIS2DLC12_BYPASS_MODE;
+      break;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO watermark level selection.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of fifo_watermark in reg FIFO_THS
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_watermark_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FIFO_THS, (uint8_t *)&val, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO watermark level selection.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of fifo_watermark in reg FIFO_THS.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_watermark_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_THS, val, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO full, 256 unread samples.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of diff in reg FIFO_SRC.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_full_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_fifo_src_t fifo_src;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_SRC, (uint8_t *)&fifo_src, 1);
+  *val = fifo_src.diff;
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO overrun status.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of fifo_ovr in reg FIFO_SRC.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_ovr_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_fifo_src_t fifo_src;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_SRC, (uint8_t *)&fifo_src, 1);
+  *val = fifo_src.fifo_ovr;
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO threshold status.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of fth in reg FIFO_SRC.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_wtm_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_fifo_src_t fifo_src;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_SRC, (uint8_t *)&fifo_src, 1);
+  *val = fifo_src.fth;
+
+  return ret;
+}
+
+/**
+  * @brief  The number of unread samples stored in FIFO.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of diff in reg FIFO_SAMPLES.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_data_level_get(const stmdev_ctx_t *ctx, uint16_t *val)
+{
+  lis2dlc12_fifo_ths_t fifo_ths;
+  lis2dlc12_fifo_src_t fifo_src;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_THS, (uint8_t *)&fifo_ths, 1);
+
+  if (ret == 0)
+  {
+    ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_SRC, (uint8_t *)&fifo_src, 1);
+    *val = fifo_src.diff;
+    *val = (*val * 256U) +  fifo_ths.fth;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  FIFO_SRCregister.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get registers FIFO_SRC.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_fifo_src_get(const stmdev_ctx_t *ctx,
+                              lis2dlc12_fifo_src_t *val)
+{
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FIFO_SRC, (uint8_t *) val, 1);
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  tilt_detection
+  * @brief   This section groups all the functions that manage the tilt
+  *          event detection.
+  * @{
+  *
+  */
+
+/**
+  * @brief  Tilt event detection status.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of tilt_int in reg FUNC_CK_GATE.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tilt_data_ready_flag_get(const stmdev_ctx_t *ctx,
+                                          uint8_t *val)
+{
+  lis2dlc12_func_ck_gate_t func_ck_gate;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FUNC_CK_GATE,
+                          (uint8_t *)&func_ck_gate, 1);
+  *val = func_ck_gate.tilt_int;
+
+  return ret;
+}
+
+/**
+  * @brief  Enable tilt calculation.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param val     change the values of tilt_on in reg FUNC_CTRL
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tilt_sens_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_func_ctrl_t func_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FUNC_CTRL,
+                          (uint8_t *)&func_ctrl, 1);
+
+  if (ret == 0)
+  {
+    func_ctrl.tilt_on = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FUNC_CTRL,
+                             (uint8_t *)&func_ctrl, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Enable tilt calculation.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of tilt_on in reg FUNC_CTRL.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_tilt_sens_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_func_ctrl_t func_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FUNC_CTRL,
+                          (uint8_t *)&func_ctrl, 1);
+  *val = func_ctrl.tilt_on;
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  module
+  * @brief   This section groups all the functions that manage
+  *          module calculation
+  * @{
+  *
+  */
+
+/**
+  * @brief  Module processing enable.[set]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    change the values of module_on in reg FUNC_CTRL
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_module_sens_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lis2dlc12_func_ctrl_t func_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FUNC_CTRL,
+                          (uint8_t *)&func_ctrl, 1);
+
+  if (ret == 0)
+  {
+    func_ctrl.module_on = val;
+    ret = lis2dlc12_write_reg(ctx, LIS2DLC12_FUNC_CTRL,
+                             (uint8_t *)&func_ctrl, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Module processing enable.[get]
+  *
+  * @param  ctx    read / write interface definitions.(ptr)
+  * @param  val    Get the values of module_on in reg FUNC_CTRL.(ptr)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lis2dlc12_module_sens_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lis2dlc12_func_ctrl_t func_ctrl;
+  int32_t ret;
+
+  ret = lis2dlc12_read_reg(ctx, LIS2DLC12_FUNC_CTRL,
+                          (uint8_t *)&func_ctrl, 1);
+  *val = func_ctrl.module_on;
+
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
