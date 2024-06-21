@@ -189,7 +189,7 @@
                 <option>
                     <name>TrustZoneModes</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGAarch64Abi</name>
@@ -448,6 +448,8 @@
                     <state>C:\Users\visconta\Projects\STdC\asm330lhbg1_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\st1vafe6ax_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\stts22h_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\lps25hb_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\lps33k_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2273,17 +2275,38 @@
         <group>
             <name>lps22hb</name>
             <file>
+                <name>$PROJ_DIR$\..\..\lps22hb_STdC\examples\lps22hb_multi_read_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps22hb_STdC\examples\lps22hb_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps22hb_STdC\examples\lps22hb_read_one_shot.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\lps22hb_STdC\driver\lps22hb_reg.c</name>
             </file>
         </group>
         <group>
             <name>lps22hh</name>
             <file>
+                <name>$PROJ_DIR$\..\..\lps22hh_STdC\examples\lps22hh_read_data_drdy.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps22hh_STdC\examples\lps22hh_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps22hh_STdC\examples\lps22hh_read_fifo_irq.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\lps22hh_STdC\driver\lps22hh_reg.c</name>
             </file>
         </group>
         <group>
             <name>lps25hb</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps25hb_STdC\examples\lps25hb_read_data_polling.c</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lps25hb_STdC\driver\lps25hb_reg.c</name>
             </file>
@@ -2320,6 +2343,12 @@
         </group>
         <group>
             <name>lps33k</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps33k_STdC\examples\lps33k_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps33k_STdC\examples\lps33k_read_one_shot.c</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lps33k_STdC\driver\lps33k_reg.c</name>
             </file>
