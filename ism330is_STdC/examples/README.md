@@ -22,7 +22,7 @@ Read accelerometer, gyroscope and temperature sensor data in both interrupt (drd
 ## ISPU
 
 Program ISM330IS ISPU to compute the norm of the three axes of the accelerometer
-(read more [here](https://github.com/STMicroelectronics/ispu-examples/blob/master//ism330is_ism330is/norm/README.md):
+(read more [here](https://github.com/STMicroelectronics/ispu-examples/blob/master//ism330is_lsm6dso16is/norm/README.md):
 
   - ism330is_ispu_norm.c
 
