@@ -1,4 +1,4 @@
-# L3GD20H
+# L3GD20
 
 The L3GD20 is a low-power three-axis angular
 rate sensor.
@@ -26,5 +26,5 @@ The L3GD20 is available in a plastic land grid
 array (LGA) package and can operate within a
 temperature range of -40 °C to +85 °C.
 
-For more info, please visit the device page at [https://www.st.com/en/mems-and-sensors/l3gd20h.html](https://www.st.com/en/mems-and-sensors/l3gd20h.html)
+For more info, please visit the device page at [https://www.st.com/en/mems-and-sensors/l3gd20.html](https://www.st.com/en/mems-and-sensors/l3gd20.html)
 
