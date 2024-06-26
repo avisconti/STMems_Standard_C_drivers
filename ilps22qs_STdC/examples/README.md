@@ -20,5 +20,5 @@ Read pressure and temperature sensor data from FIFO on FIFO threshold event:
 
 Program ILPS22QS to read AH_QVAR data:
 
-  - ilps22qs_qvar_read_data.c
+  - ilps22qs_qvar_read_data_polling.c
 
