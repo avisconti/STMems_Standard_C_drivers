@@ -1133,9 +1133,15 @@ typedef struct
   uint8_t is_mlc2                      : 1;
   uint8_t is_mlc3                      : 1;
   uint8_t is_mlc4                      : 1;
-  uint8_t not_used0                    : 4;
+  uint8_t is_mlc5                      : 1;
+  uint8_t is_mlc6                      : 1;
+  uint8_t is_mlc7                      : 1;
+  uint8_t not_used0                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 4;
+  uint8_t not_used0                    : 1;
+  uint8_t is_mlc7                      : 1;
+  uint8_t is_mlc6                      : 1;
+  uint8_t is_mlc5                      : 1;
   uint8_t is_mlc4                      : 1;
   uint8_t is_mlc3                      : 1;
   uint8_t is_mlc2                      : 1;
@@ -1172,9 +1178,13 @@ typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint8_t xl_hg_st                     : 2;
-  uint8_t not_used0                    : 6;
+  uint8_t not_used0                    : 2;
+  uint8_t hg_usr_off_on_wu             : 1;
+  uint8_t not_used1                    : 3;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 6;
+  uint8_t not_used1                    : 3;
+  uint8_t hg_usr_off_on_wu             : 1;
+  uint8_t not_used0                    : 2;
   uint8_t xl_hg_st                     : 2;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_ctrl2_xl_hg_t;
@@ -1274,9 +1284,11 @@ typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint8_t inact_ths                    : 6;
-  uint8_t not_used0                    : 2;
+  uint8_t int1_hg_shock_change         : 1;
+  uint8_t int2_hg_shock_change         : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 2;
+  uint8_t int2_hg_shock_change         : 1;
+  uint8_t int1_hg_shock_change         : 1;
   uint8_t inact_ths                    : 6;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_inactivity_ths_t;
@@ -2183,9 +2195,15 @@ typedef struct
   uint8_t int1_mlc2                    : 1;
   uint8_t int1_mlc3                    : 1;
   uint8_t int1_mlc4                    : 1;
-  uint8_t not_used0                    : 4;
+  uint8_t int1_mlc5                    : 1;
+  uint8_t int1_mlc6                    : 1;
+  uint8_t int1_mlc7                    : 1;
+  uint8_t not_used0                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 4;
+  uint8_t not_used0                    : 1;
+  uint8_t int1_mlc7                    : 1;
+  uint8_t int1_mlc6                    : 1;
+  uint8_t int1_mlc5                    : 1;
   uint8_t int1_mlc4                    : 1;
   uint8_t int1_mlc3                    : 1;
   uint8_t int1_mlc2                    : 1;
@@ -2245,9 +2263,15 @@ typedef struct
   uint8_t int2_mlc2                    : 1;
   uint8_t int2_mlc3                    : 1;
   uint8_t int2_mlc4                    : 1;
-  uint8_t not_used0                    : 4;
+  uint8_t int2_mlc5                    : 1;
+  uint8_t int2_mlc6                    : 1;
+  uint8_t int2_mlc7                    : 1;
+  uint8_t not_used0                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 4;
+  uint8_t not_used0                    : 1;
+  uint8_t int2_mlc7                    : 1;
+  uint8_t int2_mlc6                    : 1;
+  uint8_t int2_mlc5                    : 1;
   uint8_t int2_mlc4                    : 1;
   uint8_t int2_mlc3                    : 1;
   uint8_t int2_mlc2                    : 1;
@@ -2307,9 +2331,15 @@ typedef struct
   uint8_t is_mlc2                      : 1;
   uint8_t is_mlc3                      : 1;
   uint8_t is_mlc4                      : 1;
-  uint8_t not_used0                    : 4;
+  uint8_t is_mlc5                      : 1;
+  uint8_t is_mlc6                      : 1;
+  uint8_t is_mlc7                      : 1;
+  uint8_t not_used0                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 4;
+  uint8_t not_used0                    : 1;
+  uint8_t is_mlc7                      : 1;
+  uint8_t is_mlc6                      : 1;
+  uint8_t is_mlc5                      : 1;
   uint8_t is_mlc4                      : 1;
   uint8_t is_mlc3                      : 1;
   uint8_t is_mlc2                      : 1;
@@ -3058,6 +3088,36 @@ typedef struct
   uint8_t mlc4_src                     : 8;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_mlc4_src_t;
+
+#define LSM6DSV320X_MLC5_SRC                       0x74U
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t mlc5_src                     : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t mlc5_src                     : 8;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv320x_mlc5_src_t;
+
+#define LSM6DSV320X_MLC6_SRC                       0x75U
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t mlc6_src                     : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t mlc6_src                     : 8;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv320x_mlc6_src_t;
+
+#define LSM6DSV320X_MLC7_SRC                       0x76U
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t mlc7_src                     : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t mlc7_src                     : 8;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv320x_mlc7_src_t;
 
 /**
   * @}
@@ -4126,6 +4186,9 @@ typedef union
   lsm6dsv320x_mlc2_src_t                 mlc2_src;
   lsm6dsv320x_mlc3_src_t                 mlc3_src;
   lsm6dsv320x_mlc4_src_t                 mlc4_src;
+  lsm6dsv320x_mlc5_src_t                 mlc5_src;
+  lsm6dsv320x_mlc6_src_t                 mlc6_src;
+  lsm6dsv320x_mlc7_src_t                 mlc7_src;
   /* Embedded functions extended page 0 registers */
   lsm6dsv320x_fsm_ext_sensitivity_l_t    fsm_ext_sensitivity_l;
   lsm6dsv320x_fsm_ext_sensitivity_h_t    fsm_ext_sensitivity_h;
@@ -4326,16 +4389,16 @@ typedef enum
   LSM6DSV320X_ODR_HA01_AT_2000Hz   = 0x1A,
   LSM6DSV320X_ODR_HA01_AT_4000Hz   = 0x1B,
   LSM6DSV320X_ODR_HA01_AT_8000Hz   = 0x1C,
-  LSM6DSV320X_ODR_HA02_AT_12Hz5    = 0x23,
-  LSM6DSV320X_ODR_HA02_AT_25Hz     = 0x24,
-  LSM6DSV320X_ODR_HA02_AT_50Hz     = 0x25,
-  LSM6DSV320X_ODR_HA02_AT_100Hz    = 0x26,
-  LSM6DSV320X_ODR_HA02_AT_200Hz    = 0x27,
-  LSM6DSV320X_ODR_HA02_AT_400Hz    = 0x28,
-  LSM6DSV320X_ODR_HA02_AT_800Hz    = 0x29,
-  LSM6DSV320X_ODR_HA02_AT_1600Hz   = 0x2A,
-  LSM6DSV320X_ODR_HA02_AT_3200Hz   = 0x2B,
-  LSM6DSV320X_ODR_HA02_AT_6400Hz   = 0x2C,
+  LSM6DSV320X_ODR_HA02_AT_13Hz     = 0x23,
+  LSM6DSV320X_ODR_HA02_AT_26Hz     = 0x24,
+  LSM6DSV320X_ODR_HA02_AT_52Hz     = 0x25,
+  LSM6DSV320X_ODR_HA02_AT_104Hz    = 0x26,
+  LSM6DSV320X_ODR_HA02_AT_208Hz    = 0x27,
+  LSM6DSV320X_ODR_HA02_AT_417Hz    = 0x28,
+  LSM6DSV320X_ODR_HA02_AT_833Hz    = 0x29,
+  LSM6DSV320X_ODR_HA02_AT_1667Hz   = 0x2A,
+  LSM6DSV320X_ODR_HA02_AT_3333Hz   = 0x2B,
+  LSM6DSV320X_ODR_HA02_AT_6667Hz   = 0x2C,
 } lsm6dsv320x_data_rate_t;
 int32_t lsm6dsv320x_xl_data_rate_set(const stmdev_ctx_t *ctx,
                                      lsm6dsv320x_data_rate_t val);
@@ -4437,6 +4500,9 @@ int32_t lsm6dsv320x_hg_wu_interrupt_cfg_set(const stmdev_ctx_t *ctx,
                                             lsm6dsv320x_hg_wu_interrupt_cfg_t val);
 int32_t lsm6dsv320x_hg_wu_interrupt_cfg_get(const stmdev_ctx_t *ctx,
                                             lsm6dsv320x_hg_wu_interrupt_cfg_t *val);
+
+int32_t lsm6dsv320x_hg_wu_usr_off_correction_set(const stmdev_ctx_t *ctx, uint8_t val);
+int32_t lsm6dsv320x_hg_wu_usr_off_correction_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 typedef struct
 {
@@ -4570,6 +4636,9 @@ typedef struct
   uint8_t mlc2                         : 1;
   uint8_t mlc3                         : 1;
   uint8_t mlc4                         : 1;
+  uint8_t mlc5                         : 1;
+  uint8_t mlc6                         : 1;
+  uint8_t mlc7                         : 1;
   uint8_t sh_endop                     : 1;
   uint8_t sh_target0_nack              : 1;
   uint8_t sh_target1_nack              : 1;
@@ -4587,7 +4656,6 @@ int32_t lsm6dsv320x_all_sources_get(const stmdev_ctx_t *ctx,
 typedef struct
 {
   uint8_t drdy_xl                      : 1;
-  uint8_t drdy_hg_xl                   : 1;
   uint8_t drdy_g                       : 1;
   uint8_t drdy_g_eis                   : 1;
   uint8_t drdy_temp                    : 1;
@@ -4595,26 +4663,60 @@ typedef struct
   uint8_t fifo_ovr                     : 1;
   uint8_t fifo_full                    : 1;
   uint8_t cnt_bdr                      : 1;
-  uint8_t emb_func_endop               : 1;
   uint8_t timestamp                    : 1;
   uint8_t shub                         : 1;
-  uint8_t emb_func                     : 1;
   uint8_t sixd                         : 1;
   uint8_t single_tap                   : 1;
   uint8_t double_tap                   : 1;
   uint8_t wakeup                       : 1;
   uint8_t freefall                     : 1;
   uint8_t sleep_change                 : 1;
+  uint8_t drdy_hg_xl                   : 1; /* High-g */
   uint8_t hg_wakeup                    : 1;
+  uint8_t hg_shock_change              : 1;
+  uint8_t step_detector                : 1; /* Embedded Functions */
+  uint8_t tilt                         : 1;
+  uint8_t sig_mot                      : 1;
+  uint8_t emb_func_endop               : 1;
+  uint8_t fsm1                         : 1; /* FSM */
+  uint8_t fsm2                         : 1;
+  uint8_t fsm3                         : 1;
+  uint8_t fsm4                         : 1;
+  uint8_t fsm5                         : 1;
+  uint8_t fsm6                         : 1;
+  uint8_t fsm7                         : 1;
+  uint8_t fsm8                         : 1;
+  uint8_t mlc1                         : 1; /* MLC */
+  uint8_t mlc2                         : 1;
+  uint8_t mlc3                         : 1;
+  uint8_t mlc4                         : 1;
+  uint8_t mlc5                         : 1;
+  uint8_t mlc6                         : 1;
+  uint8_t mlc7                         : 1;
 } lsm6dsv320x_pin_int_route_t;
-int32_t lsm6dsv320x_pin_int1_route_set(const stmdev_ctx_t *ctx,
-                                       lsm6dsv320x_pin_int_route_t *val);
-int32_t lsm6dsv320x_pin_int1_route_get(const stmdev_ctx_t *ctx,
-                                       lsm6dsv320x_pin_int_route_t *val);
-int32_t lsm6dsv320x_pin_int2_route_set(const stmdev_ctx_t *ctx,
-                                       lsm6dsv320x_pin_int_route_t *val);
-int32_t lsm6dsv320x_pin_int2_route_get(const stmdev_ctx_t *ctx,
-                                       lsm6dsv320x_pin_int_route_t *val);
+
+int32_t lsm6dsv320x_pin_int1_route_set(const stmdev_ctx_t *ctx, lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int1_route_get(const stmdev_ctx_t *ctx, lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int2_route_set(const stmdev_ctx_t *ctx, lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int2_route_get(const stmdev_ctx_t *ctx, lsm6dsv320x_pin_int_route_t *val);
+
+int32_t lsm6dsv320x_pin_int1_route_hg_set(const stmdev_ctx_t *ctx,
+                                          lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int1_route_hg_get(const stmdev_ctx_t *ctx,
+                                          lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int2_route_hg_set(const stmdev_ctx_t *ctx,
+                                          lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int2_route_hg_get(const stmdev_ctx_t *ctx,
+                                          lsm6dsv320x_pin_int_route_t *val);
+
+int32_t lsm6dsv320x_pin_int1_route_embedded_set(const stmdev_ctx_t *ctx,
+                                                lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int1_route_embedded_get(const stmdev_ctx_t *ctx,
+                                                lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int2_route_embedded_set(const stmdev_ctx_t *ctx,
+                                                lsm6dsv320x_pin_int_route_t *val);
+int32_t lsm6dsv320x_pin_int2_route_embedded_get(const stmdev_ctx_t *ctx,
+                                                lsm6dsv320x_pin_int_route_t *val);
 
 typedef struct
 {
@@ -5250,6 +5352,9 @@ typedef struct
   uint8_t mlc2_src;
   uint8_t mlc3_src;
   uint8_t mlc4_src;
+  uint8_t mlc5_src;
+  uint8_t mlc6_src;
+  uint8_t mlc7_src;
 } lsm6dsv320x_mlc_out_t;
 int32_t lsm6dsv320x_mlc_out_get(const stmdev_ctx_t *ctx, lsm6dsv320x_mlc_out_t *val);
 

@@ -197,8 +197,8 @@ void lsm6dsv320x_hg_wakeup(void)
 
   /* enable interrupt on HG wakeup */
   pin_int.hg_wakeup = PROPERTY_ENABLE;
-  lsm6dsv320x_pin_int1_route_set(&dev_ctx, &pin_int);
-  //lsm6dsv320x_pin_int2_route_set(&dev_ctx, &pin_int);
+  lsm6dsv320x_pin_int1_route_hg_set(&dev_ctx, &pin_int);
+  //lsm6dsv320x_pin_int2_route_hg_set(&dev_ctx, &pin_int);
 
   int_cfg.hg_interrupts_enable = 1;
   lsm6dsv320x_hg_wu_interrupt_cfg_set(&dev_ctx, int_cfg);

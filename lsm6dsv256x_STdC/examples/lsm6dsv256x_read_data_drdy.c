@@ -203,8 +203,8 @@ void lsm6dsv256x_read_data_drdy(void)
 
   /* enable interrupt on High-G XL (sensor at highest frequency) */
   pin_int.drdy_hg_xl = PROPERTY_ENABLE;
-  lsm6dsv256x_pin_int1_route_set(&dev_ctx, &pin_int);
-  //lsm6dsv256x_pin_int2_route_set(&dev_ctx, &pin_int);
+  lsm6dsv256x_pin_int1_route_hg_set(&dev_ctx, &pin_int);
+  //lsm6dsv256x_pin_int2_route_hg_set(&dev_ctx, &pin_int);
 
   /* "thread" loop */
   while (1) {

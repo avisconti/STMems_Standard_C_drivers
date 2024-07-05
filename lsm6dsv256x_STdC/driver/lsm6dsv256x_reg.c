@@ -745,7 +745,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_15Hz625;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_12Hz5;
+          *val = LSM6DSV256X_ODR_HA02_AT_13Hz;
           break;
       }
       break;
@@ -761,7 +761,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_31Hz25;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_25Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_26Hz;
           break;
       }
       break;
@@ -777,7 +777,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_62Hz5;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_50Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_52Hz;
           break;
       }
       break;
@@ -793,7 +793,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_125Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_100Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_104Hz;
           break;
       }
       break;
@@ -809,7 +809,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_250Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_200Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_208Hz;
           break;
       }
       break;
@@ -825,7 +825,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_500Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_400Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_417Hz;
           break;
       }
       break;
@@ -841,7 +841,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_1000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_800Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_833Hz;
           break;
       }
       break;
@@ -857,7 +857,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_2000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_1600Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_1667Hz;
           break;
       }
       break;
@@ -873,7 +873,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_4000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_3200Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_3333Hz;
           break;
       }
       break;
@@ -889,7 +889,7 @@ int32_t lsm6dsv256x_xl_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_8000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_6400Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_6667Hz;
           break;
       }
       break;
@@ -1144,7 +1144,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_15Hz625;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_12Hz5;
+          *val = LSM6DSV256X_ODR_HA02_AT_13Hz;
           break;
       }
       break;
@@ -1160,7 +1160,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_31Hz25;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_25Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_26Hz;
           break;
       }
       break;
@@ -1176,7 +1176,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_62Hz5;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_50Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_52Hz;
           break;
       }
       break;
@@ -1192,7 +1192,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_125Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_100Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_104Hz;
           break;
       }
       break;
@@ -1208,7 +1208,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_250Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_200Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_208Hz;
           break;
       }
       break;
@@ -1224,7 +1224,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_500Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_400Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_417Hz;
           break;
       }
       break;
@@ -1240,7 +1240,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_1000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_800Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_833Hz;
           break;
       }
       break;
@@ -1256,7 +1256,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_2000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_1600Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_1667Hz;
           break;
       }
       break;
@@ -1272,7 +1272,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_4000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_3200Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_3333Hz;
           break;
       }
       break;
@@ -1288,7 +1288,7 @@ int32_t lsm6dsv256x_gy_data_rate_get(const stmdev_ctx_t *ctx,
           *val = LSM6DSV256X_ODR_HA01_AT_8000Hz;
           break;
         case 2:
-          *val = LSM6DSV256X_ODR_HA02_AT_6400Hz;
+          *val = LSM6DSV256X_ODR_HA02_AT_6667Hz;
           break;
       }
       break;
@@ -2299,6 +2299,54 @@ int32_t lsm6dsv256x_hg_wu_interrupt_cfg_get(const stmdev_ctx_t *ctx,
 }
 
 /**
+ * @brief   Emable/disable user offset data correction to hg wake-up[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    0: disable, 1: enable
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t lsm6dsv256x_hg_wu_usr_off_correction_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  lsm6dsv256x_ctrl2_xl_hg_t ctrl2_xl_hg;
+  int32_t ret;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL2_XL_HG, (uint8_t *)&ctrl2_xl_hg, 1);
+
+  if (ret == 0)
+  {
+    ctrl2_xl_hg.hg_usr_off_on_wu = (uint8_t)val & 0x1U;
+    ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_CTRL2_XL_HG, (uint8_t *)&ctrl2_xl_hg, 1);
+  }
+
+  return ret;
+}
+
+/**
+ * @brief   Emable/disable user offset data correction to hg wake-up[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    0: disable, 1: enable
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t lsm6dsv256x_hg_wu_usr_off_correction_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  lsm6dsv256x_ctrl2_xl_hg_t ctrl2_xl_hg;
+  int32_t ret;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL2_XL_HG, (uint8_t *)&ctrl2_xl_hg, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  *val = ctrl2_xl_hg.hg_usr_off_on_wu;
+
+  return ret;
+}
+
+/**
   * @brief   High-g event handling[get]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
@@ -2357,10 +2405,11 @@ int32_t lsm6dsv256x_hg_event_get(const stmdev_ctx_t *ctx, lsm6dsv256x_hg_event_t
   */
 
 /**
-  * @brief   Select the signal that need to route on int1 pad[set]
+  * @brief   Select the signals that need to be routed on int1 pad.[set]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
   * @param  val    the signals to route on int1 pin.
+  *                (xl/g drdy, fifo, 6d/tap/wu/ff/sleep_change/cnt_bdr)
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
@@ -2369,8 +2418,6 @@ int32_t lsm6dsv256x_pin_int1_route_set(const stmdev_ctx_t *ctx,
 {
   lsm6dsv256x_int1_ctrl_t           int1_ctrl;
   lsm6dsv256x_md1_cfg_t             md1_cfg;
-  lsm6dsv256x_ctrl7_t               ctrl7;
-  lsm6dsv256x_hg_functions_enable_t hg_func;
   int32_t ret;
 
   /* not available on INT1 */
@@ -2405,7 +2452,6 @@ int32_t lsm6dsv256x_pin_int1_route_set(const stmdev_ctx_t *ctx,
   }
 
   md1_cfg.int1_shub            = val->shub;
-  md1_cfg.int1_emb_func        = val->emb_func;
   md1_cfg.int1_6d              = val->sixd;
   md1_cfg.int1_single_tap      = val->single_tap;
   md1_cfg.int1_double_tap      = val->double_tap;
@@ -2419,32 +2465,15 @@ int32_t lsm6dsv256x_pin_int1_route_set(const stmdev_ctx_t *ctx,
     return ret;
   }
 
-  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
-  if (ret != 0)
-  {
-    return ret;
-  }
-
-  ctrl7.int1_drdy_xl_hg        = val->drdy_hg_xl;
-  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
-
-  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
-  if (ret != 0)
-  {
-    return ret;
-  }
-
-  hg_func.int1_hg_wu        = val->hg_wakeup;
-  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
-
   return ret;
 }
 
 /**
-  * @brief  Select the signal that need to route on int1 pad.[get]
+  * @brief  Report the signals that are routed on int1 pad.[get]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
   * @param  val    the signals that are routed on int1 pin.(ptr)
+  *                (xl/g drdy, fifo, 6d/tap/wu/ff/sleep_change/cnt_bdr)
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
@@ -2453,8 +2482,6 @@ int32_t lsm6dsv256x_pin_int1_route_get(const stmdev_ctx_t *ctx,
 {
   lsm6dsv256x_int1_ctrl_t           int1_ctrl;
   lsm6dsv256x_md1_cfg_t             md1_cfg;
-  lsm6dsv256x_ctrl7_t               ctrl7;
-  lsm6dsv256x_hg_functions_enable_t hg_func;
   int32_t ret;
 
   ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_INT1_CTRL, (uint8_t *)&int1_ctrl, 1);
@@ -2477,7 +2504,6 @@ int32_t lsm6dsv256x_pin_int1_route_get(const stmdev_ctx_t *ctx,
   }
 
   val->shub         = md1_cfg.int1_shub;
-  val->emb_func     = md1_cfg.int1_emb_func;
   val->sixd         = md1_cfg.int1_6d;
   val->single_tap   = md1_cfg.int1_single_tap;
   val->double_tap   = md1_cfg.int1_double_tap;
@@ -2485,30 +2511,15 @@ int32_t lsm6dsv256x_pin_int1_route_get(const stmdev_ctx_t *ctx,
   val->freefall     = md1_cfg.int1_ff;
   val->sleep_change = md1_cfg.int1_sleep_change;
 
-  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
-  if (ret != 0)
-  {
-    return ret;
-  }
-
-  val->drdy_hg_xl = ctrl7.int1_drdy_xl_hg;
-
-  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
-  if (ret != 0)
-  {
-    return ret;
-  }
-
-  val->hg_wakeup = hg_func.int1_hg_wu;
-
   return ret;
 }
 
 /**
-  * @brief   Select the signal that need to route on int2 pad[set]
+  * @brief   Select the signals that need to be routed on int2 pad.[set]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
   * @param  val    the signals to route on int1 pin.
+  *                (xl/g drdy, fifo, 6d/tap/wu/ff/sleep_change/cnt_bdr)
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
@@ -2518,8 +2529,6 @@ int32_t lsm6dsv256x_pin_int2_route_set(const stmdev_ctx_t *ctx,
   lsm6dsv256x_int2_ctrl_t           int2_ctrl;
   lsm6dsv256x_ctrl4_t               ctrl4;
   lsm6dsv256x_md2_cfg_t             md2_cfg;
-  lsm6dsv256x_ctrl7_t               ctrl7;
-  lsm6dsv256x_hg_functions_enable_t hg_func;
   int32_t ret;
 
   ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_INT2_CTRL, (uint8_t *)&int2_ctrl, 1);
@@ -2558,7 +2567,6 @@ int32_t lsm6dsv256x_pin_int2_route_set(const stmdev_ctx_t *ctx,
   }
 
   md2_cfg.int2_timestamp       = val->timestamp;
-  md2_cfg.int2_emb_func        = val->emb_func;
   md2_cfg.int2_6d              = val->sixd;
   md2_cfg.int2_single_tap      = val->single_tap;
   md2_cfg.int2_double_tap      = val->double_tap;
@@ -2572,32 +2580,15 @@ int32_t lsm6dsv256x_pin_int2_route_set(const stmdev_ctx_t *ctx,
     return ret;
   }
 
-  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
-  if (ret != 0)
-  {
-    return ret;
-  }
-
-  ctrl7.int2_drdy_xl_hg        = val->drdy_hg_xl;
-  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
-
-  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
-  if (ret != 0)
-  {
-    return ret;
-  }
-
-  hg_func.int2_hg_wu        = val->hg_wakeup;
-  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
-
   return ret;
 }
 
 /**
-  * @brief  Select the signal that need to route on int2 pad.[get]
+  * @brief  Report the signals that are routed on int2 pad.[get]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
   * @param  val    the signals that are routed on int1 pin.(ptr)
+  *                (xl/g drdy, fifo, 6d/tap/wu/ff/sleep_change/cnt_bdr)
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
@@ -2607,8 +2598,6 @@ int32_t lsm6dsv256x_pin_int2_route_get(const stmdev_ctx_t *ctx,
   lsm6dsv256x_int2_ctrl_t           int2_ctrl;
   lsm6dsv256x_ctrl4_t               ctrl4;
   lsm6dsv256x_md2_cfg_t             md2_cfg;
-  lsm6dsv256x_ctrl7_t               ctrl7;
-  lsm6dsv256x_hg_functions_enable_t hg_func;
   int32_t ret;
 
   ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_INT2_CTRL, (uint8_t *)&int2_ctrl, 1);
@@ -2641,13 +2630,174 @@ int32_t lsm6dsv256x_pin_int2_route_get(const stmdev_ctx_t *ctx,
   }
 
   val->timestamp      = md2_cfg.int2_timestamp;
-  val->emb_func       = md2_cfg.int2_emb_func;
   val->sixd           = md2_cfg.int2_6d;
   val->single_tap     = md2_cfg.int2_single_tap;
   val->double_tap     = md2_cfg.int2_double_tap;
   val->wakeup         = md2_cfg.int2_wu;
   val->freefall       = md2_cfg.int2_ff;
   val->sleep_change   = md2_cfg.int2_sleep_change;
+
+  return ret;
+}
+
+/**
+  * @brief   Select the signals that need to be routed on int1 pad.[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals to route on int1 pin.
+  *                (HG events only)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int1_route_hg_set(const stmdev_ctx_t *ctx,
+                                          lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_ctrl7_t               ctrl7;
+  lsm6dsv256x_hg_functions_enable_t hg_func;
+  lsm6dsv256x_inactivity_ths_t      reg_shock;
+  int32_t ret;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  ctrl7.int1_drdy_xl_hg        = val->drdy_hg_xl;
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  hg_func.int1_hg_wu        = val->hg_wakeup;
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_INACTIVITY_THS, (uint8_t *)&reg_shock, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  reg_shock.int1_hg_shock_change        = val->hg_shock_change;
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_INACTIVITY_THS, (uint8_t *)&reg_shock, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  Report the signals that are routed on int1 pad.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals that are routed on int1 pin.(ptr)
+  *                (HG events only)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int1_route_hg_get(const stmdev_ctx_t *ctx,
+                                          lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_ctrl7_t               ctrl7;
+  lsm6dsv256x_hg_functions_enable_t hg_func;
+  lsm6dsv256x_inactivity_ths_t      reg_shock;
+  int32_t ret;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->drdy_hg_xl = ctrl7.int1_drdy_xl_hg;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->hg_wakeup = hg_func.int1_hg_wu;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_INACTIVITY_THS, (uint8_t *)&reg_shock, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->hg_shock_change = reg_shock.int1_hg_shock_change;
+
+  return ret;
+}
+
+/**
+  * @brief   Select the signals that need to be routed on int2 pad.[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals to route on int2 pin.
+  *                (HG events only)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int2_route_hg_set(const stmdev_ctx_t *ctx,
+                                          lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_ctrl7_t               ctrl7;
+  lsm6dsv256x_hg_functions_enable_t hg_func;
+  lsm6dsv256x_inactivity_ths_t      reg_shock;
+  int32_t ret;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  ctrl7.int2_drdy_xl_hg        = val->drdy_hg_xl;
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  hg_func.int2_hg_wu        = val->hg_wakeup;
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_HG_FUNCTIONS_ENABLE, (uint8_t *)&hg_func, 1);
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_INACTIVITY_THS, (uint8_t *)&reg_shock, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  reg_shock.int2_hg_shock_change        = val->hg_shock_change;
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_INACTIVITY_THS, (uint8_t *)&reg_shock, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  Report the signals that are routed on int2 pad.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals that are routed on int2 pin.(ptr)
+  *                (HG events only)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int2_route_hg_get(const stmdev_ctx_t *ctx,
+                                          lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_ctrl7_t               ctrl7;
+  lsm6dsv256x_hg_functions_enable_t hg_func;
+  lsm6dsv256x_inactivity_ths_t      reg_shock;
+  int32_t ret;
 
   ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_CTRL7, (uint8_t *)&ctrl7, 1);
   if (ret != 0)
@@ -2664,6 +2814,328 @@ int32_t lsm6dsv256x_pin_int2_route_get(const stmdev_ctx_t *ctx,
   }
 
   val->hg_wakeup = hg_func.int2_hg_wu;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_INACTIVITY_THS, (uint8_t *)&reg_shock, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->hg_shock_change = reg_shock.int2_hg_shock_change;
+
+  return ret;
+}
+
+/**
+  * @brief   Select the signals that need to be routed on int1 pad.[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals to route on int1 pin.
+  *                (embedded events)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int1_route_embedded_set(const stmdev_ctx_t *ctx,
+                                                lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_md1_cfg_t             md1_cfg;
+  lsm6dsv256x_emb_func_int1_t       emb_func_int1;
+  lsm6dsv256x_fsm_int1_t            fsm_int1;
+  lsm6dsv256x_mlc_int1_t            mlc_int1;
+  int32_t ret;
+
+  /* Embedded Functions */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  emb_func_int1.int1_step_detector = val->step_detector;
+  emb_func_int1.int1_tilt = val->tilt;
+  emb_func_int1.int1_sig_mot = val->sig_mot;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MD1_CFG, (uint8_t *)&md1_cfg, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  md1_cfg.int1_emb_func = 1;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_MD1_CFG, (uint8_t *)&md1_cfg, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  /* FSM */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_FSM_INT1, (uint8_t *)&fsm_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  fsm_int1.int1_fsm1 = val->fsm1;
+  fsm_int1.int1_fsm2 = val->fsm2;
+  fsm_int1.int1_fsm3 = val->fsm3;
+  fsm_int1.int1_fsm4 = val->fsm4;
+  fsm_int1.int1_fsm5 = val->fsm5;
+  fsm_int1.int1_fsm6 = val->fsm6;
+  fsm_int1.int1_fsm7 = val->fsm7;
+  fsm_int1.int1_fsm8 = val->fsm8;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_FSM_INT1, (uint8_t *)&fsm_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  /* MLC */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC_INT1, (uint8_t *)&mlc_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  mlc_int1.int1_mlc1 = val->mlc1;
+  mlc_int1.int1_mlc2 = val->mlc2;
+  mlc_int1.int1_mlc3 = val->mlc3;
+  mlc_int1.int1_mlc4 = val->mlc4;
+  mlc_int1.int1_mlc5 = val->mlc5;
+  mlc_int1.int1_mlc6 = val->mlc6;
+  mlc_int1.int1_mlc7 = val->mlc7;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_MLC_INT1, (uint8_t *)&mlc_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief   Report the signals that are routed on int1 pad.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals to route on int1 pin.
+  *                (embedded events)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int1_route_embedded_get(const stmdev_ctx_t *ctx,
+                                                lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_emb_func_int1_t       emb_func_int1;
+  lsm6dsv256x_fsm_int1_t            fsm_int1;
+  lsm6dsv256x_mlc_int1_t            mlc_int1;
+  int32_t ret;
+
+  /* Embedded Functions */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_EMB_FUNC_INT1, (uint8_t *)&emb_func_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->step_detector = emb_func_int1.int1_step_detector;
+  val->sig_mot       = emb_func_int1.int1_sig_mot;
+  val->tilt          = emb_func_int1.int1_tilt;
+
+  /* FSM */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_FSM_INT1, (uint8_t *)&fsm_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->fsm1 = fsm_int1.int1_fsm1;
+  val->fsm2 = fsm_int1.int1_fsm2;
+  val->fsm3 = fsm_int1.int1_fsm3;
+  val->fsm4 = fsm_int1.int1_fsm4;
+  val->fsm5 = fsm_int1.int1_fsm5;
+  val->fsm6 = fsm_int1.int1_fsm6;
+  val->fsm7 = fsm_int1.int1_fsm7;
+  val->fsm8 = fsm_int1.int1_fsm8;
+
+  /* MLC */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC_INT1, (uint8_t *)&mlc_int1, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->mlc1 = mlc_int1.int1_mlc1;
+  val->mlc2 = mlc_int1.int1_mlc2;
+  val->mlc3 = mlc_int1.int1_mlc3;
+  val->mlc4 = mlc_int1.int1_mlc4;
+  val->mlc5 = mlc_int1.int1_mlc5;
+  val->mlc6 = mlc_int1.int1_mlc6;
+  val->mlc7 = mlc_int1.int1_mlc7;
+
+  return ret;
+}
+
+/**
+  * @brief   Select the signals that need to be routed on int2 pad[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals to route on int2 pin.
+  *                (embedded events)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int2_route_embedded_set(const stmdev_ctx_t *ctx,
+                                                lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_md2_cfg_t             md2_cfg;
+  lsm6dsv256x_emb_func_int2_t       emb_func_int2;
+  lsm6dsv256x_fsm_int2_t            fsm_int2;
+  lsm6dsv256x_mlc_int2_t            mlc_int2;
+  int32_t ret;
+
+  /* Embedded Functions */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  emb_func_int2.int2_step_detector = val->step_detector;
+  emb_func_int2.int2_tilt = val->tilt;
+  emb_func_int2.int2_sig_mot = val->sig_mot;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MD2_CFG, (uint8_t *)&md2_cfg, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  md2_cfg.int2_emb_func = 1;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_MD2_CFG, (uint8_t *)&md2_cfg, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  /* FSM */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_FSM_INT2, (uint8_t *)&fsm_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  fsm_int2.int2_fsm1 = val->fsm1;
+  fsm_int2.int2_fsm2 = val->fsm2;
+  fsm_int2.int2_fsm3 = val->fsm3;
+  fsm_int2.int2_fsm4 = val->fsm4;
+  fsm_int2.int2_fsm5 = val->fsm5;
+  fsm_int2.int2_fsm6 = val->fsm6;
+  fsm_int2.int2_fsm7 = val->fsm7;
+  fsm_int2.int2_fsm8 = val->fsm8;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_FSM_INT2, (uint8_t *)&fsm_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  /* MLC */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC_INT2, (uint8_t *)&mlc_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  mlc_int2.int2_mlc1 = val->mlc1;
+  mlc_int2.int2_mlc2 = val->mlc2;
+  mlc_int2.int2_mlc3 = val->mlc3;
+  mlc_int2.int2_mlc4 = val->mlc4;
+  mlc_int2.int2_mlc5 = val->mlc5;
+  mlc_int2.int2_mlc6 = val->mlc6;
+  mlc_int2.int2_mlc7 = val->mlc7;
+
+  ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_MLC_INT2, (uint8_t *)&mlc_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  return ret;
+}
+
+/**
+  * @brief   Report the signals that are routed on int2 pad.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the signals to route on int2 pin.
+  *                (embedded events)
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t lsm6dsv256x_pin_int2_route_embedded_get(const stmdev_ctx_t *ctx,
+                                                lsm6dsv256x_pin_int_route_t *val)
+{
+  lsm6dsv256x_emb_func_int2_t       emb_func_int2;
+  lsm6dsv256x_fsm_int2_t            fsm_int2;
+  lsm6dsv256x_mlc_int2_t            mlc_int2;
+  int32_t ret;
+
+  /* Embedded Functions */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_EMB_FUNC_INT2, (uint8_t *)&emb_func_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->step_detector = emb_func_int2.int2_step_detector;
+  val->sig_mot       = emb_func_int2.int2_sig_mot;
+  val->tilt          = emb_func_int2.int2_tilt;
+
+  /* FSM */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_FSM_INT2, (uint8_t *)&fsm_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->fsm1 = fsm_int2.int2_fsm1;
+  val->fsm2 = fsm_int2.int2_fsm2;
+  val->fsm3 = fsm_int2.int2_fsm3;
+  val->fsm4 = fsm_int2.int2_fsm4;
+  val->fsm5 = fsm_int2.int2_fsm5;
+  val->fsm6 = fsm_int2.int2_fsm6;
+  val->fsm7 = fsm_int2.int2_fsm7;
+  val->fsm8 = fsm_int2.int2_fsm8;
+
+  /* MLC */
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC_INT2, (uint8_t *)&mlc_int2, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val->mlc1 = mlc_int2.int2_mlc1;
+  val->mlc2 = mlc_int2.int2_mlc2;
+  val->mlc3 = mlc_int2.int2_mlc3;
+  val->mlc4 = mlc_int2.int2_mlc4;
+  val->mlc5 = mlc_int2.int2_mlc5;
+  val->mlc6 = mlc_int2.int2_mlc6;
+  val->mlc7 = mlc_int2.int2_mlc7;
 
   return ret;
 }
@@ -2798,6 +3270,9 @@ int32_t lsm6dsv256x_all_sources_get(const stmdev_ctx_t *ctx,
   val->mlc2 = mlc_status_mainpage.is_mlc2;
   val->mlc3 = mlc_status_mainpage.is_mlc3;
   val->mlc4 = mlc_status_mainpage.is_mlc4;
+  val->mlc5 = mlc_status_mainpage.is_mlc5;
+  val->mlc6 = mlc_status_mainpage.is_mlc6;
+  val->mlc7 = mlc_status_mainpage.is_mlc7;
 
 
   /* embedded func */
@@ -3300,7 +3775,6 @@ int32_t lsm6dsv256x_emb_func_conv_set(const stmdev_ctx_t *ctx, lsm6dsv256x_emb_f
   conv_reg.gyro_conv_en = val.gyro_conv_en;
   conv_reg.temp_conv_en = val.temp_conv_en;
   conv_reg.ext_sensor_conv_en = val.ext_sensor_conv_en;
-
   ret += lsm6dsv256x_write_reg(ctx, LSM6DSV256X_EMB_FUNC_SENSOR_CONV_EN, (uint8_t *)&conv_reg, 1);
 
   ret += lsm6dsv256x_mem_bank_set(ctx, LSM6DSV256X_MAIN_MEM_BANK);
@@ -7784,7 +8258,7 @@ int32_t lsm6dsv256x_mlc_out_get(const stmdev_ctx_t *ctx, lsm6dsv256x_mlc_out_t *
   ret = lsm6dsv256x_mem_bank_set(ctx, LSM6DSV256X_EMBED_FUNC_MEM_BANK);
   if (ret == 0)
   {
-    ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC1_SRC, (uint8_t *)val, 4);
+    ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC1_SRC, (uint8_t *)val, 7);
   }
   ret += lsm6dsv256x_mem_bank_set(ctx, LSM6DSV256X_MAIN_MEM_BANK);
 
