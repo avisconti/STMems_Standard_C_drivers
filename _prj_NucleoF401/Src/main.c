@@ -52,8 +52,8 @@
 void SystemClock_Config(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
-void lsm6dsv16x_fifo_irq(void);
-void lsm6dsv16x_fifo_irq_handler(void);
+void ism330bx_mlc_vibration_monitoring(void);
+void ism330bx_mlc_vibration_monitoring_handler(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -61,7 +61,7 @@ void lsm6dsv16x_fifo_irq_handler(void);
 /* overwrite default interrupt callback */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  lsm6dsv16x_fifo_irq_handler();
+  ism330bx_mlc_vibration_monitoring_handler();
 }
 
 /* USER CODE END 0 */
@@ -111,7 +111,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    lsm6dsv16x_fifo_irq();
+    ism330bx_mlc_vibration_monitoring();
   }
   /* USER CODE END 3 */
 }

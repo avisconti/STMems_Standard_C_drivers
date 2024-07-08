@@ -450,6 +450,8 @@
                     <state>C:\Users\visconta\Projects\STdC\stts22h_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\lps25hb_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\lps33k_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\ism330bx\tilt_angle_mode0</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\ism330bx\Vibration monitoring</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1778,6 +1780,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\ism330bx_STdC\examples\ism330bx_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\ism330bx_STdC\examples\ism330bx_mlc_tilt.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\ism330bx_STdC\examples\ism330bx_mlc_vibration_monitoring.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\ism330bx_STdC\examples\ism330bx_pedometer.c</name>
