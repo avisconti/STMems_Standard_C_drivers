@@ -184,7 +184,7 @@ int32_t iis2dulpx_init_set(const stmdev_ctx_t *ctx, iis2dulpx_init_t val)
           break;
         }
 
-        /* boot procedue ended correctly */
+        /* boot procedure ended correctly */
         if (ctrl4.boot == 0U)
         {
           break;
@@ -217,7 +217,7 @@ int32_t iis2dulpx_init_set(const stmdev_ctx_t *ctx, iis2dulpx_init_t val)
           break;
         }
 
-        /* sw-reset procedue ended correctly */
+        /* sw-reset procedure ended correctly */
         if (status.sw_reset == 0U)
         {
           break;
@@ -1419,7 +1419,7 @@ int32_t iis2dulpx_spi_mode_get(const stmdev_ctx_t *ctx, iis2dulpx_spi_mode *val)
 
   ret = iis2dulpx_read_reg(ctx, IIS2DULPX_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
 
-  switch ((pin_ctrl.h_lactive))
+  switch ((pin_ctrl.sim))
   {
     case 0x0:
       *val = IIS2DULPX_SPI_4_WIRE;
@@ -2136,7 +2136,7 @@ int32_t iis2dulpx_fifo_data_get(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *m
         data->xl[0].raw[1] = (int16_t)fifo_raw[1] / 16;
         data->xl[0].raw[1] = (data->xl[0].raw[1] + ((int16_t)fifo_raw[2] * 16)) * 16;
         data->xl[0].raw[2] = (int16_t)fifo_raw[3];
-        data->xl[0].raw[2] = data->xl[0].raw[2] + ((int16_t)fifo_raw[4] * 256) * 16;
+        data->xl[0].raw[2] = (data->xl[0].raw[2] + (int16_t)fifo_raw[4] * 256) * 16;
         data->heat.raw = (int16_t)fifo_raw[4] / 16;
         data->heat.raw = (data->heat.raw + ((int16_t)fifo_raw[5] * 16)) * 16;
         if (fifo_tag.tag_sensor == (uint8_t)IIS2DULPX_XL_TEMP_TAG)
