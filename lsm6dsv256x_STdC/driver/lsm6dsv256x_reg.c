@@ -2911,6 +2911,7 @@ int32_t lsm6dsv256x_pin_int1_route_embedded_set(const stmdev_ctx_t *ctx,
   mlc_int1.int1_mlc5 = val->mlc5;
   mlc_int1.int1_mlc6 = val->mlc6;
   mlc_int1.int1_mlc7 = val->mlc7;
+  mlc_int1.int1_mlc8 = val->mlc8;
 
   ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_MLC_INT1, (uint8_t *)&mlc_int1, 1);
   if (ret != 0)
@@ -2979,6 +2980,7 @@ int32_t lsm6dsv256x_pin_int1_route_embedded_get(const stmdev_ctx_t *ctx,
   val->mlc5 = mlc_int1.int1_mlc5;
   val->mlc6 = mlc_int1.int1_mlc6;
   val->mlc7 = mlc_int1.int1_mlc7;
+  val->mlc8 = mlc_int1.int1_mlc8;
 
   return ret;
 }
@@ -3068,6 +3070,7 @@ int32_t lsm6dsv256x_pin_int2_route_embedded_set(const stmdev_ctx_t *ctx,
   mlc_int2.int2_mlc5 = val->mlc5;
   mlc_int2.int2_mlc6 = val->mlc6;
   mlc_int2.int2_mlc7 = val->mlc7;
+  mlc_int2.int2_mlc8 = val->mlc8;
 
   ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_MLC_INT2, (uint8_t *)&mlc_int2, 1);
   if (ret != 0)
@@ -3136,6 +3139,7 @@ int32_t lsm6dsv256x_pin_int2_route_embedded_get(const stmdev_ctx_t *ctx,
   val->mlc5 = mlc_int2.int2_mlc5;
   val->mlc6 = mlc_int2.int2_mlc6;
   val->mlc7 = mlc_int2.int2_mlc7;
+  val->mlc8 = mlc_int2.int2_mlc8;
 
   return ret;
 }
@@ -3273,6 +3277,7 @@ int32_t lsm6dsv256x_all_sources_get(const stmdev_ctx_t *ctx,
   val->mlc5 = mlc_status_mainpage.is_mlc5;
   val->mlc6 = mlc_status_mainpage.is_mlc6;
   val->mlc7 = mlc_status_mainpage.is_mlc7;
+  val->mlc8 = mlc_status_mainpage.is_mlc8;
 
 
   /* embedded func */
@@ -8258,7 +8263,7 @@ int32_t lsm6dsv256x_mlc_out_get(const stmdev_ctx_t *ctx, lsm6dsv256x_mlc_out_t *
   ret = lsm6dsv256x_mem_bank_set(ctx, LSM6DSV256X_EMBED_FUNC_MEM_BANK);
   if (ret == 0)
   {
-    ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC1_SRC, (uint8_t *)val, 7);
+    ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_MLC1_SRC, (uint8_t *)val, 8);
   }
   ret += lsm6dsv256x_mem_bank_set(ctx, LSM6DSV256X_MAIN_MEM_BANK);
 

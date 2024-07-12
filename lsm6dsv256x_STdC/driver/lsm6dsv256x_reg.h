@@ -1136,9 +1136,9 @@ typedef struct
   uint8_t is_mlc5                      : 1;
   uint8_t is_mlc6                      : 1;
   uint8_t is_mlc7                      : 1;
-  uint8_t not_used0                    : 1;
+  uint8_t is_mlc8                      : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 1;
+  uint8_t is_mlc8                      : 1;
   uint8_t is_mlc7                      : 1;
   uint8_t is_mlc6                      : 1;
   uint8_t is_mlc5                      : 1;
@@ -2198,9 +2198,9 @@ typedef struct
   uint8_t int1_mlc5                    : 1;
   uint8_t int1_mlc6                    : 1;
   uint8_t int1_mlc7                    : 1;
-  uint8_t not_used0                    : 1;
+  uint8_t int1_mlc8                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 1;
+  uint8_t int1_mlc8                    : 1;
   uint8_t int1_mlc7                    : 1;
   uint8_t int1_mlc6                    : 1;
   uint8_t int1_mlc5                    : 1;
@@ -2266,9 +2266,9 @@ typedef struct
   uint8_t int2_mlc5                    : 1;
   uint8_t int2_mlc6                    : 1;
   uint8_t int2_mlc7                    : 1;
-  uint8_t not_used0                    : 1;
+  uint8_t int2_mlc8                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 1;
+  uint8_t int2_mlc8                    : 1;
   uint8_t int2_mlc7                    : 1;
   uint8_t int2_mlc6                    : 1;
   uint8_t int2_mlc5                    : 1;
@@ -2334,9 +2334,9 @@ typedef struct
   uint8_t is_mlc5                      : 1;
   uint8_t is_mlc6                      : 1;
   uint8_t is_mlc7                      : 1;
-  uint8_t not_used0                    : 1;
+  uint8_t is_mlc8                      : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 1;
+  uint8_t is_mlc8                      : 1;
   uint8_t is_mlc7                      : 1;
   uint8_t is_mlc6                      : 1;
   uint8_t is_mlc5                      : 1;
@@ -3118,6 +3118,16 @@ typedef struct
   uint8_t mlc7_src                     : 8;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv256x_mlc7_src_t;
+
+#define LSM6DSV256X_MLC8_SRC                       0x77U
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t mlc8_src                     : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t mlc8_src                     : 8;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv256x_mlc8_src_t;
 
 /**
   * @}
@@ -4637,6 +4647,7 @@ typedef struct
   uint8_t mlc5                         : 1;
   uint8_t mlc6                         : 1;
   uint8_t mlc7                         : 1;
+  uint8_t mlc8                         : 1;
   uint8_t sh_endop                     : 1;
   uint8_t sh_target0_nack              : 1;
   uint8_t sh_target1_nack              : 1;
@@ -4691,6 +4702,7 @@ typedef struct
   uint8_t mlc5                         : 1;
   uint8_t mlc6                         : 1;
   uint8_t mlc7                         : 1;
+  uint8_t mlc8                         : 1;
 } lsm6dsv256x_pin_int_route_t;
 
 int32_t lsm6dsv256x_pin_int1_route_set(const stmdev_ctx_t *ctx, lsm6dsv256x_pin_int_route_t *val);
@@ -5353,6 +5365,7 @@ typedef struct
   uint8_t mlc5_src;
   uint8_t mlc6_src;
   uint8_t mlc7_src;
+  uint8_t mlc8_src;
 } lsm6dsv256x_mlc_out_t;
 int32_t lsm6dsv256x_mlc_out_get(const stmdev_ctx_t *ctx, lsm6dsv256x_mlc_out_t *val);
 
