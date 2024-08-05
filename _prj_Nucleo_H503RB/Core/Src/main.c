@@ -62,7 +62,7 @@ void lsm6dsv16x_fifo_irq_handler(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /* overwrite default interrupt callback */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
   lsm6dsv16x_fifo_irq_handler();
 }
