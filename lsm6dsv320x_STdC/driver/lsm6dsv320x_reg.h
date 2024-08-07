@@ -190,7 +190,7 @@ typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint8_t ois_ctrl_from_ui             : 1;
-  uint8_t spi2_reset                   : 1;
+  uint8_t aux_spi_reset                : 1;
   uint8_t sw_por                       : 1;
   uint8_t fsm_wr_ctrl_en               : 1;
   uint8_t not_used0                    : 2;
@@ -202,7 +202,7 @@ typedef struct
   uint8_t not_used0                    : 2;
   uint8_t fsm_wr_ctrl_en               : 1;
   uint8_t sw_por                       : 1;
-  uint8_t spi2_reset                   : 1;
+  uint8_t aux_spi_reset                : 1;
   uint8_t ois_ctrl_from_ui             : 1;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_func_cfg_access_t;
@@ -1505,65 +1505,65 @@ typedef struct
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_ui_handshake_ctrl_t;
 
-#define LSM6DSV320X_UI_SPI2_SHARED_0               0x65U
+#define LSM6DSV320X_UI_IF2_SHARED_0                0x65U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_ui_spi2_shared_0_t;
+} lsm6dsv320x_ui_if2_shared_0_t;
 
-#define LSM6DSV320X_UI_SPI2_SHARED_1               0x66U
+#define LSM6DSV320X_UI_IF2_SHARED_1                0x66U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_ui_spi2_shared_1_t;
+} lsm6dsv320x_ui_if2_shared_1_t;
 
-#define LSM6DSV320X_UI_SPI2_SHARED_2               0x67U
+#define LSM6DSV320X_UI_IF2_SHARED_2                0x67U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_ui_spi2_shared_2_t;
+} lsm6dsv320x_ui_if2_shared_2_t;
 
-#define LSM6DSV320X_UI_SPI2_SHARED_3               0x68U
+#define LSM6DSV320X_UI_IF2_SHARED_3                0x68U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_ui_spi2_shared_3_t;
+} lsm6dsv320x_ui_if2_shared_3_t;
 
-#define LSM6DSV320X_UI_SPI2_SHARED_4               0x69U
+#define LSM6DSV320X_UI_IF2_SHARED_4                0x69U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_ui_spi2_shared_4_t;
+} lsm6dsv320x_ui_if2_shared_4_t;
 
-#define LSM6DSV320X_UI_SPI2_SHARED_5               0x6AU
+#define LSM6DSV320X_UI_IF2_SHARED_5                0x6AU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t ui_spi2_shared               : 8;
+  uint8_t ui_if2_shared                : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_ui_spi2_shared_5_t;
+} lsm6dsv320x_ui_if2_shared_5_t;
 
 #define LSM6DSV320X_CTRL_EIS                       0x6BU
 typedef struct
@@ -1635,7 +1635,7 @@ typedef struct
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_read_en                 : 1;
+  uint8_t aux_spi_read_en              : 1;
   uint8_t ois_g_en                     : 1;
   uint8_t ois_xl_en                    : 1;
   uint8_t not_used0                    : 2;
@@ -1647,7 +1647,7 @@ typedef struct
   uint8_t not_used0                    : 2;
   uint8_t ois_xl_en                    : 1;
   uint8_t ois_g_en                     : 1;
-  uint8_t spi2_read_en                 : 1;
+  uint8_t aux_spi_read_en              : 1;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_ui_ctrl1_ois_t;
 
@@ -1790,12 +1790,12 @@ typedef struct
   *
   */
 
-/** @defgroup bitfields page spi2
+/** @defgroup bitfields page if2
   * @{
   *
   */
 
-#define LSM6DSV320X_SPI2_WHO_AM_I                  0x0FU
+#define LSM6DSV320X_IF2_WHO_AM_I                   0x0FU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -1803,9 +1803,9 @@ typedef struct
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t id                           : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_who_am_i_t;
+} lsm6dsv320x_if2_who_am_i_t;
 
-#define LSM6DSV320X_SPI2_STATUS_REG_OIS            0x1EU
+#define LSM6DSV320X_IF2_STATUS_REG_OIS             0x1EU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -1819,9 +1819,9 @@ typedef struct
   uint8_t gda                          : 1;
   uint8_t xlda                         : 1;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_status_reg_ois_t;
+} lsm6dsv320x_if2_status_reg_ois_t;
 
-#define LSM6DSV320X_SPI2_OUT_TEMP_L                0x20U
+#define LSM6DSV320X_IF2_OUT_TEMP_L                 0x20U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -1829,9 +1829,9 @@ typedef struct
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t temp                         : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_out_temp_l_t;
+} lsm6dsv320x_if2_out_temp_l_t;
 
-#define LSM6DSV320X_SPI2_OUT_TEMP_H                0x21U
+#define LSM6DSV320X_IF2_OUT_TEMP_H                 0x21U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -1839,143 +1839,143 @@ typedef struct
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t temp                         : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_out_temp_h_t;
+} lsm6dsv320x_if2_out_temp_h_t;
 
-#define LSM6DSV320X_SPI2_OUTX_L_G_OIS              0x22U
+#define LSM6DSV320X_IF2_OUTX_L_G_OIS               0x22U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outx_g_ois              : 8;
+  uint8_t if2_outx_g_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outx_g_ois              : 8;
+  uint8_t if2_outx_g_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outx_l_g_ois_t;
+} lsm6dsv320x_if2_outx_l_g_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTX_H_G_OIS              0x23U
+#define LSM6DSV320X_IF2_OUTX_H_G_OIS               0x23U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outx_g_ois              : 8;
+  uint8_t if2_outx_g_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outx_g_ois              : 8;
+  uint8_t if2_outx_g_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outx_h_g_ois_t;
+} lsm6dsv320x_if2_outx_h_g_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTY_L_G_OIS              0x24U
+#define LSM6DSV320X_IF2_OUTY_L_G_OIS               0x24U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outy_g_ois              : 8;
+  uint8_t if2_outy_g_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outy_g_ois              : 8;
+  uint8_t if2_outy_g_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outy_l_g_ois_t;
+} lsm6dsv320x_if2_outy_l_g_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTY_H_G_OIS              0x25U
+#define LSM6DSV320X_IF2_OUTY_H_G_OIS               0x25U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outy_g_ois              : 8;
+  uint8_t if2_outy_g_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outy_g_ois              : 8;
+  uint8_t if2_outy_g_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outy_h_g_ois_t;
+} lsm6dsv320x_if2_outy_h_g_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTZ_L_G_OIS              0x26U
+#define LSM6DSV320X_IF2_OUTZ_L_G_OIS               0x26U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outz_g_ois              : 8;
+  uint8_t if2_outz_g_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outz_g_ois              : 8;
+  uint8_t if2_outz_g_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outz_l_g_ois_t;
+} lsm6dsv320x_if2_outz_l_g_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTZ_H_G_OIS              0x27U
+#define LSM6DSV320X_IF2_OUTZ_H_G_OIS               0x27U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outz_g_ois              : 8;
+  uint8_t if2_outz_g_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outz_g_ois              : 8;
+  uint8_t if2_outz_g_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outz_h_g_ois_t;
+} lsm6dsv320x_if2_outz_h_g_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTX_L_A_OIS              0x28U
+#define LSM6DSV320X_IF2_OUTX_L_A_OIS               0x28U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outx_a_ois              : 8;
+  uint8_t if2_outx_a_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outx_a_ois              : 8;
+  uint8_t if2_outx_a_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outx_l_a_ois_t;
+} lsm6dsv320x_if2_outx_l_a_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTX_H_A_OIS              0x29U
+#define LSM6DSV320X_IF2_OUTX_H_A_OIS               0x29U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outx_a_ois              : 8;
+  uint8_t if2_outx_a_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outx_a_ois              : 8;
+  uint8_t if2_outx_a_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outx_h_a_ois_t;
+} lsm6dsv320x_if2_outx_h_a_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTY_L_A_OIS              0x2AU
+#define LSM6DSV320X_IF2_OUTY_L_A_OIS               0x2AU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outy_a_ois              : 8;
+  uint8_t if2_outy_a_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outy_a_ois              : 8;
+  uint8_t if2_outy_a_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outy_l_a_ois_t;
+} lsm6dsv320x_if2_outy_l_a_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTY_H_A_OIS              0x2BU
+#define LSM6DSV320X_IF2_OUTY_H_A_OIS               0x2BU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outy_a_ois              : 8;
+  uint8_t if2_outy_a_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outy_a_ois              : 8;
+  uint8_t if2_outy_a_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outy_h_a_ois_t;
+} lsm6dsv320x_if2_outy_h_a_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTZ_L_A_OIS              0x2CU
+#define LSM6DSV320X_IF2_OUTZ_L_A_OIS               0x2CU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outz_a_ois              : 8;
+  uint8_t if2_outz_a_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outz_a_ois              : 8;
+  uint8_t if2_outz_a_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outz_l_a_ois_t;
+} lsm6dsv320x_if2_outz_l_a_ois_t;
 
-#define LSM6DSV320X_SPI2_OUTZ_H_A_OIS              0x2DU
+#define LSM6DSV320X_IF2_OUTZ_H_A_OIS               0x2DU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_outz_a_ois              : 8;
+  uint8_t if2_outz_a_ois               : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t spi2_outz_a_ois              : 8;
+  uint8_t if2_outz_a_ois               : 8;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_outz_h_a_ois_t;
+} lsm6dsv320x_if2_outz_h_a_ois_t;
 
-#define LSM6DSV320X_SPI2_HANDSHAKE_CTRL            0x6EU
+#define LSM6DSV320X_IF2_HANDSHAKE_CTRL             0x6EU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_shared_ack              : 1;
-  uint8_t spi2_shared_req              : 1;
+  uint8_t if2_shared_ack               : 1;
+  uint8_t if2_shared_req               : 1;
   uint8_t not_used0                    : 6;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t not_used0                    : 6;
-  uint8_t spi2_shared_req              : 1;
-  uint8_t spi2_shared_ack              : 1;
+  uint8_t if2_shared_req               : 1;
+  uint8_t if2_shared_ack               : 1;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_handshake_ctrl_t;
+} lsm6dsv320x_if2_handshake_ctrl_t;
 
-#define LSM6DSV320X_SPI2_INT_OIS                   0x6FU
+#define LSM6DSV320X_IF2_INT_OIS                    0x6FU
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -1993,13 +1993,13 @@ typedef struct
   uint8_t st_g_ois                     : 2;
   uint8_t st_xl_ois                    : 2;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_int_ois_t;
+} lsm6dsv320x_if2_int_ois_t;
 
-#define LSM6DSV320X_SPI2_CTRL1_OIS                 0x70U
+#define LSM6DSV320X_IF2_CTRL1_OIS                  0x70U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t spi2_read_en                 : 1;
+  uint8_t aux_spi_read_en              : 1;
   uint8_t ois_g_en                     : 1;
   uint8_t ois_xl_en                    : 1;
   uint8_t not_used0                    : 2;
@@ -2011,11 +2011,11 @@ typedef struct
   uint8_t not_used0                    : 2;
   uint8_t ois_xl_en                    : 1;
   uint8_t ois_g_en                     : 1;
-  uint8_t spi2_read_en                 : 1;
+  uint8_t aux_spi_read_en              : 1;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_ctrl1_ois_t;
+} lsm6dsv320x_if2_ctrl1_ois_t;
 
-#define LSM6DSV320X_SPI2_CTRL2_OIS                 0x71U
+#define LSM6DSV320X_IF2_CTRL2_OIS                  0x71U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -2027,9 +2027,9 @@ typedef struct
   uint8_t lpf1_g_ois_bw                : 2;
   uint8_t fs_g_ois                     : 3;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_ctrl2_ois_t;
+} lsm6dsv320x_if2_ctrl2_ois_t;
 
-#define LSM6DSV320X_SPI2_CTRL3_OIS                 0x72U
+#define LSM6DSV320X_IF2_CTRL3_OIS                  0x72U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -2043,7 +2043,7 @@ typedef struct
   uint8_t not_used0                    : 1;
   uint8_t fs_xl_ois                    : 2;
 #endif /* DRV_BYTE_ORDER */
-} lsm6dsv320x_spi2_ctrl3_ois_t;
+} lsm6dsv320x_if2_ctrl3_ois_t;
 
 /**
   * @}
@@ -4080,12 +4080,12 @@ typedef union
   lsm6dsv320x_md2_cfg_t                  md2_cfg;
   lsm6dsv320x_emb_func_cfg_t             emb_func_cfg;
   lsm6dsv320x_ui_handshake_ctrl_t        ui_handshake_ctrl;
-  lsm6dsv320x_ui_spi2_shared_0_t         ui_spi2_shared_0;
-  lsm6dsv320x_ui_spi2_shared_1_t         ui_spi2_shared_1;
-  lsm6dsv320x_ui_spi2_shared_2_t         ui_spi2_shared_2;
-  lsm6dsv320x_ui_spi2_shared_3_t         ui_spi2_shared_3;
-  lsm6dsv320x_ui_spi2_shared_4_t         ui_spi2_shared_4;
-  lsm6dsv320x_ui_spi2_shared_5_t         ui_spi2_shared_5;
+  lsm6dsv320x_ui_if2_shared_0_t          ui_if2_shared_0;
+  lsm6dsv320x_ui_if2_shared_1_t          ui_if2_shared_1;
+  lsm6dsv320x_ui_if2_shared_2_t          ui_if2_shared_2;
+  lsm6dsv320x_ui_if2_shared_3_t          ui_if2_shared_3;
+  lsm6dsv320x_ui_if2_shared_4_t          ui_if2_shared_4;
+  lsm6dsv320x_ui_if2_shared_5_t          ui_if2_shared_5;
   lsm6dsv320x_ctrl_eis_t                 ctrl_eis;
   lsm6dsv320x_hg_x_ofs_usr_t             hg_x_ofs_usr;
   lsm6dsv320x_hg_y_ofs_usr_t             hg_y_ofs_usr;
@@ -4104,28 +4104,28 @@ typedef union
   lsm6dsv320x_fifo_data_out_y_h_t        fifo_data_out_y_h;
   lsm6dsv320x_fifo_data_out_z_l_t        fifo_data_out_z_l;
   lsm6dsv320x_fifo_data_out_z_h_t        fifo_data_out_z_h;
-  /* SPI2 registers */
-  lsm6dsv320x_spi2_who_am_i_t            spi2_who_am_i;
-  lsm6dsv320x_spi2_status_reg_ois_t      spi2_status_reg_ois;
-  lsm6dsv320x_spi2_out_temp_l_t          spi2_out_temp_l;
-  lsm6dsv320x_spi2_out_temp_h_t          spi2_out_temp_h;
-  lsm6dsv320x_spi2_outx_l_g_ois_t        spi2_outx_l_g_ois;
-  lsm6dsv320x_spi2_outx_h_g_ois_t        spi2_outx_h_g_ois;
-  lsm6dsv320x_spi2_outy_l_g_ois_t        spi2_outy_l_g_ois;
-  lsm6dsv320x_spi2_outy_h_g_ois_t        spi2_outy_h_g_ois;
-  lsm6dsv320x_spi2_outz_l_g_ois_t        spi2_outz_l_g_ois;
-  lsm6dsv320x_spi2_outz_h_g_ois_t        spi2_outz_h_g_ois;
-  lsm6dsv320x_spi2_outx_l_a_ois_t        spi2_outx_l_a_ois;
-  lsm6dsv320x_spi2_outx_h_a_ois_t        spi2_outx_h_a_ois;
-  lsm6dsv320x_spi2_outy_l_a_ois_t        spi2_outy_l_a_ois;
-  lsm6dsv320x_spi2_outy_h_a_ois_t        spi2_outy_h_a_ois;
-  lsm6dsv320x_spi2_outz_l_a_ois_t        spi2_outz_l_a_ois;
-  lsm6dsv320x_spi2_outz_h_a_ois_t        spi2_outz_h_a_ois;
-  lsm6dsv320x_spi2_handshake_ctrl_t      spi2_handshake_ctrl;
-  lsm6dsv320x_spi2_int_ois_t             spi2_int_ois;
-  lsm6dsv320x_spi2_ctrl1_ois_t           spi2_ctrl1_ois;
-  lsm6dsv320x_spi2_ctrl2_ois_t           spi2_ctrl2_ois;
-  lsm6dsv320x_spi2_ctrl3_ois_t           spi2_ctrl3_ois;
+  /* IF2 registers */
+  lsm6dsv320x_if2_who_am_i_t             if2_who_am_i;
+  lsm6dsv320x_if2_status_reg_ois_t       if2_status_reg_ois;
+  lsm6dsv320x_if2_out_temp_l_t           if2_out_temp_l;
+  lsm6dsv320x_if2_out_temp_h_t           if2_out_temp_h;
+  lsm6dsv320x_if2_outx_l_g_ois_t         if2_outx_l_g_ois;
+  lsm6dsv320x_if2_outx_h_g_ois_t         if2_outx_h_g_ois;
+  lsm6dsv320x_if2_outy_l_g_ois_t         if2_outy_l_g_ois;
+  lsm6dsv320x_if2_outy_h_g_ois_t         if2_outy_h_g_ois;
+  lsm6dsv320x_if2_outz_l_g_ois_t         if2_outz_l_g_ois;
+  lsm6dsv320x_if2_outz_h_g_ois_t         if2_outz_h_g_ois;
+  lsm6dsv320x_if2_outx_l_a_ois_t         if2_outx_l_a_ois;
+  lsm6dsv320x_if2_outx_h_a_ois_t         if2_outx_h_a_ois;
+  lsm6dsv320x_if2_outy_l_a_ois_t         if2_outy_l_a_ois;
+  lsm6dsv320x_if2_outy_h_a_ois_t         if2_outy_h_a_ois;
+  lsm6dsv320x_if2_outz_l_a_ois_t         if2_outz_l_a_ois;
+  lsm6dsv320x_if2_outz_h_a_ois_t         if2_outz_h_a_ois;
+  lsm6dsv320x_if2_handshake_ctrl_t       if2_handshake_ctrl;
+  lsm6dsv320x_if2_int_ois_t              if2_int_ois;
+  lsm6dsv320x_if2_ctrl1_ois_t            if2_ctrl1_ois;
+  lsm6dsv320x_if2_ctrl2_ois_t            if2_ctrl2_ois;
+  lsm6dsv320x_if2_ctrl3_ois_t            if2_ctrl3_ois;
   /* Embedded functions registers */
   lsm6dsv320x_page_sel_t                 page_sel;
   lsm6dsv320x_emb_func_en_a_t            emb_func_en_a;
@@ -4807,8 +4807,8 @@ int32_t lsm6dsv320x_eis_gy_full_scale_set(const stmdev_ctx_t *ctx,
 int32_t lsm6dsv320x_eis_gy_full_scale_get(const stmdev_ctx_t *ctx,
                                           lsm6dsv320x_eis_gy_full_scale_t *val);
 
-int32_t lsm6dsv320x_eis_gy_on_spi2_set(const stmdev_ctx_t *ctx, uint8_t val);
-int32_t lsm6dsv320x_eis_gy_on_spi2_get(const stmdev_ctx_t *ctx, uint8_t *val);
+int32_t lsm6dsv320x_eis_gy_on_if2_set(const stmdev_ctx_t *ctx, uint8_t val);
+int32_t lsm6dsv320x_eis_gy_on_if2_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 typedef enum
 {
@@ -5409,8 +5409,8 @@ int32_t lsm6dsv320x_ois_handshake_from_ois_get(const stmdev_ctx_t *ctx,
 int32_t lsm6dsv320x_ois_shared_set(const stmdev_ctx_t *ctx, uint8_t val[6]);
 int32_t lsm6dsv320x_ois_shared_get(const stmdev_ctx_t *ctx, uint8_t val[6]);
 
-int32_t lsm6dsv320x_ois_on_spi2_set(const stmdev_ctx_t *ctx, uint8_t val);
-int32_t lsm6dsv320x_ois_on_spi2_get(const stmdev_ctx_t *ctx, uint8_t *val);
+int32_t lsm6dsv320x_ois_on_if2_set(const stmdev_ctx_t *ctx, uint8_t val);
+int32_t lsm6dsv320x_ois_on_if2_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 typedef struct
 {
@@ -5589,14 +5589,9 @@ int32_t lsm6dsv320x_spi_mode_get(const stmdev_ctx_t *ctx, lsm6dsv320x_spi_mode_t
 int32_t lsm6dsv320x_ui_sda_pull_up_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t lsm6dsv320x_ui_sda_pull_up_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
-typedef enum
-{
-  LSM6DSV320X_SPI2_4_WIRE = 0x0,
-  LSM6DSV320X_SPI2_3_WIRE = 0x1,
-} lsm6dsv320x_spi2_mode_t;
-int32_t lsm6dsv320x_spi2_mode_set(const stmdev_ctx_t *ctx, lsm6dsv320x_spi2_mode_t val);
-int32_t lsm6dsv320x_spi2_mode_get(const stmdev_ctx_t *ctx,
-                                  lsm6dsv320x_spi2_mode_t *val);
+int32_t lsm6dsv320x_aux_spi_mode_set(const stmdev_ctx_t *ctx, lsm6dsv320x_spi_mode_t val);
+int32_t lsm6dsv320x_aux_spi_mode_get(const stmdev_ctx_t *ctx,
+                                     lsm6dsv320x_spi_mode_t *val);
 
 int32_t lsm6dsv320x_sigmot_mode_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t lsm6dsv320x_sigmot_mode_get(const stmdev_ctx_t *ctx, uint8_t *val);

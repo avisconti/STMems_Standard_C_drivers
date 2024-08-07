@@ -644,7 +644,7 @@ int32_t lsm6dsv320x_mem_bank_get(const stmdev_ctx_t *ctx, lsm6dsv320x_mem_bank_t
 
 /**
   * @brief  Device ID.[get] THis function works also for OIS
-  *        (WHO_AM_I and SPI2_WHO_AM_I have same address)
+  *        (WHO_AM_I and IF2_WHO_AM_I have same address)
   *
   * @param  ctx      read / write interface definitions
   * @param  val      Device ID.
@@ -2045,7 +2045,7 @@ int32_t lsm6dsv320x_hg_xl_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv320x_sel
 }
 
 /**
-  * @brief  SPI2 Accelerometer self-test selection.[set]
+  * @brief  IF2 Accelerometer self-test selection.[set]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      ST_DISABLE, ST_POSITIVE, ST_NEGATIVE,
@@ -2054,22 +2054,22 @@ int32_t lsm6dsv320x_hg_xl_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv320x_sel
   */
 int32_t lsm6dsv320x_ois_xl_self_test_set(const stmdev_ctx_t *ctx, lsm6dsv320x_self_test_t val)
 {
-  lsm6dsv320x_spi2_int_ois_t spi2_int_ois;
+  lsm6dsv320x_if2_int_ois_t if2_int_ois;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
 
   if (ret == 0)
   {
-    spi2_int_ois.st_xl_ois = ((uint8_t)val & 0x3U);
-    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+    if2_int_ois.st_xl_ois = ((uint8_t)val & 0x3U);
+    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
   }
 
   return ret;
 }
 
 /**
-  * @brief  SPI2 Accelerometer self-test selection.[get]
+  * @brief  IF2 Accelerometer self-test selection.[get]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      ST_DISABLE, ST_POSITIVE, ST_NEGATIVE,
@@ -2078,16 +2078,16 @@ int32_t lsm6dsv320x_ois_xl_self_test_set(const stmdev_ctx_t *ctx, lsm6dsv320x_se
   */
 int32_t lsm6dsv320x_ois_xl_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv320x_self_test_t *val)
 {
-  lsm6dsv320x_spi2_int_ois_t spi2_int_ois;
+  lsm6dsv320x_if2_int_ois_t if2_int_ois;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
   if (ret != 0)
   {
     return ret;
   }
 
-  switch (spi2_int_ois.st_xl_ois)
+  switch (if2_int_ois.st_xl_ois)
   {
     case LSM6DSV320X_ST_DISABLE:
       *val = LSM6DSV320X_ST_DISABLE;
@@ -2110,7 +2110,7 @@ int32_t lsm6dsv320x_ois_xl_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv320x_se
 }
 
 /**
-  * @brief  SPI2 Accelerometer self-test selection.[set]
+  * @brief  IF2 Accelerometer self-test selection.[set]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      GY_ST_DISABLE, GY_ST_POSITIVE, GY_ST_NEGATIVE, LSM6DSV320X_OIS_GY_ST_CLAMP_POS, LSM6DSV320X_OIS_GY_ST_CLAMP_NEG
@@ -2120,23 +2120,23 @@ int32_t lsm6dsv320x_ois_xl_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv320x_se
 int32_t lsm6dsv320x_ois_gy_self_test_set(const stmdev_ctx_t *ctx,
                                          lsm6dsv320x_ois_gy_self_test_t val)
 {
-  lsm6dsv320x_spi2_int_ois_t spi2_int_ois;
+  lsm6dsv320x_if2_int_ois_t if2_int_ois;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
 
   if (ret == 0)
   {
-    spi2_int_ois.st_g_ois = ((uint8_t)val & 0x3U);
-    spi2_int_ois.st_ois_clampdis = ((uint8_t)val & 0x04U) >> 2;
-    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+    if2_int_ois.st_g_ois = ((uint8_t)val & 0x3U);
+    if2_int_ois.st_ois_clampdis = ((uint8_t)val & 0x04U) >> 2;
+    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
   }
 
   return ret;
 }
 
 /**
-  * @brief  SPI2 Accelerometer self-test selection.[get]
+  * @brief  IF2 Accelerometer self-test selection.[get]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      GY_ST_DISABLE, GY_ST_POSITIVE, GY_ST_NEGATIVE, LSM6DSV320X_OIS_GY_ST_CLAMP_POS, LSM6DSV320X_OIS_GY_ST_CLAMP_NEG
@@ -2146,28 +2146,28 @@ int32_t lsm6dsv320x_ois_gy_self_test_set(const stmdev_ctx_t *ctx,
 int32_t lsm6dsv320x_ois_gy_self_test_get(const stmdev_ctx_t *ctx,
                                          lsm6dsv320x_ois_gy_self_test_t *val)
 {
-  lsm6dsv320x_spi2_int_ois_t spi2_int_ois;
+  lsm6dsv320x_if2_int_ois_t if2_int_ois;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
   if (ret != 0)
   {
     return ret;
   }
 
-  switch (spi2_int_ois.st_g_ois)
+  switch (if2_int_ois.st_g_ois)
   {
     case LSM6DSV320X_OIS_GY_ST_DISABLE:
       *val = LSM6DSV320X_OIS_GY_ST_DISABLE;
       break;
 
     case LSM6DSV320X_OIS_GY_ST_POSITIVE:
-      *val = (spi2_int_ois.st_ois_clampdis == 1U) ? LSM6DSV320X_OIS_GY_ST_CLAMP_POS :
+      *val = (if2_int_ois.st_ois_clampdis == 1U) ? LSM6DSV320X_OIS_GY_ST_CLAMP_POS :
              LSM6DSV320X_OIS_GY_ST_POSITIVE;
       break;
 
     case LSM6DSV320X_OIS_GY_ST_NEGATIVE:
-      *val = (spi2_int_ois.st_ois_clampdis == 1U) ? LSM6DSV320X_OIS_GY_ST_CLAMP_NEG :
+      *val = (if2_int_ois.st_ois_clampdis == 1U) ? LSM6DSV320X_OIS_GY_ST_CLAMP_NEG :
              LSM6DSV320X_OIS_GY_ST_NEGATIVE;
       break;
 
@@ -3437,7 +3437,7 @@ int32_t lsm6dsv320x_angular_rate_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
   * @brief  Angular rate sensor.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      OIS Angular rate sensor (thru SPI2).
+  * @param  val      OIS Angular rate sensor (thru IF2).
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -3446,7 +3446,7 @@ int32_t lsm6dsv320x_ois_angular_rate_raw_get(const stmdev_ctx_t *ctx, int16_t *v
   uint8_t buff[6];
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_OUTX_L_G_OIS, &buff[0], 6);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_OUTX_L_G_OIS, &buff[0], 6);
   if (ret != 0)
   {
     return ret;
@@ -4247,14 +4247,14 @@ int32_t lsm6dsv320x_eis_gy_full_scale_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Enables routing of gyroscope EIS outputs on SPI2 (OIS interface). The gyroscope data on SPI2 (OIS interface) cannot be read from User Interface (UI).[set]
+  * @brief  Enables routing of gyroscope EIS outputs on IF2 (OIS interface). The gyroscope data on IF2 (OIS interface) cannot be read from User Interface (UI).[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Enables routing of gyroscope EIS outputs on SPI2 (OIS interface). The gyroscope data on SPI2 (OIS interface) cannot be read from User Interface (UI).
+  * @param  val      Enables routing of gyroscope EIS outputs on IF2 (OIS interface). The gyroscope data on IF2 (OIS interface) cannot be read from User Interface (UI).
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lsm6dsv320x_eis_gy_on_spi2_set(const stmdev_ctx_t *ctx, uint8_t val)
+int32_t lsm6dsv320x_eis_gy_on_if2_set(const stmdev_ctx_t *ctx, uint8_t val)
 {
   lsm6dsv320x_ctrl_eis_t ctrl_eis;
   int32_t ret;
@@ -4271,14 +4271,14 @@ int32_t lsm6dsv320x_eis_gy_on_spi2_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Enables routing of gyroscope EIS outputs on SPI2 (OIS interface). The gyroscope data on SPI2 (OIS interface) cannot be read from User Interface (UI).[get]
+  * @brief  Enables routing of gyroscope EIS outputs on IF2 (OIS interface). The gyroscope data on IF2 (OIS interface) cannot be read from User Interface (UI).[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Enables routing of gyroscope EIS outputs on SPI2 (OIS interface). The gyroscope data on SPI2 (OIS interface) cannot be read from User Interface (UI).
+  * @param  val      Enables routing of gyroscope EIS outputs on IF2 (OIS interface). The gyroscope data on IF2 (OIS interface) cannot be read from User Interface (UI).
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lsm6dsv320x_eis_gy_on_spi2_get(const stmdev_ctx_t *ctx, uint8_t *val)
+int32_t lsm6dsv320x_eis_gy_on_if2_get(const stmdev_ctx_t *ctx, uint8_t *val)
 {
   lsm6dsv320x_ctrl_eis_t ctrl_eis;
   int32_t ret;
@@ -5872,15 +5872,15 @@ int32_t lsm6dsv320x_filt_settling_mask_get(const stmdev_ctx_t *ctx,
 int32_t lsm6dsv320x_filt_ois_settling_mask_set(const stmdev_ctx_t *ctx,
                                                lsm6dsv320x_filt_ois_settling_mask_t val)
 {
-  lsm6dsv320x_spi2_int_ois_t spi2_int_ois;
+  lsm6dsv320x_if2_int_ois_t if2_int_ois;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
 
   if (ret == 0)
   {
-    spi2_int_ois.drdy_mask_ois = val.ois_drdy;
-    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
+    if2_int_ois.drdy_mask_ois = val.ois_drdy;
+    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
   }
 
   return ret;
@@ -5898,11 +5898,11 @@ int32_t lsm6dsv320x_filt_ois_settling_mask_get(const stmdev_ctx_t *ctx,
                                                lsm6dsv320x_filt_ois_settling_mask_t *val)
 {
 
-  lsm6dsv320x_spi2_int_ois_t spi2_int_ois;
+  lsm6dsv320x_if2_int_ois_t if2_int_ois;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_INT_OIS, (uint8_t *)&spi2_int_ois, 1);
-  val->ois_drdy = spi2_int_ois.drdy_mask_ois;
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_INT_OIS, (uint8_t *)&if2_int_ois, 1);
+  val->ois_drdy = if2_int_ois.drdy_mask_ois;
 
   return ret;
 }
@@ -6559,7 +6559,7 @@ int32_t lsm6dsv320x_filt_gy_eis_lp_bandwidth_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope OIS digital LPF1 filter bandwidth selection. This function works also on OIS interface (SPI2_CTRL2_OIS = UI_CTRL2_OIS).[set]
+  * @brief  Gyroscope OIS digital LPF1 filter bandwidth selection. This function works also on OIS interface (IF2_CTRL2_OIS = UI_CTRL2_OIS).[set]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      OIS_GY_LP_NORMAL, OIS_GY_LP_STRONG, OIS_GY_LP_AGGRESSIVE, OIS_GY_LP_LIGHT,
@@ -6584,7 +6584,7 @@ int32_t lsm6dsv320x_filt_gy_ois_lp_bandwidth_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope OIS digital LPF1 filter bandwidth selection. This function works also on OIS interface (SPI2_CTRL2_OIS = UI_CTRL2_OIS).[get]
+  * @brief  Gyroscope OIS digital LPF1 filter bandwidth selection. This function works also on OIS interface (IF2_CTRL2_OIS = UI_CTRL2_OIS).[get]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      OIS_GY_LP_NORMAL, OIS_GY_LP_STRONG, OIS_GY_LP_AGGRESSIVE, OIS_GY_LP_LIGHT,
@@ -6631,7 +6631,7 @@ int32_t lsm6dsv320x_filt_gy_ois_lp_bandwidth_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects accelerometer OIS channel bandwidth. This function works also on OIS interface (SPI2_CTRL3_OIS = UI_CTRL3_OIS).[set]
+  * @brief  Selects accelerometer OIS channel bandwidth. This function works also on OIS interface (IF2_CTRL3_OIS = UI_CTRL3_OIS).[set]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      OIS_XL_LP_ULTRA_LIGHT, OIS_XL_LP_VERY_LIGHT, OIS_XL_LP_LIGHT, OIS_XL_LP_NORMAL, OIS_XL_LP_STRONG, OIS_XL_LP_VERY_STRONG, OIS_XL_LP_AGGRESSIVE, OIS_XL_LP_XTREME,
@@ -6656,7 +6656,7 @@ int32_t lsm6dsv320x_filt_xl_ois_lp_bandwidth_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects accelerometer OIS channel bandwidth. This function works also on OIS interface (SPI2_CTRL3_OIS = UI_CTRL3_OIS).[get]
+  * @brief  Selects accelerometer OIS channel bandwidth. This function works also on OIS interface (IF2_CTRL3_OIS = UI_CTRL3_OIS).[get]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      OIS_XL_LP_ULTRA_LIGHT, OIS_XL_LP_VERY_LIGHT, OIS_XL_LP_LIGHT, OIS_XL_LP_NORMAL, OIS_XL_LP_STRONG, OIS_XL_LP_VERY_STRONG, OIS_XL_LP_AGGRESSIVE, OIS_XL_LP_XTREME,
@@ -8419,7 +8419,7 @@ int32_t lsm6dsv320x_ois_reset_set(const stmdev_ctx_t *ctx, int8_t val)
   ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
   if (ret == 0)
   {
-    func_cfg_access.spi2_reset = (uint8_t)val;
+    func_cfg_access.aux_spi_reset = (uint8_t)val;
     ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
   }
 
@@ -8440,7 +8440,7 @@ int32_t lsm6dsv320x_ois_reset_get(const stmdev_ctx_t *ctx, int8_t *val)
   int32_t ret;
 
   ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
-  *val = (int8_t)func_cfg_access.spi2_reset;
+  *val = (int8_t)func_cfg_access.aux_spi_reset;
 
   return ret;
 }
@@ -8488,10 +8488,10 @@ int32_t lsm6dsv320x_ois_interface_pull_up_get(const stmdev_ctx_t *ctx, uint8_t *
 }
 
 /**
-  * @brief  Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[set]
+  * @brief  Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
+  * @param  val      Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -8513,10 +8513,10 @@ int32_t lsm6dsv320x_ois_handshake_from_ui_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[get]
+  * @brief  Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
+  * @param  val      Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -8539,64 +8539,61 @@ int32_t lsm6dsv320x_ois_handshake_from_ui_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[set]
+  * @brief  Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
+  * @param  val      Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
 int32_t lsm6dsv320x_ois_handshake_from_ois_set(const stmdev_ctx_t *ctx,
                                                lsm6dsv320x_ois_handshake_t val)
 {
-  lsm6dsv320x_spi2_handshake_ctrl_t spi2_handshake_ctrl;
+  lsm6dsv320x_if2_handshake_ctrl_t if2_handshake_ctrl;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_HANDSHAKE_CTRL, (uint8_t *)&spi2_handshake_ctrl,
-                             1);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_HANDSHAKE_CTRL, (uint8_t *)&if2_handshake_ctrl, 1);
   if (ret == 0)
   {
-    spi2_handshake_ctrl.spi2_shared_ack = val.ack;
-    spi2_handshake_ctrl.spi2_shared_req = val.req;
-    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_SPI2_HANDSHAKE_CTRL, (uint8_t *)&spi2_handshake_ctrl,
-                                1);
+    if2_handshake_ctrl.if2_shared_ack = val.ack;
+    if2_handshake_ctrl.if2_shared_req = val.req;
+    ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_IF2_HANDSHAKE_CTRL, (uint8_t *)&if2_handshake_ctrl, 1);
   }
 
   return ret;
 }
 
 /**
-  * @brief  Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[get]
+  * @brief  Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Handshake for (User Interface) UI / (OIS interface) SPI2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_SPI2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_SPI2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
+  * @param  val      Handshake for (User Interface) UI / (OIS interface) IF2 shared registers. ACK: This bit acknowledges the handshake. If the secondary interface is not accessing the shared registers, this bit is set to 1 by the device and the R/W operation on the UI_IF2_SHARED registers is allowed on the primary interface. REQ: This bit is used by the primary interface controller to request access to the UI_IF2_SHARED registers. When the R/W operation is finished, the controller must reset this bit.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
 int32_t lsm6dsv320x_ois_handshake_from_ois_get(const stmdev_ctx_t *ctx,
                                                lsm6dsv320x_ois_handshake_t *val)
 {
-  lsm6dsv320x_spi2_handshake_ctrl_t spi2_handshake_ctrl;
+  lsm6dsv320x_if2_handshake_ctrl_t if2_handshake_ctrl;
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_SPI2_HANDSHAKE_CTRL, (uint8_t *)&spi2_handshake_ctrl,
-                             1);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_IF2_HANDSHAKE_CTRL, (uint8_t *)&if2_handshake_ctrl, 1);
   if (ret != 0)
   {
     return ret;
   }
 
-  val->ack = spi2_handshake_ctrl.spi2_shared_ack;
-  val->req = spi2_handshake_ctrl.spi2_shared_req;
+  val->ack = if2_handshake_ctrl.if2_shared_ack;
+  val->req = if2_handshake_ctrl.if2_shared_req;
 
   return ret;
 }
 
 /**
-  * @brief  User interface (UI) / SPI2 (OIS) shared registers[set]
+  * @brief  User interface (UI) / IF2 (OIS) shared registers[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      User interface (UI) / SPI2 (OIS) shared registers
+  * @param  val      User interface (UI) / IF2 (OIS) shared registers
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -8604,16 +8601,16 @@ int32_t lsm6dsv320x_ois_shared_set(const stmdev_ctx_t *ctx, uint8_t val[6])
 {
   int32_t ret;
 
-  ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_UI_SPI2_SHARED_0, val, 6);
+  ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_UI_IF2_SHARED_0, val, 6);
 
   return ret;
 }
 
 /**
-  * @brief  User interface (UI) / SPI2 (OIS) shared registers[get]
+  * @brief  User interface (UI) / IF2 (OIS) shared registers[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      User interface (UI) / SPI2 (OIS) shared registers
+  * @param  val      User interface (UI) / IF2 (OIS) shared registers
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -8621,20 +8618,20 @@ int32_t lsm6dsv320x_ois_shared_get(const stmdev_ctx_t *ctx, uint8_t val[6])
 {
   int32_t ret;
 
-  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_UI_SPI2_SHARED_0, val, 6);
+  ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_UI_IF2_SHARED_0, val, 6);
 
   return ret;
 }
 
 /**
-  * @brief  In User Interface (UI) full control mode, enables SPI2 (OIS Interface) for reading OIS data. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[set]
+  * @brief  In User Interface (UI) full control mode, enables IF2 (OIS Interface) for reading OIS data. This function works also on OIS (UI_CTRL1_OIS = IF2_CTRL1_OIS).[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      In User Interface (UI) full control mode, enables SPI2 (OIS Interface) for reading OIS data.
+  * @param  val      In User Interface (UI) full control mode, enables IF2 (OIS Interface) for reading OIS data.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lsm6dsv320x_ois_on_spi2_set(const stmdev_ctx_t *ctx, uint8_t val)
+int32_t lsm6dsv320x_ois_on_if2_set(const stmdev_ctx_t *ctx, uint8_t val)
 {
   lsm6dsv320x_ui_ctrl1_ois_t ui_ctrl1_ois;
   int32_t ret;
@@ -8642,7 +8639,7 @@ int32_t lsm6dsv320x_ois_on_spi2_set(const stmdev_ctx_t *ctx, uint8_t val)
   ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_UI_CTRL1_OIS, (uint8_t *)&ui_ctrl1_ois, 1);
   if (ret == 0)
   {
-    ui_ctrl1_ois.spi2_read_en = val;
+    ui_ctrl1_ois.aux_spi_read_en = val;
     ret = lsm6dsv320x_write_reg(ctx, LSM6DSV320X_UI_CTRL1_OIS, (uint8_t *)&ui_ctrl1_ois, 1);
   }
 
@@ -8650,26 +8647,26 @@ int32_t lsm6dsv320x_ois_on_spi2_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  In User Interface (UI) full control mode, enables SPI2 (OIS Interface) for reading OIS data. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[get]
+  * @brief  In User Interface (UI) full control mode, enables IF2 (OIS Interface) for reading OIS data. This function works also on OIS (UI_CTRL1_OIS = IF2_CTRL1_OIS).[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      In User Interface (UI) full control mode, enables SPI2 (OIS Interface) for reading OIS data.
+  * @param  val      In User Interface (UI) full control mode, enables IF2 (OIS Interface) for reading OIS data.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lsm6dsv320x_ois_on_spi2_get(const stmdev_ctx_t *ctx, uint8_t *val)
+int32_t lsm6dsv320x_ois_on_if2_get(const stmdev_ctx_t *ctx, uint8_t *val)
 {
   lsm6dsv320x_ui_ctrl1_ois_t ui_ctrl1_ois;
   int32_t ret;
 
   ret = lsm6dsv320x_read_reg(ctx, LSM6DSV320X_UI_CTRL1_OIS, (uint8_t *)&ui_ctrl1_ois, 1);
-  *val = ui_ctrl1_ois.spi2_read_en;
+  *val = ui_ctrl1_ois.aux_spi_read_en;
 
   return ret;
 }
 
 /**
-  * @brief  Enables gyroscope/accelerometer OIS chain. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[set]
+  * @brief  Enables gyroscope/accelerometer OIS chain. This function works also on OIS (UI_CTRL1_OIS = IF2_CTRL1_OIS).[set]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      Enables gyroscope/accelerometer OIS chain.
@@ -9974,14 +9971,14 @@ int32_t lsm6dsv320x_ui_sda_pull_up_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  SPI2 (OIS Inteface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[set]
+  * @brief  IF2 (OIS Inteface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = IF2_CTRL1_OIS).[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      SPI2_4_WIRE, SPI2_3_WIRE,
+  * @param  val      SPI_4_WIRE, SPI_3_WIRE,
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lsm6dsv320x_spi2_mode_set(const stmdev_ctx_t *ctx, lsm6dsv320x_spi2_mode_t val)
+int32_t lsm6dsv320x_aux_spi_mode_set(const stmdev_ctx_t *ctx, lsm6dsv320x_spi_mode_t val)
 {
   lsm6dsv320x_ui_ctrl1_ois_t ui_ctrl1_ois;
   int32_t ret;
@@ -9997,14 +9994,14 @@ int32_t lsm6dsv320x_spi2_mode_set(const stmdev_ctx_t *ctx, lsm6dsv320x_spi2_mode
 }
 
 /**
-  * @brief  SPI2 (OIS Inteface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = SPI2_CTRL1_OIS).[get]
+  * @brief  IF2 (OIS Inteface) Serial Interface Mode selection. This function works also on OIS (UI_CTRL1_OIS = IF2_CTRL1_OIS).[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      SPI2_4_WIRE, SPI2_3_WIRE,
+  * @param  val      SPI_4_WIRE, SPI_3_WIRE,
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lsm6dsv320x_spi2_mode_get(const stmdev_ctx_t *ctx, lsm6dsv320x_spi2_mode_t *val)
+int32_t lsm6dsv320x_aux_spi_mode_get(const stmdev_ctx_t *ctx, lsm6dsv320x_spi_mode_t *val)
 {
   lsm6dsv320x_ui_ctrl1_ois_t ui_ctrl1_ois;
   int32_t ret;
@@ -10017,16 +10014,16 @@ int32_t lsm6dsv320x_spi2_mode_get(const stmdev_ctx_t *ctx, lsm6dsv320x_spi2_mode
 
   switch (ui_ctrl1_ois.sim_ois)
   {
-    case LSM6DSV320X_SPI2_4_WIRE:
-      *val = LSM6DSV320X_SPI2_4_WIRE;
+    case LSM6DSV320X_SPI_4_WIRE:
+      *val = LSM6DSV320X_SPI_4_WIRE;
       break;
 
-    case LSM6DSV320X_SPI2_3_WIRE:
-      *val = LSM6DSV320X_SPI2_3_WIRE;
+    case LSM6DSV320X_SPI_3_WIRE:
+      *val = LSM6DSV320X_SPI_3_WIRE;
       break;
 
     default:
-      *val = LSM6DSV320X_SPI2_4_WIRE;
+      *val = LSM6DSV320X_SPI_4_WIRE;
       break;
   }
 
