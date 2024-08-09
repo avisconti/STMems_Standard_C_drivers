@@ -13,4 +13,4 @@ every hardware.
 
 www.st.com/mems
 
-STENG1AX DS rev0.5
+STENG1AX DS rev0.8

@@ -166,6 +166,7 @@ void steng1ax_read_data_polling(void)
   /* Enable ENG (fully differential, gain 2, Zin 100Mohm) */
   mode.ah_eng_en = PROPERTY_ENABLE;
   steng1ax_ah_eng_mode_set(&dev_ctx, mode);
+  steng1ax_ah_eng_active(&dev_ctx);
 
   /* Set bdu and if_inc recommended for driver usage */
   steng1ax_init_set(&dev_ctx, STENG1AX_SENSOR_ONLY_ON);

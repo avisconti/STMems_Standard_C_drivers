@@ -165,7 +165,7 @@ int32_t steng1ax_power_up(const stmdev_ctx_t *ctx)
   dev_cfg.en_dev_conf = PROPERTY_ENABLE;
   ret = steng1ax_write_reg(ctx, STENG1AX_EN_DEVICE_CONFIG, (uint8_t *)&dev_cfg, 1);
 
-  if (ctx->mdelay == NULL) {
+  if (ctx->mdelay != NULL) {
     ctx->mdelay(25);
   }
 
@@ -213,6 +213,65 @@ int32_t steng1ax_init_set(const stmdev_ctx_t *ctx, steng1ax_init_t val)
       ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t*)&ctrl1, 1);
       break;
   }
+  return ret;
+}
+
+/**
+  * @brief  Smart mode configuration.[set]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      steng1ax_smart_power_t (pwr_en, pwr_win, pwr_dur)
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t steng1ax_smart_power_set(const stmdev_ctx_t *ctx, steng1ax_smart_power_t val)
+{
+  steng1ax_ctrl1_t ctrl1;
+  steng1ax_smart_power_ctrl_t pwr_ctrl;
+  int32_t ret;
+
+  /* Configure smart power */
+  pwr_ctrl.smart_power_ctrl_win = val.pwr_ctrl_win;
+  pwr_ctrl.smart_power_ctrl_dur = val.pwr_ctrl_dur;
+  ret = steng1ax_ln_pg_write(ctx, STENG1AX_SMART_POWER_CTRL, (uint8_t *)&pwr_ctrl, 1);
+
+  /* Enable smart power */
+  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (ret == 0)
+  {
+    ctrl1.smart_power_en = val.pwr_en;
+    ret = steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Smart mode configuration.[get]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      steng1ax_smart_power_t (pwr_en, pwr_win, pwr_dur)
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t steng1ax_smart_power_get(const stmdev_ctx_t *ctx, steng1ax_smart_power_t *val)
+{
+  steng1ax_ctrl1_t ctrl1;
+  steng1ax_smart_power_ctrl_t pwr_ctrl;
+  int32_t ret;
+
+  /* Read smart power configuration */
+  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret += steng1ax_ln_pg_read(ctx, STENG1AX_SMART_POWER_CTRL, (uint8_t *)&pwr_ctrl, 1);
+
+  if (ret == 0)
+  {
+    val->pwr_en = ctrl1.smart_power_en;
+    val->pwr_ctrl_win = pwr_ctrl.smart_power_ctrl_win;
+    val->pwr_ctrl_dur = pwr_ctrl.smart_power_ctrl_dur;
+  }
+
   return ret;
 }
 
@@ -1463,17 +1522,19 @@ int32_t steng1ax_ah_eng_mode_get(const stmdev_ctx_t *ctx, steng1ax_ah_eng_mode_t
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_ah_eng_reset(const stmdev_ctx_t *ctx)
+int32_t steng1ax_ah_eng_active(const stmdev_ctx_t *ctx)
 {
   steng1ax_ah_eng_cfg3_t cfg3 = {0};
   int32_t ret;
 
-  cfg3.ah_eng_active = 0U;
+  cfg3.ah_eng_active = 1U;
   ret = steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
 
-  ctx->mdelay(10);
+  if (ctx->mdelay != NULL) {
+    ctx->mdelay(10);
+  }
 
-  cfg3.ah_eng_active = 1U;
+  cfg3.ah_eng_active = 0U;
   ret = steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
 
   return ret;
@@ -2074,7 +2135,7 @@ int32_t steng1ax_fsm_number_of_programs_set(const stmdev_ctx_t *ctx,
 {
   int32_t ret;
 
-  ret = steng1ax_ln_pg_write(ctx, STENG1AX_FSM_PROGRAMS, buff, 2);
+  ret = steng1ax_ln_pg_write(ctx, STENG1AX_FSM_PROGRAMS, buff, 1);
 
   return ret;
 }
@@ -2092,7 +2153,7 @@ int32_t steng1ax_fsm_number_of_programs_get(const stmdev_ctx_t *ctx,
 {
   int32_t ret;
 
-  ret = steng1ax_ln_pg_read(ctx, STENG1AX_FSM_PROGRAMS, buff, 2);
+  ret = steng1ax_ln_pg_read(ctx, STENG1AX_FSM_PROGRAMS, buff, 1);
 
   return ret;
 }

@@ -231,9 +231,9 @@ typedef struct
   uint8_t if_add_inc                   : 1;
   uint8_t sw_reset                     : 1;
   uint8_t int1_pin_en                  : 1;
-  uint8_t not_used0                    : 1;
+  uint8_t smart_power_en               : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
-  uint8_t not_used0                    : 1;
+  uint8_t smart_power_en               : 1;
   uint8_t int1_pin_en                  : 1;
   uint8_t sw_reset                     : 1;
   uint8_t if_add_inc                   : 1;
@@ -1301,6 +1301,18 @@ typedef struct
 #endif /* DRV_BYTE_ORDER */
 } steng1ax_ah_eng_sensitivity_h_t;
 
+#define STENG1AX_SMART_POWER_CTRL                     0xD2U
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t smart_power_ctrl_win         : 4;
+  uint8_t smart_power_ctrl_dur         : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t smart_power_ctrl_dur         : 4;
+  uint8_t smart_power_ctrl_win         : 4;
+#endif /* DRV_BYTE_ORDER */
+} steng1ax_smart_power_ctrl_t;
+
 /**
   * @}
   *
@@ -1430,6 +1442,14 @@ typedef enum {
                                            embedded functions usage (it takes 10ms) */
 } steng1ax_init_t;
 int32_t steng1ax_init_set(const stmdev_ctx_t *ctx, steng1ax_init_t val);
+
+typedef struct {
+  uint8_t pwr_en                       : 1; /* Smart power enable */
+  uint8_t pwr_ctrl_win                 : 4; /* Number of consecutive windows */
+  uint8_t pwr_ctrl_dur                 : 4; /* Duration threshold */
+} steng1ax_smart_power_t;
+int32_t steng1ax_smart_power_set(const stmdev_ctx_t *ctx, steng1ax_smart_power_t val);
+int32_t steng1ax_smart_power_get(const stmdev_ctx_t *ctx, steng1ax_smart_power_t *val);
 
 typedef struct {
   uint8_t sw_reset                     : 1; /* Restoring configuration registers */
@@ -1665,7 +1685,7 @@ typedef struct
 int32_t steng1ax_ah_eng_mode_set(const stmdev_ctx_t *ctx, steng1ax_ah_eng_mode_t val);
 int32_t steng1ax_ah_eng_mode_get(const stmdev_ctx_t *ctx, steng1ax_ah_eng_mode_t *val);
 
-int32_t steng1ax_ah_eng_reset(const stmdev_ctx_t *ctx);
+int32_t steng1ax_ah_eng_active(const stmdev_ctx_t *ctx);
 
 int32_t steng1ax_timestamp_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t steng1ax_timestamp_get(const stmdev_ctx_t *ctx, uint8_t *val);
