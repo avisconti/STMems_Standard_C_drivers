@@ -452,6 +452,7 @@
                     <state>C:\Users\visconta\Projects\STdC\lps33k_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\ism330bx\tilt_angle_mode0</state>
                     <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\ism330bx\Vibration monitoring</state>
+                    <state>C:\Users\visconta\Projects\STdC\lps28dfw5_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2341,6 +2342,12 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lps28dfw_STdC\driver\lps28dfw_reg.c</name>
+            </file>
+        </group>
+        <group>
+            <name>lps28dfw5</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps28dfw5_STdC\driver\lps28dfw5_reg.c</name>
             </file>
         </group>
         <group>
