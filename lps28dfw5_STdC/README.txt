@@ -13,5 +13,5 @@ every hardware.
 
 www.st.com/mems
 
-LPS28DFW5 DS rev0.1
+LPS28DFW5 DS rev1.0
 

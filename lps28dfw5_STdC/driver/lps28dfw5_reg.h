@@ -518,7 +518,7 @@ int32_t lps28dfw5_write_reg(stmdev_ctx_t *ctx, uint8_t reg,
                            uint8_t *data, uint16_t len);
 
 extern float_t lps28dfw5_from_fs1260_to_hPa(int32_t lsb);
-extern float_t lps28dfw5_from_fs5060_to_hPa(int32_t lsb);
+extern float_t lps28dfw5_from_fs5560_to_hPa(int32_t lsb);
 
 extern float_t lps28dfw5_from_lsb_to_celsius(int16_t lsb);
 
@@ -607,7 +607,7 @@ typedef struct
   enum
   {
     LPS28DFW5_1260hPa = 0x00,
-    LPS28DFW5_5060hPa = 0x01,
+    LPS28DFW5_5560hPa = 0x01,
   } fs;
   enum
   {

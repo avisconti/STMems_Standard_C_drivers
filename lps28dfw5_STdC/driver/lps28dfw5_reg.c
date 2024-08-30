@@ -120,7 +120,7 @@ float_t lps28dfw5_from_fs1260_to_hPa(int32_t lsb)
           - knl3 * powf((hpa - p0), 3));
 }
 
-float_t lps28dfw5_from_fs5060_to_hPa(int32_t lsb)
+float_t lps28dfw5_from_fs5560_to_hPa(int32_t lsb)
 {
   float_t hpa = (float_t)lsb /  345600.0f; /* 1350.0f * 256 */
   float_t p0 = 760.0f;
@@ -525,7 +525,7 @@ int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
     ctrl_reg2.lfpf_cfg = ((uint8_t)val->lpf & 0x02U) >> 2;
     ctrl_reg2.fs_mode = (uint8_t)val->fs;
 
-    lps28dfw5_read_reg(ctx, 0x70, &rev, 1);
+    lps28dfw5_read_reg(ctx, LPS28DFW5_ID_FS, &rev, 1);
     switch (rev & 0x3)
     {
       case 0x1: /* bit1 == 0, bit0 == 1 */
@@ -537,7 +537,7 @@ int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
       case 0x3: /* bit1 == 1, bit0 == 1 */
       default:
         Delta_P0 = 240;
-        if (val->fs == LPS28DFW5_5060hPa)
+        if (val->fs == LPS28DFW5_5560hPa)
         {
           uint8_t reg[5] = {0U, 0U, 0U, 0U, 0U}; /* 0x4A - 0x4E */
           float gain;
@@ -597,8 +597,8 @@ int32_t lps28dfw5_mode_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
       case LPS28DFW5_1260hPa:
         val->fs = LPS28DFW5_1260hPa;
         break;
-      case LPS28DFW5_5060hPa:
-        val->fs = LPS28DFW5_5060hPa;
+      case LPS28DFW5_5560hPa:
+        val->fs = LPS28DFW5_5560hPa;
         break;
       default:
         val->fs = LPS28DFW5_1260hPa;
@@ -742,8 +742,8 @@ int32_t lps28dfw5_data_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *md,
     case LPS28DFW5_1260hPa:
       data->pressure.hpa = lps28dfw5_from_fs1260_to_hPa(data->pressure.raw);
       break;
-    case LPS28DFW5_5060hPa:
-      data->pressure.hpa = lps28dfw5_from_fs5060_to_hPa(data->pressure.raw);
+    case LPS28DFW5_5560hPa:
+      data->pressure.hpa = lps28dfw5_from_fs5560_to_hPa(data->pressure.raw);
       break;
     default:
       data->pressure.hpa = 0.0f;
@@ -917,8 +917,8 @@ int32_t lps28dfw5_fifo_data_get(stmdev_ctx_t *ctx, uint8_t samp,
       case LPS28DFW5_1260hPa:
         data[i].hpa = lps28dfw5_from_fs1260_to_hPa(data[i].raw);
         break;
-      case LPS28DFW5_5060hPa:
-        data[i].hpa = lps28dfw5_from_fs5060_to_hPa(data[i].raw);
+      case LPS28DFW5_5560hPa:
+        data[i].hpa = lps28dfw5_from_fs5560_to_hPa(data[i].raw);
         break;
       default:
         data[i].hpa = 0.0f;
