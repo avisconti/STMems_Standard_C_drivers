@@ -199,9 +199,9 @@ float_t lsm6dsv320x_from_lsb_to_celsius(int16_t lsb)
   return (((float_t)lsb / 256.0f) + 25.0f);
 }
 
-float_t lsm6dsv320x_from_lsb_to_nsec(uint32_t lsb)
+uint64_t lsm6dsv320x_from_lsb_to_nsec(uint32_t lsb)
 {
-  return ((float_t)lsb * 21750.0f);
+  return ((uint64_t)lsb * 21750.0f);
 }
 
 float_t lsm6dsv320x_from_lsb_to_mv(int16_t lsb)

@@ -4325,7 +4325,7 @@ float_t lsm6dsv256x_from_fs4000_to_mdps(int16_t lsb);
 
 float_t lsm6dsv256x_from_lsb_to_celsius(int16_t lsb);
 
-float_t lsm6dsv256x_from_lsb_to_nsec(uint32_t lsb);
+uint64_t lsm6dsv256x_from_lsb_to_nsec(uint32_t lsb);
 
 float_t lsm6dsv256x_from_lsb_to_mv(int16_t lsb);
 
