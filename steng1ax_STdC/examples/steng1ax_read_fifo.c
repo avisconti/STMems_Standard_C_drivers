@@ -133,7 +133,7 @@ static stmdev_ctx_t dev_ctx;
 static steng1ax_md_t md;
 static steng1ax_fifo_mode_t fifo_mode;
 static uint8_t fifo_wtm_event = 0;
-static steng1ax_ah_eng_mode_t mode;
+static steng1ax_ah_eng_config_t cfg;
 
 void steng1ax_read_fifo_handler(void)
 {
@@ -164,7 +164,7 @@ void steng1ax_read_fifo(void)
   /* Wait sensor boot time */
   platform_delay(BOOT_TIME);
 
-  steng1ax_power_up(&dev_ctx);
+  steng1ax_exit_deep_power_down(&dev_ctx);
 
   /* Check device ID */
   steng1ax_device_id_get(&dev_ctx, &id);
@@ -174,7 +174,7 @@ void steng1ax_read_fifo(void)
   /* Restore default configuration */
   steng1ax_init_set(&dev_ctx, STENG1AX_RESET);
   do {
-    steng1ax_all_status_get(&dev_ctx, &status);
+    steng1ax_status_get(&dev_ctx, &status);
   } while (status.sw_reset);
 
   /* Set FIFO watermark to 32 sample(s) */
@@ -185,9 +185,11 @@ void steng1ax_read_fifo(void)
   steng1ax_fifo_mode_set(&dev_ctx, fifo_mode);
 
   /* Enable ENG (fully differential, gain 2, Zin 100Mohm) */
-  mode.ah_eng_en = PROPERTY_ENABLE;
-  steng1ax_ah_eng_mode_set(&dev_ctx, mode);
-  steng1ax_ah_eng_active(&dev_ctx);
+  cfg.mode = STENG1AX_DIFFERENTIAL_MODE;
+  steng1ax_ah_eng_config_set(&dev_ctx, cfg);
+
+  steng1ax_enable_sensor(&dev_ctx);
+  steng1ax_ah_eng_active(&dev_ctx, 0); /* lpf0_en is 0, so odr == 800Hz */
 
   /* Set bdu and if_inc recommended for driver usage */
   steng1ax_init_set(&dev_ctx, STENG1AX_SENSOR_ONLY_ON);
@@ -200,7 +202,7 @@ void steng1ax_read_fifo(void)
 
   /* Set Output Data Rate */
   md.odr = STENG1AX_800Hz;
-  md.bw = STENG1AX_ODR_div_2;
+  md.bw = STENG1AX_BW_VAFE_90Hz;
   steng1ax_mode_set(&dev_ctx, &md);
 
   /* wait forever (ENG samples read with drdy irq) */

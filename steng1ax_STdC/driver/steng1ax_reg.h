@@ -7,7 +7,7 @@
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
+ * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
  * All rights reserved.</center></h2>
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -23,7 +23,7 @@
 #define STENG1AX_REGS_H
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -75,7 +75,8 @@
 #ifndef MEMS_SHARED_TYPES
 #define MEMS_SHARED_TYPES
 
-typedef struct{
+typedef struct
+{
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint8_t bit0                         : 1;
   uint8_t bit1                         : 1;
@@ -108,8 +109,10 @@ typedef struct{
   *
   */
 
-typedef int32_t (*stmdev_write_ptr)(void *, uint8_t, const uint8_t *, uint16_t);
-typedef int32_t (*stmdev_read_ptr)(void *, uint8_t, uint8_t *, uint16_t);
+typedef int32_t (*stmdev_write_ptr)(void *ctx, uint8_t reg,
+                                    const uint8_t *data, uint16_t len);
+typedef int32_t (*stmdev_read_ptr)(void *ctx, uint8_t reg,
+                                   uint8_t *data, uint16_t len);
 typedef void (*stmdev_mdelay_ptr)(uint32_t millisec);
 
 typedef struct
@@ -144,7 +147,8 @@ typedef struct
   *
   */
 
-typedef struct {
+typedef struct
+{
   uint8_t address;
   uint8_t data;
 } ucf_line_t;
@@ -178,7 +182,7 @@ typedef struct {
   *
   */
 
-#define STENG1AX_EXT_CLK_CFG                          0x0CU
+#define STENG1AX_EXT_CLK_CFG                          0x08U
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
@@ -226,19 +230,19 @@ typedef struct
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t not_used1                    : 3;
+  uint8_t not_used0                    : 3;
   uint8_t drdy_pulsed                  : 1;
   uint8_t if_add_inc                   : 1;
   uint8_t sw_reset                     : 1;
-  uint8_t int1_pin_en                  : 1;
+  uint8_t int_pin_en                   : 1;
   uint8_t smart_power_en               : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t smart_power_en               : 1;
-  uint8_t int1_pin_en                  : 1;
+  uint8_t int_pin_en                   : 1;
   uint8_t sw_reset                     : 1;
   uint8_t if_add_inc                   : 1;
   uint8_t drdy_pulsed                  : 1;
-  uint8_t not_used1                    : 3;
+  uint8_t not_used0                    : 3;
 #endif /* DRV_BYTE_ORDER */
 } steng1ax_ctrl1_t;
 
@@ -342,11 +346,11 @@ typedef struct
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t not_used0                    : 7;
+  uint8_t not_used1                    : 7;
   uint8_t timestamp_en                 : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t timestamp_en                 : 1;
-  uint8_t not_used0                    : 7;
+  uint8_t not_used1                    : 7;
 #endif /* DRV_BYTE_ORDER */
 } steng1ax_interrupt_cfg_t;
 
@@ -356,7 +360,9 @@ typedef struct
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint8_t int_emb_func                 : 1;
   uint8_t int_timestamp                : 1;
+  uint8_t not_used0                    : 6;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t not_used0                    : 6;
   uint8_t int_timestamp                : 1;
   uint8_t int_emb_func                 : 1;
 #endif /* DRV_BYTE_ORDER */
@@ -440,13 +446,13 @@ typedef struct
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint8_t ah_eng_en                    : 1;
   uint8_t ah_eng_gain                  : 2;
-  uint8_t ah_eng_zin                   : 2;
+  uint8_t ah_eng_c_zin                 : 2;
   uint8_t ah_eng_mode                  : 2;
   uint8_t not_used0                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t not_used0                    : 1;
   uint8_t ah_eng_mode                  : 2;
-  uint8_t ah_eng_zin                   : 2;
+  uint8_t ah_eng_c_zin                 : 2;
   uint8_t ah_eng_gain                  : 2;
   uint8_t ah_eng_en                    : 1;
 #endif /* DRV_BYTE_ORDER */
@@ -486,7 +492,7 @@ typedef struct
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t not_used0                    : 7;
+  uint8_t not_used1                    : 7;
   uint8_t is_fsm_lc                    : 1;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t is_fsm_lc                    : 1;
@@ -1320,85 +1326,86 @@ typedef struct
 
 typedef union
 {
-  steng1ax_ext_clk_cfg_t    ext_clk_cfg;
-  steng1ax_pin_ctrl_t    pin_ctrl;
-  steng1ax_who_am_i_t    who_am_i;
-  steng1ax_ctrl1_t    ctrl1;
-  steng1ax_ctrl2_t    ctrl2;
-  steng1ax_ctrl3_t    ctrl3;
-  steng1ax_ctrl4_t    ctrl4;
-  steng1ax_ctrl5_t    ctrl5;
-  steng1ax_fifo_ctrl_t    fifo_ctrl;
-  steng1ax_fifo_wtm_t    fifo_wtm;
-  steng1ax_interrupt_cfg_t    interrupt_cfg;
-  steng1ax_md1_cfg_t    md1_cfg;
-  steng1ax_status_register_t    status;
-  steng1ax_fifo_status1_t    fifo_status1;
-  steng1ax_fifo_status2_t    fifo_status2;
-  steng1ax_out_ah_eng_l_t out_ah_eng_l;
-  steng1ax_out_ah_eng_h_t out_ah_eng_h;
-  steng1ax_ah_eng_cfg1_t ah_eng_cfg1;
-  steng1ax_ah_eng_cfg2_t ah_eng_cfg2;
-  steng1ax_ah_eng_cfg3_t ah_eng_cfg3;
-  steng1ax_i3c_if_ctrl_t    i3c_if_ctrl;
+  steng1ax_ext_clk_cfg_t                 ext_clk_cfg;
+  steng1ax_pin_ctrl_t                    pin_ctrl;
+  steng1ax_who_am_i_t                    who_am_i;
+  steng1ax_ctrl1_t                       ctrl1;
+  steng1ax_ctrl2_t                       ctrl2;
+  steng1ax_ctrl3_t                       ctrl3;
+  steng1ax_ctrl4_t                       ctrl4;
+  steng1ax_ctrl5_t                       ctrl5;
+  steng1ax_fifo_ctrl_t                   fifo_ctrl;
+  steng1ax_fifo_wtm_t                    fifo_wtm;
+  steng1ax_interrupt_cfg_t               interrupt_cfg;
+  steng1ax_md1_cfg_t                     md1_cfg;
+  steng1ax_status_register_t             status;
+  steng1ax_fifo_status1_t                fifo_status1;
+  steng1ax_fifo_status2_t                fifo_status2;
+  steng1ax_out_ah_eng_l_t                out_ah_eng_l;
+  steng1ax_out_ah_eng_h_t                out_ah_eng_h;
+  steng1ax_ah_eng_cfg1_t                 ah_eng_cfg1;
+  steng1ax_ah_eng_cfg2_t                 ah_eng_cfg2;
+  steng1ax_ah_eng_cfg3_t                 ah_eng_cfg3;
+  steng1ax_i3c_if_ctrl_t                 i3c_if_ctrl;
   steng1ax_emb_func_status_mainpage_t    emb_func_status_mainpage;
-  steng1ax_fsm_status_mainpage_t    fsm_status_mainpage;
-  steng1ax_mlc_status_mainpage_t    mlc_status_mainpage;
-  steng1ax_en_device_config_t en_device_config;
-  steng1ax_func_cfg_access_t    func_cfg_access;
-  steng1ax_fifo_data_out_tag_t    fifo_data_out_tag;
-  steng1ax_fifo_data_out_x_l_t    fifo_data_out_x_l;
-  steng1ax_fifo_data_out_x_h_t    fifo_data_out_x_h;
-  steng1ax_fifo_data_out_y_l_t    fifo_data_out_y_l;
-  steng1ax_fifo_data_out_y_h_t    fifo_data_out_y_h;
-  steng1ax_fifo_data_out_z_l_t    fifo_data_out_z_l;
-  steng1ax_fifo_data_out_z_h_t    fifo_data_out_z_h;
-  steng1ax_fifo_batch_dec_t    fifo_batch_dec;
-  steng1ax_timestamp0_t    timestamp0;
-  steng1ax_timestamp1_t    timestamp1;
-  steng1ax_timestamp2_t    timestamp2;
-  steng1ax_timestamp3_t    timestamp3;
-  steng1ax_page_sel_t    page_sel;
-  steng1ax_emb_func_en_a_t    emb_func_en_a;
-  steng1ax_emb_func_en_b_t    emb_func_en_b;
-  steng1ax_emb_func_exec_status_t    emb_func_exec_status;
-  steng1ax_page_address_t    page_address;
-  steng1ax_page_value_t    page_value;
-  steng1ax_emb_func_int_t    emb_func_int;
-  steng1ax_fsm_int_t    fsm_int;
-  steng1ax_mlc_int_t    mlc_int;
-  steng1ax_emb_func_status_t    emb_func_status;
-  steng1ax_fsm_status_t    fsm_status;
-  steng1ax_mlc_status_t    mlc_status;
-  steng1ax_page_rw_t    page_rw;
-  steng1ax_emb_func_fifo_en_t    emb_func_fifo_en;
-  steng1ax_fsm_enable_t    fsm_enable;
-  steng1ax_fsm_long_counter_l_t    fsm_long_counter_l;
-  steng1ax_fsm_long_counter_h_t    fsm_long_counter_h;
-  steng1ax_int_ack_mask_t    int_ack_mask;
-  steng1ax_fsm_outs1_t    fsm_outs1;
-  steng1ax_fsm_outs2_t    fsm_outs2;
-  steng1ax_fsm_outs3_t    fsm_outs3;
-  steng1ax_fsm_outs4_t    fsm_outs4;
-  steng1ax_fsm_outs5_t    fsm_outs5;
-  steng1ax_fsm_outs6_t    fsm_outs6;
-  steng1ax_fsm_outs7_t    fsm_outs7;
-  steng1ax_fsm_outs8_t    fsm_outs8;
-  steng1ax_emb_func_init_a_t    emb_func_init_a;
-  steng1ax_emb_func_init_b_t    emb_func_init_b;
-  steng1ax_mlc1_src_t    mlc1_src;
-  steng1ax_mlc2_src_t    mlc2_src;
-  steng1ax_mlc3_src_t    mlc3_src;
-  steng1ax_mlc4_src_t    mlc4_src;
-  steng1ax_fsm_odr_t    fsm_odr;
-  steng1ax_mlc_odr_t    mlc_odr;
-  steng1ax_fsm_lc_timeout_l_t    fsm_lc_timeout_l;
-  steng1ax_fsm_lc_timeout_h_t    fsm_lc_timeout_h;
-  steng1ax_fsm_programs_t    fsm_programs;
-  steng1ax_fsm_start_add_l_t    fsm_start_add_l;
-  steng1ax_fsm_start_add_h_t    fsm_start_add_h;
-  steng1ax_ah_eng_sensitivity_l_t    ah_eng_sensitivity_l;
-  steng1ax_ah_eng_sensitivity_h_t    ah_eng_sensitivity_h;
+  steng1ax_fsm_status_mainpage_t         fsm_status_mainpage;
+  steng1ax_mlc_status_mainpage_t         mlc_status_mainpage;
+  steng1ax_en_device_config_t            en_device_config;
+  steng1ax_func_cfg_access_t             func_cfg_access;
+  steng1ax_fifo_data_out_tag_t           fifo_data_out_tag;
+  steng1ax_fifo_data_out_x_l_t           fifo_data_out_x_l;
+  steng1ax_fifo_data_out_x_h_t           fifo_data_out_x_h;
+  steng1ax_fifo_data_out_y_l_t           fifo_data_out_y_l;
+  steng1ax_fifo_data_out_y_h_t           fifo_data_out_y_h;
+  steng1ax_fifo_data_out_z_l_t           fifo_data_out_z_l;
+  steng1ax_fifo_data_out_z_h_t           fifo_data_out_z_h;
+  steng1ax_fifo_batch_dec_t              fifo_batch_dec;
+  steng1ax_timestamp0_t                  timestamp0;
+  steng1ax_timestamp1_t                  timestamp1;
+  steng1ax_timestamp2_t                  timestamp2;
+  steng1ax_timestamp3_t                  timestamp3;
+  steng1ax_page_sel_t                    page_sel;
+  steng1ax_emb_func_en_a_t               emb_func_en_a;
+  steng1ax_emb_func_en_b_t               emb_func_en_b;
+  steng1ax_emb_func_exec_status_t        emb_func_exec_status;
+  steng1ax_page_address_t                page_address;
+  steng1ax_page_value_t                  page_value;
+  steng1ax_emb_func_int_t                emb_func_int;
+  steng1ax_fsm_int_t                     fsm_int;
+  steng1ax_mlc_int_t                     mlc_int;
+  steng1ax_emb_func_status_t             emb_func_status;
+  steng1ax_fsm_status_t                  fsm_status;
+  steng1ax_mlc_status_t                  mlc_status;
+  steng1ax_page_rw_t                     page_rw;
+  steng1ax_emb_func_fifo_en_t            emb_func_fifo_en;
+  steng1ax_fsm_enable_t                  fsm_enable;
+  steng1ax_fsm_long_counter_l_t          fsm_long_counter_l;
+  steng1ax_fsm_long_counter_h_t          fsm_long_counter_h;
+  steng1ax_int_ack_mask_t                int_ack_mask;
+  steng1ax_fsm_outs1_t                   fsm_outs1;
+  steng1ax_fsm_outs2_t                   fsm_outs2;
+  steng1ax_fsm_outs3_t                   fsm_outs3;
+  steng1ax_fsm_outs4_t                   fsm_outs4;
+  steng1ax_fsm_outs5_t                   fsm_outs5;
+  steng1ax_fsm_outs6_t                   fsm_outs6;
+  steng1ax_fsm_outs7_t                   fsm_outs7;
+  steng1ax_fsm_outs8_t                   fsm_outs8;
+  steng1ax_emb_func_init_a_t             emb_func_init_a;
+  steng1ax_emb_func_init_b_t             emb_func_init_b;
+  steng1ax_mlc1_src_t                    mlc1_src;
+  steng1ax_mlc2_src_t                    mlc2_src;
+  steng1ax_mlc3_src_t                    mlc3_src;
+  steng1ax_mlc4_src_t                    mlc4_src;
+  steng1ax_fsm_odr_t                     fsm_odr;
+  steng1ax_mlc_odr_t                     mlc_odr;
+  steng1ax_fsm_lc_timeout_l_t            fsm_lc_timeout_l;
+  steng1ax_fsm_lc_timeout_h_t            fsm_lc_timeout_h;
+  steng1ax_fsm_programs_t                fsm_programs;
+  steng1ax_fsm_start_add_l_t             fsm_start_add_l;
+  steng1ax_fsm_start_add_h_t             fsm_start_add_h;
+  steng1ax_ah_eng_sensitivity_l_t        ah_eng_sensitivity_l;
+  steng1ax_ah_eng_sensitivity_h_t        ah_eng_sensitivity_h;
+  steng1ax_smart_power_ctrl_t            smart_power_ctrl;
   bitwise_t    bitwise;
   uint8_t    byte;
 } steng1ax_reg_t;
@@ -1432,9 +1439,8 @@ float_t steng1ax_from_lsb_to_mv(int16_t lsb);
 
 int32_t steng1ax_device_id_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
-int32_t steng1ax_power_up(const stmdev_ctx_t *ctx);
-
-typedef enum {
+typedef enum
+{
   STENG1AX_SENSOR_ONLY_ON     = 0x00, /* Initialize the driver for sensor usage */
   STENG1AX_BOOT               = 0x01, /* Restore calib. param. (it takes 10ms) */
   STENG1AX_RESET              = 0x02, /* Reset configuration registers */
@@ -1443,7 +1449,8 @@ typedef enum {
 } steng1ax_init_t;
 int32_t steng1ax_init_set(const stmdev_ctx_t *ctx, steng1ax_init_t val);
 
-typedef struct {
+typedef struct
+{
   uint8_t pwr_en                       : 1; /* Smart power enable */
   uint8_t pwr_ctrl_win                 : 4; /* Number of consecutive windows */
   uint8_t pwr_ctrl_dur                 : 4; /* Duration threshold */
@@ -1451,13 +1458,21 @@ typedef struct {
 int32_t steng1ax_smart_power_set(const stmdev_ctx_t *ctx, steng1ax_smart_power_t val);
 int32_t steng1ax_smart_power_get(const stmdev_ctx_t *ctx, steng1ax_smart_power_t *val);
 
-typedef struct {
+typedef struct
+{
   uint8_t sw_reset                     : 1; /* Restoring configuration registers */
   uint8_t boot                         : 1; /* Restoring calibration parameters */
   uint8_t drdy                         : 1; /* Accelerometer data ready */
+  uint8_t power_down                   : 1; /* Monitors power-down. */
 } steng1ax_status_t;
-int32_t steng1ax_all_status_get(const stmdev_ctx_t *ctx, steng1ax_status_t *val);
+int32_t steng1ax_status_get(const stmdev_ctx_t *ctx, steng1ax_status_t *val);
 int32_t steng1ax_drdy_status_get(const stmdev_ctx_t *ctx, steng1ax_status_t *val);
+
+typedef struct
+{
+  uint8_t is_fsm_lc                    : 1; /* FSM long counter timeout */
+} steng1ax_embedded_status_t;
+int32_t steng1ax_embedded_status_get(const stmdev_ctx_t *ctx, steng1ax_embedded_status_t *val);
 
 typedef enum
 {
@@ -1467,38 +1482,57 @@ typedef enum
 int32_t steng1ax_data_ready_mode_set(const stmdev_ctx_t *ctx, steng1ax_data_ready_mode_t val);
 int32_t steng1ax_data_ready_mode_get(const stmdev_ctx_t *ctx, steng1ax_data_ready_mode_t *val);
 
-typedef struct {
-  enum {
-    STENG1AX_OFF            = 0x00, /* in power down */
-    STENG1AX_800Hz          = 0x01, /* ODR 800Hz, Filter on */
-    STENG1AX_3200Hz         = 0x02, /* ODR 3200Hz, Filter off */
-  } odr;
-  enum {
-    STENG1AX_ODR_div_2   = 0,
-    STENG1AX_ODR_div_4   = 1,
-    STENG1AX_ODR_div_8   = 2,
-    STENG1AX_ODR_div_16  = 3,
-  } bw;
+typedef enum
+{
+  STENG1AX_OFF               = 0x00, /* in power down */
+  STENG1AX_800Hz             = 0x01, /* ODR 800Hz, Filter on */
+  STENG1AX_3200Hz            = 0x02, /* ODR 3200Hz, Filter off */
+} steng1ax_odr_t;
+
+typedef enum
+{
+  STENG1AX_BW_VAFE_45Hz      = 0,
+  STENG1AX_BW_VAFE_90Hz      = 1,
+  STENG1AX_BW_VAFE_180Hz     = 2,
+  STENG1AX_BW_VAFE_360Hz     = 3,
+  STENG1AX_BW_VAFE_700Hz     = 4,
+  STENG1AX_BW_VAFE_1600Hz    = 5,
+} steng1ax_bw_t;
+
+typedef struct
+{
+  steng1ax_odr_t odr;
+  steng1ax_bw_t bw;
 } steng1ax_md_t;
-int32_t steng1ax_mode_set(const stmdev_ctx_t *ctx, steng1ax_md_t *val);
+int32_t steng1ax_mode_set(const stmdev_ctx_t *ctx,
+                          const steng1ax_md_t *val);
 int32_t steng1ax_mode_get(const stmdev_ctx_t *ctx, steng1ax_md_t *val);
 
 typedef struct
 {
   uint8_t drdy                         : 1;
+  uint8_t fifo_full                    : 1;
   uint8_t fifo_ovr                     : 1;
   uint8_t fifo_th                      : 1;
 } steng1ax_all_sources_t;
-int32_t steng1ax_all_sources_get(const stmdev_ctx_t *ctx, steng1ax_all_sources_t *val);
+int32_t steng1ax_all_sources_get(const stmdev_ctx_t *ctx,
+                                 steng1ax_all_sources_t *val);
 
-typedef struct {
+typedef struct
+{
   float_t mv;
   int16_t raw;
 } steng1ax_ah_eng_data_t;
-int32_t steng1ax_ah_eng_data_get(const stmdev_ctx_t *ctx, steng1ax_ah_eng_data_t *data);
+int32_t steng1ax_ah_eng_data_get(const stmdev_ctx_t *ctx,
+                                 steng1ax_ah_eng_data_t *data);
 
-typedef struct {
-  enum {
+int32_t steng1ax_enter_deep_power_down(const stmdev_ctx_t *ctx, uint8_t val);
+int32_t steng1ax_exit_deep_power_down(const stmdev_ctx_t *ctx);
+
+typedef struct
+{
+  enum
+  {
     STENG1AX_I3C_BUS_AVAIL_TIME_20US = 0x0,
     STENG1AX_I3C_BUS_AVAIL_TIME_50US = 0x1,
     STENG1AX_I3C_BUS_AVAIL_TIME_1MS  = 0x2,
@@ -1507,49 +1541,64 @@ typedef struct {
   uint8_t asf_on                       : 1;
   uint8_t drstdaa_en                   : 1;
 } steng1ax_i3c_cfg_t;
-int32_t steng1ax_i3c_configure_set(const stmdev_ctx_t *ctx, steng1ax_i3c_cfg_t *val);
-int32_t steng1ax_i3c_configure_get(const stmdev_ctx_t *ctx, steng1ax_i3c_cfg_t *val);
+int32_t steng1ax_i3c_configure_set(const stmdev_ctx_t *ctx,
+                                   const steng1ax_i3c_cfg_t *val);
+int32_t steng1ax_i3c_configure_get(const stmdev_ctx_t *ctx,
+                                   steng1ax_i3c_cfg_t *val);
 
 typedef enum
 {
   STENG1AX_MAIN_MEM_BANK       = 0x0,
   STENG1AX_EMBED_FUNC_MEM_BANK = 0x1,
 } steng1ax_mem_bank_t;
-int32_t steng1ax_mem_bank_set(const stmdev_ctx_t *ctx, steng1ax_mem_bank_t val);
-int32_t steng1ax_mem_bank_get(const stmdev_ctx_t *ctx, steng1ax_mem_bank_t *val);
+int32_t steng1ax_mem_bank_set(const stmdev_ctx_t *ctx,
+                              steng1ax_mem_bank_t val);
+int32_t steng1ax_mem_bank_get(const stmdev_ctx_t *ctx,
+                              steng1ax_mem_bank_t *val);
 
-int32_t steng1ax_ln_pg_write(const stmdev_ctx_t *ctx, uint16_t address, uint8_t *buf, uint8_t len);
-int32_t steng1ax_ln_pg_read(const stmdev_ctx_t *ctx, uint16_t address, uint8_t *buf, uint8_t len);
+int32_t steng1ax_ln_pg_write(const stmdev_ctx_t *ctx, uint16_t address,
+                             uint8_t *buf, uint8_t len);
+int32_t steng1ax_ln_pg_read(const stmdev_ctx_t *ctx, uint16_t address,
+                            uint8_t *buf, uint8_t len);
 
 int32_t steng1ax_ext_clk_en_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t steng1ax_ext_clk_en_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
-typedef struct {
+typedef struct
+{
   uint8_t sdo_pull_up                  : 1; /* 1 = pull up enable */
   uint8_t sda_pull_up                  : 1; /* 1 = pull up enable */
   uint8_t cs_pull_up                   : 1; /* 1 = pull up enable */
   uint8_t int_push_pull                : 1; /* 1 = push-pull / 0 = open-drain*/
 } steng1ax_pin_conf_t;
-int32_t steng1ax_pin_conf_set(const stmdev_ctx_t *ctx, steng1ax_pin_conf_t *val);
-int32_t steng1ax_pin_conf_get(const stmdev_ctx_t *ctx, steng1ax_pin_conf_t *val);
+int32_t steng1ax_pin_conf_set(const stmdev_ctx_t *ctx,
+                              const steng1ax_pin_conf_t *val);
+int32_t steng1ax_pin_conf_get(const stmdev_ctx_t *ctx,
+                              steng1ax_pin_conf_t *val);
 
 typedef enum
 {
   STENG1AX_ACTIVE_HIGH = 0x0,
   STENG1AX_ACTIVE_LOW  = 0x1,
 } steng1ax_int_pin_polarity_t;
-int32_t steng1ax_int_pin_polarity_set(const stmdev_ctx_t *ctx, steng1ax_int_pin_polarity_t val);
-int32_t steng1ax_int_pin_polarity_get(const stmdev_ctx_t *ctx, steng1ax_int_pin_polarity_t *val);
+int32_t steng1ax_int_pin_polarity_set(const stmdev_ctx_t *ctx,
+                                      steng1ax_int_pin_polarity_t val);
+int32_t steng1ax_int_pin_polarity_get(const stmdev_ctx_t *ctx,
+                                      steng1ax_int_pin_polarity_t *val);
 
 typedef enum
 {
   STENG1AX_SPI_4_WIRE  = 0x0, /* SPI 4 wires */
   STENG1AX_SPI_3_WIRE  = 0x1, /* SPI 3 wires */
 } steng1ax_spi_mode;
-int32_t steng1ax_spi_mode_set(const stmdev_ctx_t *ctx, steng1ax_spi_mode val);
-int32_t steng1ax_spi_mode_get(const stmdev_ctx_t *ctx, steng1ax_spi_mode *val);
+int32_t steng1ax_spi_mode_set(const stmdev_ctx_t *ctx,
+                              steng1ax_spi_mode val);
+int32_t steng1ax_spi_mode_get(const stmdev_ctx_t *ctx,
+                              steng1ax_spi_mode *val);
 
-typedef struct {
+typedef struct
+{
+  uint8_t int_pin_en                   : 1; /* Interrupt on INT pin */
   uint8_t drdy                         : 1; /* Accelerometer data ready */
   uint8_t boot                         : 1; /* Restoring calibration parameters */
   uint8_t fifo_th                      : 1; /* FIFO threshold reached */
@@ -1559,77 +1608,82 @@ typedef struct {
   uint8_t timestamp                    : 1; /* Timestamp */
 } steng1ax_pin_int_route_t;
 int32_t steng1ax_pin_int_route_set(const stmdev_ctx_t *ctx,
-                                   steng1ax_pin_int_route_t *val);
+                                   const steng1ax_pin_int_route_t *val);
 int32_t steng1ax_pin_int_route_get(const stmdev_ctx_t *ctx,
                                    steng1ax_pin_int_route_t *val);
 
-typedef struct {
+typedef struct
+{
   uint8_t fsm_lc                       : 1; /* route FSM long counter event on INT pad */
 } steng1ax_emb_pin_int_route_t;
 int32_t steng1ax_emb_pin_int_route_set(const stmdev_ctx_t *ctx,
-                                       steng1ax_emb_pin_int_route_t *val);
+                                       const steng1ax_emb_pin_int_route_t *val);
 int32_t steng1ax_emb_pin_int_route_get(const stmdev_ctx_t *ctx,
                                        steng1ax_emb_pin_int_route_t *val);
-int32_t steng1ax_emb_pin_int2_route_set(const stmdev_ctx_t *ctx,
-                                        steng1ax_emb_pin_int_route_t *val);
-int32_t steng1ax_emb_pin_int2_route_get(const stmdev_ctx_t *ctx,
-                                        steng1ax_emb_pin_int_route_t *val);
 
 typedef enum
 {
-  STENG1AX_EMBEDDED_INT_LEVEL         = 0x0,
-  STENG1AX_EMBEDDED_INT_LATCHED       = 0x1,
+  STENG1AX_EMBEDDED_INT_LEVEL     = 0x0,
+  STENG1AX_EMBEDDED_INT_LATCHED   = 0x1,
 } steng1ax_embedded_int_config_t;
-int32_t steng1ax_embedded_int_config_set(const stmdev_ctx_t *ctx, steng1ax_embedded_int_config_t val);
-int32_t steng1ax_embedded_int_config_get(const stmdev_ctx_t *ctx, steng1ax_embedded_int_config_t *val);
+int32_t steng1ax_embedded_int_cfg_set(const stmdev_ctx_t *ctx,
+                                      steng1ax_embedded_int_config_t val);
+int32_t steng1ax_embedded_int_cfg_get(const stmdev_ctx_t *ctx,
+                                      steng1ax_embedded_int_config_t *val);
 
-typedef struct {
-  enum steng1ax_operation
+typedef struct
+{
+  enum steng1ax_operation_t
   {
-    STENG1AX_BYPASS_MODE              = 0x0,
-    STENG1AX_FIFO_MODE                = 0x1,
-    STENG1AX_STREAM_TO_FIFO_MODE      = 0x3,
-    STENG1AX_BYPASS_TO_STREAM_MODE    = 0x4,
-    STENG1AX_STREAM_MODE              = 0x6,
-    STENG1AX_BYPASS_TO_FIFO_MODE      = 0x7,
-    STENG1AX_FIFO_OFF                 = 0x8,
+    STENG1AX_BYPASS_MODE            = 0x0,
+    STENG1AX_FIFO_MODE              = 0x1,
+    STENG1AX_STREAM_TO_FIFO_MODE    = 0x3,
+    STENG1AX_BYPASS_TO_STREAM_MODE  = 0x4,
+    STENG1AX_STREAM_MODE            = 0x6,
+    STENG1AX_BYPASS_TO_FIFO_MODE    = 0x7,
+    STENG1AX_FIFO_OFF               = 0x8,
   } operation;
+
   uint8_t watermark                    : 7; /* (0 disable) max 127 @16bit, even and max 256 @8bit.*/
   uint8_t cfg_change_in_fifo           : 1;
-  struct {
-    enum steng1ax_dec_ts
+  struct
+  {
+    enum steng1ax_dec_ts_t
     {
       STENG1AX_DEC_TS_OFF             = 0x0,
       STENG1AX_DEC_TS_1               = 0x1,
       STENG1AX_DEC_TS_8               = 0x2,
       STENG1AX_DEC_TS_32              = 0x3,
     } dec_ts; /* decimation for timestamp batching*/
-    enum steng1ax_bdr
+
+    enum steng1ax_bdr_t
     {
-      STENG1AX_BDR_ODR             = 0x0,
-      STENG1AX_BDR_ODR_DIV_2       = 0x1,
-      STENG1AX_BDR_ODR_DIV_4       = 0x2,
-      STENG1AX_BDR_ODR_DIV_8       = 0x3,
-      STENG1AX_BDR_ODR_DIV_16      = 0x4,
-      STENG1AX_BDR_ODR_DIV_32      = 0x5,
-      STENG1AX_BDR_ODR_DIV_64      = 0x6,
-      STENG1AX_BDR_ODR_OFF         = 0x7,
-    } bdr; /* batch data rate*/
+      STENG1AX_BDR_ODR               = 0x0,
+      STENG1AX_BDR_ODR_DIV_2         = 0x1,
+      STENG1AX_BDR_ODR_DIV_4         = 0x2,
+      STENG1AX_BDR_ODR_DIV_8         = 0x3,
+      STENG1AX_BDR_ODR_DIV_16        = 0x4,
+      STENG1AX_BDR_ODR_DIV_32        = 0x5,
+      STENG1AX_BDR_ODR_DIV_64        = 0x6,
+      STENG1AX_BDR_ODR_OFF           = 0x7,
+    } bdr; /* AH/ENG batch data rate*/
   } batch;
 } steng1ax_fifo_mode_t;
-int32_t steng1ax_fifo_mode_set(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t val);
-int32_t steng1ax_fifo_mode_get(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t *val);
+int32_t steng1ax_fifo_mode_set(const stmdev_ctx_t *ctx,
+                               steng1ax_fifo_mode_t val);
+int32_t steng1ax_fifo_mode_get(const stmdev_ctx_t *ctx,
+                               steng1ax_fifo_mode_t *val);
 
 int32_t steng1ax_fifo_data_level_get(const stmdev_ctx_t *ctx, uint16_t *val);
 int32_t steng1ax_fifo_wtm_flag_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 typedef enum
 {
-  STENG1AX_FIFO_EMPTY                 = 0x0,
+  STENG1AX_FIFO_EMPTY_TAG             = 0x0,
   STENG1AX_TIMESTAMP_CFG_CHG_TAG      = 0x4,
   STENG1AX_MLC_RESULT_TAG             = 0x1A,
   STENG1AX_MLC_FILTER_TAG             = 0x1B,
-  STENG1AX_MLC_FEATURE                = 0x1C,
+  STENG1AX_MLC_FEATURE_TAG            = 0x1C,
   STENG1AX_FSM_RESULT_TAG             = 0x1D,
   STENG1AX_AH_ENG_DATA_TAG            = 0x1E,
 } steng1ax_fifo_sensor_tag_t;
@@ -1638,95 +1692,110 @@ int32_t steng1ax_fifo_sensor_tag_get(const stmdev_ctx_t *ctx,
 
 int32_t steng1ax_fifo_out_raw_get(const stmdev_ctx_t *ctx, uint8_t *buff);
 
-typedef struct {
+typedef struct
+{
   uint8_t tag;
-  struct {
+  struct
+  {
     float_t mv;
     int16_t raw;
   } ah_eng;
-  struct steng1ax_cfg_chg {
+
+  struct
+  {
     uint8_t cfg_change                 : 1; /* 1 if ODR/BDR configuration is changed */
     uint8_t odr                        : 4; /* ODR */
     uint8_t bw                         : 2; /* BW */
-    uint8_t lp_hp                      : 1; /* Power (LP == 0/HP == 1) */
-    uint8_t qvar_en                    : 1; /* QVAR is enabled */
+    uint8_t lp_hp                      : 1; /* Power: 0 for LP, 1 for HP */
+    uint8_t ah_en                      : 1; /* AH is enabled */
     uint8_t fs                         : 2; /* FS */
     uint8_t dec_ts                     : 2; /* Timestamp decimator value */
     uint8_t odr_xl_batch               : 1; /* Accelerometer ODR is batched */
     uint32_t timestamp;
   } cfg_chg;
 } steng1ax_fifo_data_t;
-int32_t steng1ax_fifo_data_get(const stmdev_ctx_t *ctx, steng1ax_md_t *md, steng1ax_fifo_data_t *data);
+int32_t steng1ax_fifo_data_get(const stmdev_ctx_t *ctx,
+                               const steng1ax_md_t *md,
+                               steng1ax_fifo_data_t *data);
+
 
 typedef struct
 {
-  uint8_t ah_eng_en                   : 1;
-  uint8_t ah_eng_zin_dis_1            : 1;
-  uint8_t ah_eng_zin_dis_2            : 1;
-  enum {
-    STENG1AX_MODE_DIFFERENTIAL          = 0x0,
-    STENG1AX_MODE_SINGLE_ENDED_I1_FLOAT = 0x1,
-    STENG1AX_MODE_SINGLE_ENDED_I2_FLOAT = 0x2,
-    STENG1AX_MODE_RESET                 = 0x3,
-  } ah_eng_mode;
-  enum {
-    STENG1AX_100MOhm           = 0x0,
-    STENG1AX_200MOhm           = 0x1,
-    STENG1AX_500MOhm           = 0x2,
-    STENG1AX_1GOhm             = 0x3,
-  } ah_eng_zin;
-  enum {
-    STENG1AX_GAIN_2            = 0x0,
-    STENG1AX_GAIN_4            = 0x1,
-    STENG1AX_GAIN_8            = 0x2,
-    STENG1AX_GAIN_16           = 0x3,
-  } ah_eng_gain;
-} steng1ax_ah_eng_mode_t;
-int32_t steng1ax_ah_eng_mode_set(const stmdev_ctx_t *ctx, steng1ax_ah_eng_mode_t val);
-int32_t steng1ax_ah_eng_mode_get(const stmdev_ctx_t *ctx, steng1ax_ah_eng_mode_t *val);
+  uint8_t ah_eng_zin_dis_1                    : 1;
+  uint8_t ah_eng_zin_dis_2                    : 1;
 
-int32_t steng1ax_ah_eng_active(const stmdev_ctx_t *ctx);
+  enum
+  {
+    STENG1AX_DIFFERENTIAL_MODE            = 0x0,
+    STENG1AX_SINGLE_MODE_01               = 0x1,
+    STENG1AX_SINGLE_MODE_10               = 0x2,
+    STENG1AX_FORCED_RESET                 = 0x3,
+  } mode;
+
+  enum
+  {
+    STENG1AX_100MOhm                      = 0x0,
+    STENG1AX_200MOhm                      = 0x1,
+    STENG1AX_500MOhm                      = 0x2,
+    STENG1AX_1GOhm                        = 0x3,
+  } zin;
+
+  enum
+  {
+    STENG1AX_GAIN_2                       = 0x0,
+    STENG1AX_GAIN_4                       = 0x1,
+    STENG1AX_GAIN_8                       = 0x2,
+    STENG1AX_GAIN_16                      = 0x3,
+  } gain;
+} steng1ax_ah_eng_config_t;
+int32_t steng1ax_ah_eng_config_set(const stmdev_ctx_t *ctx,
+                                   steng1ax_ah_eng_config_t val);
+int32_t steng1ax_ah_eng_config_get(const stmdev_ctx_t *ctx,
+                                   steng1ax_ah_eng_config_t *val);
+
+int32_t steng1ax_enable_sensor(const stmdev_ctx_t *ctx);
+int32_t steng1ax_ah_eng_active(const stmdev_ctx_t *ctx, uint8_t filter_on);
 
 int32_t steng1ax_timestamp_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t steng1ax_timestamp_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 int32_t steng1ax_timestamp_raw_get(const stmdev_ctx_t *ctx, uint32_t *val);
 
-int32_t steng1ax_long_cnt_flag_data_ready_get(const stmdev_ctx_t *ctx, uint8_t *val);
+int32_t steng1ax_long_cnt_flag_data_ready_get(const stmdev_ctx_t *ctx,
+                                              uint8_t *val);
 
 int32_t steng1ax_emb_fsm_en_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t steng1ax_emb_fsm_en_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 typedef struct
 {
-  steng1ax_fsm_enable_t          fsm_enable;
+  steng1ax_fsm_enable_t fsm_enable;
 } steng1ax_emb_fsm_enable_t;
 int32_t steng1ax_fsm_enable_set(const stmdev_ctx_t *ctx,
-                                  steng1ax_emb_fsm_enable_t *val);
+                                steng1ax_emb_fsm_enable_t *val);
 int32_t steng1ax_fsm_enable_get(const stmdev_ctx_t *ctx,
-                                  steng1ax_emb_fsm_enable_t *val);
+                                steng1ax_emb_fsm_enable_t *val);
 
 int32_t steng1ax_long_cnt_set(const stmdev_ctx_t *ctx, uint16_t val);
 int32_t steng1ax_long_cnt_get(const stmdev_ctx_t *ctx, uint16_t *val);
 
 int32_t steng1ax_fsm_status_get(const stmdev_ctx_t *ctx,
-                                  steng1ax_fsm_status_mainpage_t *val);
+                                steng1ax_fsm_status_mainpage_t *val);
 int32_t steng1ax_fsm_out_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 typedef enum
 {
-  STENG1AX_ODR_FSM_12Hz5 = 0,
-  STENG1AX_ODR_FSM_25Hz  = 1,
-  STENG1AX_ODR_FSM_50Hz  = 2,
-  STENG1AX_ODR_FSM_100Hz = 3,
-  STENG1AX_ODR_FSM_200Hz = 4,
-  STENG1AX_ODR_FSM_400Hz = 5,
-  STENG1AX_ODR_FSM_800Hz = 6,
+  STENG1AX_ODR_FSM_VAFE_50Hz   = 0x10,
+  STENG1AX_ODR_FSM_VAFE_100Hz  = 0x11,
+  STENG1AX_ODR_FSM_VAFE_200Hz  = 0x12,
+  STENG1AX_ODR_FSM_VAFE_400Hz  = 0x13,
+  STENG1AX_ODR_FSM_VAFE_800Hz  = 0x14,
+  STENG1AX_ODR_FSM_VAFE_1600Hz = 0x15,
 } steng1ax_fsm_val_odr_t;
 int32_t steng1ax_fsm_data_rate_set(const stmdev_ctx_t *ctx,
-                                     steng1ax_fsm_val_odr_t val);
+                                   steng1ax_fsm_val_odr_t val);
 int32_t steng1ax_fsm_data_rate_get(const stmdev_ctx_t *ctx,
-                                     steng1ax_fsm_val_odr_t *val);
+                                   steng1ax_fsm_val_odr_t *val);
 
 int32_t steng1ax_fsm_init_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t steng1ax_fsm_init_get(const stmdev_ctx_t *ctx, uint8_t *val);
@@ -1735,49 +1804,48 @@ int32_t steng1ax_fsm_fifo_en_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t steng1ax_fsm_fifo_en_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 int32_t steng1ax_long_cnt_int_value_set(const stmdev_ctx_t *ctx,
-                                          uint16_t val);
+                                        uint16_t val);
 int32_t steng1ax_long_cnt_int_value_get(const stmdev_ctx_t *ctx,
-                                          uint16_t *val);
+                                        uint16_t *val);
 
-int32_t steng1ax_fsm_number_of_programs_set(const stmdev_ctx_t *ctx,
-                                              uint8_t *buff);
-int32_t steng1ax_fsm_number_of_programs_get(const stmdev_ctx_t *ctx,
-                                              uint8_t *buff);
+int32_t steng1ax_fsm_programs_num_set(const stmdev_ctx_t *ctx, uint8_t val);
+int32_t steng1ax_fsm_programs_num_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 int32_t steng1ax_fsm_start_address_set(const stmdev_ctx_t *ctx,
-                                         uint16_t val);
+                                       uint16_t val);
 int32_t steng1ax_fsm_start_address_get(const stmdev_ctx_t *ctx,
-                                         uint16_t *val);
+                                       uint16_t *val);
 
 typedef enum
 {
-  STENG1AX_MLC_OFF                    = 0,
-  STENG1AX_MLC_ON                     = 1,
-  STENG1AX_MLC_ON_BEFORE_FSM          = 2,
+  STENG1AX_MLC_OFF              = 0,
+  STENG1AX_MLC_ON               = 1,
+  STENG1AX_MLC_ON_BEFORE_FSM    = 2,
 } steng1ax_mlc_mode_t;
 int32_t steng1ax_mlc_set(const stmdev_ctx_t *ctx, steng1ax_mlc_mode_t val);
 int32_t steng1ax_mlc_get(const stmdev_ctx_t *ctx, steng1ax_mlc_mode_t *val);
 
 int32_t steng1ax_mlc_status_get(const stmdev_ctx_t *ctx,
-                                  steng1ax_mlc_status_mainpage_t *val);
+                                steng1ax_mlc_status_mainpage_t *val);
 
 int32_t steng1ax_mlc_out_get(const stmdev_ctx_t *ctx, uint8_t *buff);
 
 typedef enum
 {
-  STENG1AX_ODR_PRGS_12Hz5 = 0,
-  STENG1AX_ODR_PRGS_25Hz  = 1,
-  STENG1AX_ODR_PRGS_50Hz  = 2,
-  STENG1AX_ODR_PRGS_100Hz = 3,
-  STENG1AX_ODR_PRGS_200Hz = 4,
+  STENG1AX_ODR_PRGS_VAFE_50Hz   = 0x10,
+  STENG1AX_ODR_PRGS_VAFE_100Hz  = 0x11,
+  STENG1AX_ODR_PRGS_VAFE_200Hz  = 0x12,
+  STENG1AX_ODR_PRGS_VAFE_400Hz  = 0x13,
+  STENG1AX_ODR_PRGS_VAFE_800Hz  = 0x14,
+  STENG1AX_ODR_PRGS_VAFE_1600Hz = 0x15,
 } steng1ax_mlc_odr_val_t;
 int32_t steng1ax_mlc_data_rate_set(const stmdev_ctx_t *ctx,
-                                     steng1ax_mlc_odr_val_t val);
+                                   steng1ax_mlc_odr_val_t val);
 int32_t steng1ax_mlc_data_rate_get(const stmdev_ctx_t *ctx,
-                                     steng1ax_mlc_odr_val_t *val);
+                                   steng1ax_mlc_odr_val_t *val);
 
-int32_t steng1ax_mlc_init_set(const stmdev_ctx_t *ctx, uint8_t val);
-int32_t steng1ax_mlc_init_get(const stmdev_ctx_t *ctx, uint8_t *val);
+int32_t steng1ax_mlc_fifo_en_set(const stmdev_ctx_t *ctx, uint8_t val);
+int32_t steng1ax_mlc_fifo_en_get(const stmdev_ctx_t *ctx, uint8_t *val);
 
 #ifdef __cplusplus
 }

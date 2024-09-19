@@ -6,7 +6,7 @@
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
+ * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
  * All rights reserved.</center></h2>
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -46,16 +46,15 @@
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t __weak steng1ax_read_reg(const stmdev_ctx_t* ctx, uint8_t reg, uint8_t* data,
-                                   uint16_t len)
+int32_t __weak steng1ax_read_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+                                 uint8_t *data, uint16_t len)
 {
-  int32_t ret;
+  if (ctx == NULL)
+  {
+    return -1;
+  }
 
-  if (ctx == NULL) return -1;
-
-  ret = ctx->read_reg(ctx->handle, reg, data, len);
-
-  return ret;
+  return ctx->read_reg(ctx->handle, reg, data, len);
 }
 
 /**
@@ -68,16 +67,15 @@ int32_t __weak steng1ax_read_reg(const stmdev_ctx_t* ctx, uint8_t reg, uint8_t* 
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t __weak steng1ax_write_reg(const stmdev_ctx_t* ctx, uint8_t reg, uint8_t* data,
-                                    uint16_t len)
+int32_t __weak steng1ax_write_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+                                  uint8_t *data, uint16_t len)
 {
-  int32_t ret;
+  if (ctx == NULL)
+  {
+    return -1;
+  }
 
-  if (ctx == NULL) return -1;
-
-  ret = ctx->write_reg(ctx->handle, reg, data, len);
-
-  return ret;
+  return ctx->write_reg(ctx->handle, reg, data, len);
 }
 
 /**
@@ -92,29 +90,9 @@ int32_t __weak steng1ax_write_reg(const stmdev_ctx_t* ctx, uint8_t reg, uint8_t*
   *
   */
 
-float_t steng1ax_from_fs2g_to_mg(int16_t lsb)
+float_t steng1ax_from_lsb_to_mv(int16_t lsb)
 {
-  return (float_t)lsb * 0.061f;
-}
-
-float_t steng1ax_from_fs4g_to_mg(int16_t lsb)
-{
-  return (float_t)lsb * 0.122f;
-}
-
-float_t steng1ax_from_fs8g_to_mg(int16_t lsb)
-{
-  return (float_t)lsb * 0.244f;
-}
-
-float_t steng1ax_from_fs16g_to_mg(int16_t lsb)
-{
-  return (float_t)lsb * 0.488f;
-}
-
-float_t steng1ax_from_lsb_to_celsius(int16_t lsb)
-{
-  return ((float_t)lsb / 355.5f) + 25.0f;
+  return ((float_t)lsb) / 1311.0f;
 }
 
 /**
@@ -128,11 +106,6 @@ float_t steng1ax_from_lsb_to_celsius(int16_t lsb)
   * @{/
   *
   */
-float_t steng1ax_from_lsb_to_mv(int16_t lsb)
-{
-  return ((float_t)lsb) / 1311.0f;
-}
-
 /**
   * @brief  Device ID.[get]
   *
@@ -151,28 +124,6 @@ int32_t steng1ax_device_id_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Enter Power Down state
-  *
-  * @param  ctx      read / write interface definitions
-  * @retval          interface status (MANDATORY: return 0 -> no Error)
-  *
-  */
-int32_t steng1ax_power_up(const stmdev_ctx_t *ctx)
-{
-  steng1ax_en_device_config_t dev_cfg = {0};
-  int32_t ret;
-
-  dev_cfg.en_dev_conf = PROPERTY_ENABLE;
-  ret = steng1ax_write_reg(ctx, STENG1AX_EN_DEVICE_CONFIG, (uint8_t *)&dev_cfg, 1);
-
-  if (ctx->mdelay != NULL) {
-    ctx->mdelay(25);
-  }
-
-  return ret;
-}
-
-/**
   * @brief  Configures the bus operating mode.[get]
   *
   * @param  ctx   communication interface handler.(ptr)
@@ -184,35 +135,101 @@ int32_t steng1ax_init_set(const stmdev_ctx_t *ctx, steng1ax_init_t val)
 {
   steng1ax_ctrl1_t ctrl1;
   steng1ax_ctrl4_t ctrl4;
-  int32_t ret = 0;
+  steng1ax_status_t status;
+  uint8_t cnt = 0;
+  uint8_t ret;
 
-  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t*)&ctrl1, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL4, (uint8_t*)&ctrl4, 1);
-  switch (val) {
+  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
+
+  switch (val)
+  {
     case STENG1AX_BOOT:
       ctrl4.boot = PROPERTY_ENABLE;
-      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL4, (uint8_t*)&ctrl4, 1);
+      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
+      if (ret != 0)
+      {
+        break;
+      }
+
+      do
+      {
+        ret = steng1ax_read_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
+        if (ret != 0)
+        {
+          break;
+        }
+
+        /* boot procedure ended correctly */
+        if (ctrl4.boot == 0U)
+        {
+          break;
+        }
+
+        if (ctx->mdelay != NULL)
+        {
+          ctx->mdelay(25); /* 25 ms of boot time */
+        }
+      } while (cnt++ < 5U);
+
+      if (cnt >= 5U)
+      {
+        ret = -1;  /* boot procedure failed */
+      }
+      break;
+    case STENG1AX_RESET:
+      ctrl1.sw_reset = PROPERTY_ENABLE;
+      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
+      if (ret != 0)
+      {
+        break;
+      }
+
+      do
+      {
+        ret = steng1ax_status_get(ctx, &status);
+        if (ret != 0)
+        {
+          break;
+        }
+
+        /* sw-reset procedure ended correctly */
+        if (status.sw_reset == 0U)
+        {
+          break;
+        }
+
+        if (ctx->mdelay != NULL)
+        {
+          ctx->mdelay(1); /* should be 50 us */
+        }
+      } while (cnt++ < 5U);
+
+      if (cnt >= 5U)
+      {
+        ret = -1;  /* sw-reset procedure failed */
+      }
       break;
     case STENG1AX_SENSOR_ONLY_ON:
       /* no embedded funcs are used */
       ctrl4.emb_func_en = PROPERTY_DISABLE;
       ctrl1.if_add_inc = PROPERTY_ENABLE;
-      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL4, (uint8_t*)&ctrl4, 1);
-      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t*)&ctrl1, 1);
+      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
+      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
       break;
     case STENG1AX_SENSOR_EMB_FUNC_ON:
       /* complete configuration is used */
       ctrl4.emb_func_en = PROPERTY_ENABLE;
       ctrl1.if_add_inc = PROPERTY_ENABLE;
-      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL4, (uint8_t*)&ctrl4, 1);
-      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t*)&ctrl1, 1);
+      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
+      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
       break;
-    case STENG1AX_RESET:
     default:
       ctrl1.sw_reset = PROPERTY_ENABLE;
-      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t*)&ctrl1, 1);
+      ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
       break;
   }
+
   return ret;
 }
 
@@ -276,23 +293,24 @@ int32_t steng1ax_smart_power_get(const stmdev_ctx_t *ctx, steng1ax_smart_power_t
 }
 
 /**
-  * @brief  Get all status flags of the device.[get]
+  * @brief  Get the status of the device.[get]
   *
   * @param  ctx   communication interface handler.(ptr)
-  * @param  val   the status flags of the device (boot, reset, drdy) .(ptr)
+  * @param  val   the status of the device.(ptr)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_all_status_get(const stmdev_ctx_t *ctx, steng1ax_status_t *val)
+int32_t steng1ax_status_get(const stmdev_ctx_t *ctx, steng1ax_status_t *val)
 {
   steng1ax_status_register_t status_register;
   steng1ax_ctrl1_t ctrl1;
   steng1ax_ctrl4_t ctrl4;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_STATUS, (uint8_t*)&status_register, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t*)&ctrl1, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL4, (uint8_t*)&ctrl4, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_STATUS,
+                          (uint8_t *)&status_register, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
 
   val->sw_reset = ctrl1.sw_reset;
   val->boot     = ctrl4.boot;
@@ -314,8 +332,32 @@ int32_t steng1ax_drdy_status_get(const stmdev_ctx_t *ctx, steng1ax_status_t *val
   steng1ax_status_register_t status_register;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_STATUS, (uint8_t*)&status_register, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_STATUS, (uint8_t *)&status_register, 1);
   val->drdy     = status_register.drdy;
+
+  return ret;
+}
+
+/**
+  * @brief  Get the status of the embedded funcs.[get]
+  *
+  * @param  ctx   communication interface handler.(ptr)
+  * @param  val   the status of the embedded funcs.(ptr)
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t steng1ax_embedded_status_get(const stmdev_ctx_t *ctx,
+                                     steng1ax_embedded_status_t *val)
+{
+  steng1ax_emb_func_status_t status;
+  int32_t ret;
+
+  ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
+  ret += steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_STATUS,
+                           (uint8_t *)&status, 1);
+  ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
+
+  val->is_fsm_lc = status.is_fsm_lc;
 
   return ret;
 }
@@ -328,7 +370,8 @@ int32_t steng1ax_drdy_status_get(const stmdev_ctx_t *ctx, steng1ax_status_t *val
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_data_ready_mode_set(const stmdev_ctx_t *ctx, steng1ax_data_ready_mode_t val)
+int32_t steng1ax_data_ready_mode_set(const stmdev_ctx_t *ctx,
+                                     steng1ax_data_ready_mode_t val)
 {
   steng1ax_ctrl1_t ctrl1;
   int32_t ret;
@@ -352,7 +395,8 @@ int32_t steng1ax_data_ready_mode_set(const stmdev_ctx_t *ctx, steng1ax_data_read
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_data_ready_mode_get(const stmdev_ctx_t *ctx, steng1ax_data_ready_mode_t *val)
+int32_t steng1ax_data_ready_mode_get(const stmdev_ctx_t *ctx,
+                                     steng1ax_data_ready_mode_t *val)
 {
   steng1ax_ctrl1_t ctrl1;
   int32_t ret;
@@ -380,40 +424,83 @@ int32_t steng1ax_data_ready_mode_get(const stmdev_ctx_t *ctx, steng1ax_data_read
   * @brief  Sensor mode.[set]
   *
   * @param  ctx   communication interface handler.(ptr)
-  * @param  val   set the sensor ODR and bandwith.(ptr)
+  * @param  val   set the sensor FS and ODR.(ptr)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_mode_set(const stmdev_ctx_t *ctx, steng1ax_md_t *val)
+int32_t steng1ax_mode_set(const stmdev_ctx_t *ctx, const steng1ax_md_t *val)
 {
   steng1ax_ctrl3_t ctrl3;
   steng1ax_ctrl5_t ctrl5;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL5, (uint8_t*)&ctrl5, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL3, (uint8_t*)&ctrl3, 1);
-  if (ret != 0) { return ret; }
+  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL3, (uint8_t *)&ctrl3, 1);
 
-  /* set odr and bandwidth */
-  switch (val->odr) {
+  ctrl5.odr = (uint8_t)val->odr & 0xFU;
+
+  /* set the bandwidth */
+  switch (val->odr)
+  {
+    /* no anti-aliasing filter present */
+    default:
+    case STENG1AX_OFF:
+      ctrl5.bw = 0x0;
+      break;
+
     case STENG1AX_800Hz:
       ctrl3.lpf0_en = PROPERTY_ENABLE;
       ctrl5.odr = 0xb;
-      ctrl5.bw = (uint8_t)val->bw;
+      switch (val->bw)
+      {
+        case STENG1AX_BW_VAFE_45Hz:
+          ctrl5.bw = 0x3;
+          break;
+        case STENG1AX_BW_VAFE_90Hz:
+          ctrl5.bw = 0x2;
+          break;
+        case STENG1AX_BW_VAFE_180Hz:
+          ctrl5.bw = 0x1;
+          break;
+        case STENG1AX_BW_VAFE_360Hz:
+          ctrl5.bw = 0x0;
+          break;
+        default:
+          /* value not allowed */
+          ret = -1;
+          break;
+      }
       break;
     case STENG1AX_3200Hz:
       ctrl3.lpf0_en = PROPERTY_DISABLE;
       ctrl5.odr = 0xb;
-      ctrl5.bw = (uint8_t)val->bw;
-      break;
-    case STENG1AX_OFF:
-    default:
-      ctrl5.odr = 0x0;
+      switch (val->bw)
+      {
+        case STENG1AX_BW_VAFE_180Hz:
+          ctrl5.bw = 0x3;
+          break;
+        case STENG1AX_BW_VAFE_360Hz:
+          ctrl5.bw = 0x2;
+          break;
+        case STENG1AX_BW_VAFE_700Hz:
+          ctrl5.bw = 0x1;
+          break;
+        case STENG1AX_BW_VAFE_1600Hz:
+          ctrl5.bw = 0x0;
+          break;
+        default:
+          /* value not allowed */
+          ret = -1;
+          break;
+      }
       break;
   }
 
-  ret = steng1ax_write_reg(ctx, STENG1AX_CTRL5, (uint8_t*)&ctrl5, 1);
-  ret += steng1ax_write_reg(ctx, STENG1AX_CTRL3, (uint8_t*)&ctrl3, 1);
+  if (ret == 0)
+  {
+    ret = steng1ax_write_reg(ctx, STENG1AX_CTRL5, (uint8_t *)&ctrl5, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_CTRL3, (uint8_t *)&ctrl3, 1);
+  }
 
   return ret;
 }
@@ -422,7 +509,7 @@ int32_t steng1ax_mode_set(const stmdev_ctx_t *ctx, steng1ax_md_t *val)
   * @brief  Sensor mode.[get]
   *
   * @param  ctx   communication interface handler.(ptr)
-  * @param  val   get the sensor ODR and bandwidth.(ptr)
+  * @param  val   get the sensor FS and ODR.(ptr)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -432,52 +519,82 @@ int32_t steng1ax_mode_get(const stmdev_ctx_t *ctx, steng1ax_md_t *val)
   steng1ax_ctrl5_t ctrl5;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL5, (uint8_t*)&ctrl5, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL3, (uint8_t*)&ctrl3, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL5, (uint8_t *)&ctrl5, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL3, (uint8_t *)&ctrl3, 1);
 
-  switch (ctrl5.odr) {
-    case 0xb:
+  switch (ctrl5.odr)
+  {
+    case 0x00:
+      val->odr = STENG1AX_OFF;
+      break;
+    case 0x0B:
       val->odr = (ctrl3.lpf0_en == PROPERTY_ENABLE) ? STENG1AX_800Hz : STENG1AX_3200Hz;
       break;
-    case 0x0:
     default:
       val->odr = STENG1AX_OFF;
       break;
   }
 
-  switch (ctrl5.bw) {
-    case STENG1AX_ODR_div_2:
-      val->bw = STENG1AX_ODR_div_2;
+  switch (ctrl5.bw)
+  {
+    case 0:
+      val->bw = (ctrl3.lpf0_en == 0x1U) ?
+                STENG1AX_BW_VAFE_360Hz : STENG1AX_BW_VAFE_1600Hz;
       break;
-    case STENG1AX_ODR_div_4:
-      val->bw = STENG1AX_ODR_div_4;
+    case 1:
+      val->bw = (ctrl3.lpf0_en == 0x1U) ?
+                STENG1AX_BW_VAFE_180Hz : STENG1AX_BW_VAFE_700Hz;
       break;
-    case STENG1AX_ODR_div_8:
-      val->bw = STENG1AX_ODR_div_8;
+    case 2:
+      val->bw = (ctrl3.lpf0_en == 0x1U) ?
+                STENG1AX_BW_VAFE_90Hz : STENG1AX_BW_VAFE_360Hz;
       break;
-    case STENG1AX_ODR_div_16:
-      val->bw = STENG1AX_ODR_div_16;
+    case 3:
+      val->bw = (ctrl3.lpf0_en == 0x1U) ?
+                STENG1AX_BW_VAFE_45Hz : STENG1AX_BW_VAFE_180Hz;
       break;
     default:
-      val->bw = STENG1AX_ODR_div_2;
+      val->bw = (ctrl3.lpf0_en == 0x1U) ?
+                STENG1AX_BW_VAFE_360Hz : STENG1AX_BW_VAFE_1600Hz;
       break;
   }
 
   return ret;
 }
 
-int32_t steng1ax_all_sources_get(const stmdev_ctx_t *ctx, steng1ax_all_sources_t *val)
+/**
+  * @brief  Enter soft power down in SPI case[set]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      Enter soft power down in SPI case
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t steng1ax_exit_deep_power_down(const stmdev_ctx_t *ctx)
 {
-  steng1ax_status_register_t status;
-  steng1ax_fifo_status1_t fifo;
+  steng1ax_en_device_config_t en_device_config = {0};
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_STATUS, (uint8_t*)&status, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_STATUS1, (uint8_t*)&fifo, 1);
+  en_device_config.en_dev_conf = PROPERTY_ENABLE;
+  ret = steng1ax_write_reg(ctx, STENG1AX_EN_DEVICE_CONFIG,
+                           (uint8_t *)&en_device_config, 1);
 
+  if (ctx->mdelay != NULL)
+  {
+    ctx->mdelay(25);
+  }
+
+  return ret;
+}
+
+int32_t steng1ax_all_sources_get(const stmdev_ctx_t *ctx,
+                                 steng1ax_all_sources_t *val)
+{
+  steng1ax_status_register_t status;
+  int32_t ret;
+
+  ret = steng1ax_read_reg(ctx, STENG1AX_STATUS, (uint8_t *)&status, 1);
   val->drdy = status.drdy;
-  val->fifo_ovr = fifo.fifo_ovr_ia;
-  val->fifo_th = fifo.fifo_wtm_ia;
 
   return ret;
 }
@@ -490,17 +607,19 @@ int32_t steng1ax_all_sources_get(const stmdev_ctx_t *ctx, steng1ax_all_sources_t
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_ah_eng_data_get(const stmdev_ctx_t *ctx, steng1ax_ah_eng_data_t *data)
+int32_t steng1ax_ah_eng_data_get(const stmdev_ctx_t *ctx,
+                                 steng1ax_ah_eng_data_t *data)
 {
   uint8_t buff[2];
   int32_t ret;
 
   ret = steng1ax_read_reg(ctx, STENG1AX_OUT_AH_ENG_L, buff, 2);
 
-  data->raw = (int16_t)buff[1U];
-  data->raw = (data->raw * 256) + (int16_t) buff[0];
+  data->raw = (int16_t)buff[1];
+  data->raw = (data->raw * 256U) + (int16_t)buff[0];
 
   data->mv = steng1ax_from_lsb_to_mv(data->raw);
+
   return ret;
 }
 
@@ -512,19 +631,22 @@ int32_t steng1ax_ah_eng_data_get(const stmdev_ctx_t *ctx, steng1ax_ah_eng_data_t
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_i3c_configure_set(const stmdev_ctx_t *ctx, steng1ax_i3c_cfg_t *val)
+int32_t steng1ax_i3c_configure_set(const stmdev_ctx_t *ctx,
+                                   const steng1ax_i3c_cfg_t *val)
 {
   steng1ax_i3c_if_ctrl_t i3c_cfg;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_I3C_IF_CTRL, (uint8_t *)&i3c_cfg, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_I3C_IF_CTRL,
+                          (uint8_t *)&i3c_cfg, 1);
 
   if (ret == 0)
   {
     i3c_cfg.bus_act_sel = (uint8_t)val->bus_act_sel;
     i3c_cfg.dis_drstdaa = val->drstdaa_en;
     i3c_cfg.asf_on = val->asf_on;
-    ret = steng1ax_write_reg(ctx, STENG1AX_I3C_IF_CTRL, (uint8_t *)&i3c_cfg, 1);
+    ret = steng1ax_write_reg(ctx, STENG1AX_I3C_IF_CTRL,
+                             (uint8_t *)&i3c_cfg, 1);
   }
 
   return ret;
@@ -537,57 +659,64 @@ int32_t steng1ax_i3c_configure_set(const stmdev_ctx_t *ctx, steng1ax_i3c_cfg_t *
   * @param  val   configuration params
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
-  */int32_t steng1ax_i3c_configure_get(const stmdev_ctx_t *ctx, steng1ax_i3c_cfg_t *val)
+  */int32_t steng1ax_i3c_configure_get(const stmdev_ctx_t *ctx,
+                                       steng1ax_i3c_cfg_t *val)
 {
   steng1ax_i3c_if_ctrl_t i3c_cfg;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_I3C_IF_CTRL, (uint8_t *)&i3c_cfg, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_I3C_IF_CTRL,
+                          (uint8_t *)&i3c_cfg, 1);
 
   val->drstdaa_en = i3c_cfg.dis_drstdaa;
   val->asf_on = i3c_cfg.asf_on;
 
-  switch (val->bus_act_sel) {
+  switch (val->bus_act_sel)
+  {
     case STENG1AX_I3C_BUS_AVAIL_TIME_20US:
-     val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_20US;
-     break;
+      val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_20US;
+      break;
 
     case STENG1AX_I3C_BUS_AVAIL_TIME_50US:
-     val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_50US;
-     break;
+      val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_50US;
+      break;
 
     case STENG1AX_I3C_BUS_AVAIL_TIME_1MS:
-     val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_1MS;
-     break;
+      val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_1MS;
+      break;
 
     case STENG1AX_I3C_BUS_AVAIL_TIME_25MS:
     default:
-     val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_25MS;
-     break;
+      val->bus_act_sel = STENG1AX_I3C_BUS_AVAIL_TIME_25MS;
+      break;
   }
 
- return ret;
+  return ret;
 }
 
 /**
   * @brief  Change memory bank.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      MAIN_MEM_BANK, EMBED_FUNC_MEM_BANK, SENSOR_HUB_MEM_BANK, STRED_MEM_BANK,
+  * @param  val      MAIN_MEM_BANK, EMBED_FUNC_MEM_BANK, SENSOR_HUB_MEM_BANK,
+  *                  STRED_MEM_BANK,
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_mem_bank_set(const stmdev_ctx_t *ctx, steng1ax_mem_bank_t val)
+int32_t steng1ax_mem_bank_set(const stmdev_ctx_t *ctx,
+                              steng1ax_mem_bank_t val)
 {
   steng1ax_func_cfg_access_t func_cfg_access;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_FUNC_CFG_ACCESS,
+                          (uint8_t *)&func_cfg_access, 1);
 
   if (ret == 0)
   {
     func_cfg_access.emb_func_reg_access = ((uint8_t)val & 0x1U);
-    ret = steng1ax_write_reg(ctx, STENG1AX_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
+    ret = steng1ax_write_reg(ctx, STENG1AX_FUNC_CFG_ACCESS,
+                             (uint8_t *)&func_cfg_access, 1);
   }
 
   return ret;
@@ -597,24 +726,27 @@ int32_t steng1ax_mem_bank_set(const stmdev_ctx_t *ctx, steng1ax_mem_bank_t val)
   * @brief  Change memory bank.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      MAIN_MEM_BANK, EMBED_FUNC_MEM_BANK, SENSOR_HUB_MEM_BANK, STRED_MEM_BANK,
+  * @param  val      MAIN_MEM_BANK, EMBED_FUNC_MEM_BANK, SENSOR_HUB_MEM_BANK,
+  *                  STRED_MEM_BANK,
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_mem_bank_get(const stmdev_ctx_t *ctx, steng1ax_mem_bank_t *val)
+int32_t steng1ax_mem_bank_get(const stmdev_ctx_t *ctx,
+                              steng1ax_mem_bank_t *val)
 {
   steng1ax_func_cfg_access_t func_cfg_access;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_FUNC_CFG_ACCESS,
+                          (uint8_t *)&func_cfg_access, 1);
 
   switch ((func_cfg_access.emb_func_reg_access))
   {
-    case STENG1AX_MAIN_MEM_BANK:
+    case 0x0:
       *val = STENG1AX_MAIN_MEM_BANK;
       break;
 
-    case STENG1AX_EMBED_FUNC_MEM_BANK:
+    case 0x1:
       *val = STENG1AX_EMBED_FUNC_MEM_BANK;
       break;
 
@@ -629,14 +761,15 @@ int32_t steng1ax_mem_bank_get(const stmdev_ctx_t *ctx, steng1ax_mem_bank_t *val)
   * @brief  Write buffer in a page.
   *
   * @param  ctx      read / write interface definitions
-  * @param  address  Address of page register to be written (page number in 8-bit
-  *                  msb, register address in 8-bit lsb).
+  * @param  address  Address of page register to be written (page number in
+  *                  8-bit msb, register address in 8-bit lsb).
   * @param  buf      Pointer to data buffer.
   * @param  len      Buffer len.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_ln_pg_write(const stmdev_ctx_t *ctx, uint16_t address, uint8_t *buf, uint8_t len)
+int32_t steng1ax_ln_pg_write(const stmdev_ctx_t *ctx, uint16_t address,
+                             uint8_t *buf, uint8_t len)
 {
   steng1ax_page_address_t  page_address;
   steng1ax_page_sel_t page_sel;
@@ -656,17 +789,21 @@ int32_t steng1ax_ln_pg_write(const stmdev_ctx_t *ctx, uint16_t address, uint8_t 
     ret = steng1ax_read_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
     page_rw.page_read = PROPERTY_DISABLE;
     page_rw.page_write = PROPERTY_ENABLE;
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW,
+                              (uint8_t *)&page_rw, 1);
 
-    ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+    ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL,
+                             (uint8_t *)&page_sel, 1);
     page_sel.page_sel = msb;
     page_sel.not_used0 = 1; // Default value
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL,
+                              (uint8_t *)&page_sel, 1);
 
     page_address.page_addr = lsb;
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_ADDRESS, (uint8_t *)&page_address, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_ADDRESS,
+                              (uint8_t *)&page_address, 1);
 
-    for (i = 0; ((i < len) && (ret == 0)); i++)
+    for (i = 0; i < len; i++)
     {
       ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_VALUE, &buf[i], 1);
       lsb++;
@@ -675,21 +812,30 @@ int32_t steng1ax_ln_pg_write(const stmdev_ctx_t *ctx, uint16_t address, uint8_t 
       if (((lsb & 0xFFU) == 0x00U) && (ret == 0))
       {
         msb++;
-        ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+        ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL,
+                                 (uint8_t *)&page_sel, 1);
         page_sel.page_sel = msb;
         page_sel.not_used0 = 1; // Default value
-        ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+        ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL,
+                                  (uint8_t *)&page_sel, 1);
+      }
+
+      if (ret != 0)
+      {
+        break;
       }
     }
 
     page_sel.page_sel = 0;
     page_sel.not_used0 = 1;// Default value
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL,
+                              (uint8_t *)&page_sel, 1);
 
     ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
     page_rw.page_read = PROPERTY_DISABLE;
     page_rw.page_write = PROPERTY_DISABLE;
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW,
+                              (uint8_t *)&page_rw, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -708,7 +854,8 @@ int32_t steng1ax_ln_pg_write(const stmdev_ctx_t *ctx, uint16_t address, uint8_t 
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_ln_pg_read(const stmdev_ctx_t *ctx, uint16_t address, uint8_t *buf, uint8_t len)
+int32_t steng1ax_ln_pg_read(const stmdev_ctx_t *ctx, uint16_t address,
+                            uint8_t *buf, uint8_t len)
 {
   steng1ax_page_address_t  page_address;
   steng1ax_page_sel_t page_sel;
@@ -728,17 +875,21 @@ int32_t steng1ax_ln_pg_read(const stmdev_ctx_t *ctx, uint16_t address, uint8_t *
     ret = steng1ax_read_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
     page_rw.page_read = PROPERTY_ENABLE;
     page_rw.page_write = PROPERTY_DISABLE;
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW,
+                              (uint8_t *)&page_rw, 1);
 
-    ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+    ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL,
+                             (uint8_t *)&page_sel, 1);
     page_sel.page_sel = msb;
     page_sel.not_used0 = 1; // Default value
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL,
+                              (uint8_t *)&page_sel, 1);
 
     page_address.page_addr = lsb;
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_ADDRESS, (uint8_t *)&page_address, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_ADDRESS,
+                              (uint8_t *)&page_address, 1);
 
-    for (i = 0; ((i < len) && (ret == 0)); i++)
+    for (i = 0; i < len; i++)
     {
       ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_VALUE, &buf[i], 1);
       lsb++;
@@ -747,21 +898,30 @@ int32_t steng1ax_ln_pg_read(const stmdev_ctx_t *ctx, uint16_t address, uint8_t *
       if (((lsb & 0xFFU) == 0x00U) && (ret == 0))
       {
         msb++;
-        ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+        ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_SEL,
+                                 (uint8_t *)&page_sel, 1);
         page_sel.page_sel = msb;
         page_sel.not_used0 = 1; // Default value
-        ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+        ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL,
+                                  (uint8_t *)&page_sel, 1);
+      }
+
+      if (ret != 0)
+      {
+        break;
       }
     }
 
     page_sel.page_sel = 0;
     page_sel.not_used0 = 1;// Default value
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL, (uint8_t *)&page_sel, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_SEL,
+                              (uint8_t *)&page_sel, 1);
 
     ret += steng1ax_read_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
     page_rw.page_read = PROPERTY_DISABLE;
     page_rw.page_write = PROPERTY_DISABLE;
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW,
+                              (uint8_t *)&page_rw, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -794,9 +954,9 @@ int32_t steng1ax_ext_clk_en_set(const stmdev_ctx_t *ctx, uint8_t val)
   steng1ax_ext_clk_cfg_t clk;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_PIN_CTRL, (uint8_t *)&clk, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_EXT_CLK_CFG, (uint8_t *)&clk, 1);
   clk.ext_clk_en = val;
-  ret += steng1ax_write_reg(ctx, STENG1AX_PIN_CTRL, (uint8_t *)&clk, 1);
+  ret += steng1ax_write_reg(ctx, STENG1AX_EXT_CLK_CFG, (uint8_t *)&clk, 1);
 
   return ret;
 }
@@ -814,7 +974,7 @@ int32_t steng1ax_ext_clk_en_get(const stmdev_ctx_t *ctx, uint8_t *val)
   steng1ax_ext_clk_cfg_t clk;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_PIN_CTRL, (uint8_t *)&clk, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_EXT_CLK_CFG, (uint8_t *)&clk, 1);
   *val = clk.ext_clk_en;
 
   return ret;
@@ -828,7 +988,8 @@ int32_t steng1ax_ext_clk_en_get(const stmdev_ctx_t *ctx, uint8_t *val)
   * @retval      interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_pin_conf_set(const stmdev_ctx_t *ctx, steng1ax_pin_conf_t *val)
+int32_t steng1ax_pin_conf_set(const stmdev_ctx_t *ctx,
+                              const steng1ax_pin_conf_t *val)
 {
   steng1ax_pin_ctrl_t pin_ctrl;
   int32_t ret;
@@ -842,7 +1003,8 @@ int32_t steng1ax_pin_conf_set(const stmdev_ctx_t *ctx, steng1ax_pin_conf_t *val)
     pin_ctrl.sdo_pu_en = val->sdo_pull_up;
     pin_ctrl.pp_od = ~val->int_push_pull;
 
-    ret = steng1ax_write_reg(ctx, STENG1AX_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
+    ret = steng1ax_write_reg(ctx, STENG1AX_PIN_CTRL,
+                             (uint8_t *)&pin_ctrl, 1);
   }
 
   return ret;
@@ -856,7 +1018,8 @@ int32_t steng1ax_pin_conf_set(const stmdev_ctx_t *ctx, steng1ax_pin_conf_t *val)
   * @retval      interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_pin_conf_get(const stmdev_ctx_t *ctx, steng1ax_pin_conf_t *val)
+int32_t steng1ax_pin_conf_get(const stmdev_ctx_t *ctx,
+                              steng1ax_pin_conf_t *val)
 {
   steng1ax_pin_ctrl_t pin_ctrl;
   int32_t ret;
@@ -879,7 +1042,8 @@ int32_t steng1ax_pin_conf_get(const stmdev_ctx_t *ctx, steng1ax_pin_conf_t *val)
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_int_pin_polarity_set(const stmdev_ctx_t *ctx, steng1ax_int_pin_polarity_t val)
+int32_t steng1ax_int_pin_polarity_set(const stmdev_ctx_t *ctx,
+                                      steng1ax_int_pin_polarity_t val)
 {
   steng1ax_pin_ctrl_t pin_ctrl;
   int32_t ret;
@@ -889,7 +1053,8 @@ int32_t steng1ax_int_pin_polarity_set(const stmdev_ctx_t *ctx, steng1ax_int_pin_
   if (ret == 0)
   {
     pin_ctrl.h_lactive = (uint8_t)val;
-    ret = steng1ax_write_reg(ctx, STENG1AX_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
+    ret = steng1ax_write_reg(ctx, STENG1AX_PIN_CTRL,
+                             (uint8_t *)&pin_ctrl, 1);
   }
 
   return ret;
@@ -903,7 +1068,8 @@ int32_t steng1ax_int_pin_polarity_set(const stmdev_ctx_t *ctx, steng1ax_int_pin_
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_int_pin_polarity_get(const stmdev_ctx_t *ctx, steng1ax_int_pin_polarity_t *val)
+int32_t steng1ax_int_pin_polarity_get(const stmdev_ctx_t *ctx,
+                                      steng1ax_int_pin_polarity_t *val)
 {
   steng1ax_pin_ctrl_t pin_ctrl;
   int32_t ret;
@@ -912,11 +1078,11 @@ int32_t steng1ax_int_pin_polarity_get(const stmdev_ctx_t *ctx, steng1ax_int_pin_
 
   switch ((pin_ctrl.h_lactive))
   {
-    case STENG1AX_ACTIVE_HIGH:
+    case 0x0:
       *val = STENG1AX_ACTIVE_HIGH;
       break;
 
-    case STENG1AX_ACTIVE_LOW:
+    case 0x1:
       *val = STENG1AX_ACTIVE_LOW;
       break;
 
@@ -924,6 +1090,7 @@ int32_t steng1ax_int_pin_polarity_get(const stmdev_ctx_t *ctx, steng1ax_int_pin_
       *val = STENG1AX_ACTIVE_HIGH;
       break;
   }
+
   return ret;
 }
 
@@ -935,7 +1102,8 @@ int32_t steng1ax_int_pin_polarity_get(const stmdev_ctx_t *ctx, steng1ax_int_pin_
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_spi_mode_set(const stmdev_ctx_t *ctx, steng1ax_spi_mode val)
+int32_t steng1ax_spi_mode_set(const stmdev_ctx_t *ctx,
+                              steng1ax_spi_mode val)
 {
   steng1ax_pin_ctrl_t pin_ctrl;
   int32_t ret;
@@ -945,7 +1113,8 @@ int32_t steng1ax_spi_mode_set(const stmdev_ctx_t *ctx, steng1ax_spi_mode val)
   if (ret == 0)
   {
     pin_ctrl.sim = (uint8_t)val;
-    ret = steng1ax_write_reg(ctx, STENG1AX_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
+    ret = steng1ax_write_reg(ctx, STENG1AX_PIN_CTRL,
+                             (uint8_t *)&pin_ctrl, 1);
   }
 
   return ret;
@@ -959,7 +1128,8 @@ int32_t steng1ax_spi_mode_set(const stmdev_ctx_t *ctx, steng1ax_spi_mode val)
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_spi_mode_get(const stmdev_ctx_t *ctx, steng1ax_spi_mode *val)
+int32_t steng1ax_spi_mode_get(const stmdev_ctx_t *ctx,
+                              steng1ax_spi_mode *val)
 {
   steng1ax_pin_ctrl_t pin_ctrl;
   int32_t ret;
@@ -968,11 +1138,11 @@ int32_t steng1ax_spi_mode_get(const stmdev_ctx_t *ctx, steng1ax_spi_mode *val)
 
   switch ((pin_ctrl.sim))
   {
-    case STENG1AX_SPI_4_WIRE:
+    case 0x0:
       *val = STENG1AX_SPI_4_WIRE;
       break;
 
-    case STENG1AX_SPI_3_WIRE:
+    case 0x1:
       *val = STENG1AX_SPI_3_WIRE;
       break;
 
@@ -991,7 +1161,8 @@ int32_t steng1ax_spi_mode_get(const stmdev_ctx_t *ctx, steng1ax_spi_mode *val)
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_pin_int_route_set(const stmdev_ctx_t *ctx, steng1ax_pin_int_route_t *val)
+int32_t steng1ax_pin_int_route_set(const stmdev_ctx_t *ctx,
+                                   const steng1ax_pin_int_route_t *val)
 {
   steng1ax_ctrl1_t ctrl1;
   steng1ax_ctrl2_t ctrl2;
@@ -999,31 +1170,42 @@ int32_t steng1ax_pin_int_route_set(const stmdev_ctx_t *ctx, steng1ax_pin_int_rou
   int32_t ret;
 
   ret = steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
-  ctrl1.int1_pin_en = PROPERTY_ENABLE;
-  ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
-  if (ret != 0) { return ret; }
-
-  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL2, (uint8_t *)&ctrl2, 1);
 
   if (ret == 0)
   {
-    ctrl2.int_drdy = val->drdy;
-    ctrl2.int_fifo_ovr = val->fifo_ovr;
-    ctrl2.int_fifo_th = val->fifo_th;
-    ctrl2.int_fifo_full = val->fifo_full;
-    ctrl2.int_boot = val->boot;
+    ctrl1.int_pin_en = val->int_pin_en;
 
-    ret = steng1ax_write_reg(ctx, STENG1AX_CTRL2, (uint8_t *)&ctrl2, 1);
+    ret = steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
   }
 
-  ret += steng1ax_read_reg(ctx, STENG1AX_MD1_CFG, (uint8_t *)&md1_cfg, 1);
+  if (ret == 0)
+  {
+    ret = steng1ax_read_reg(ctx, STENG1AX_CTRL2, (uint8_t *)&ctrl2, 1);
+
+    if (ret == 0)
+    {
+      ctrl2.int_drdy = val->drdy;
+      ctrl2.int_fifo_ovr = val->fifo_ovr;
+      ctrl2.int_fifo_th = val->fifo_th;
+      ctrl2.int_fifo_full = val->fifo_full;
+      ctrl2.int_boot = val->boot;
+
+      ret = steng1ax_write_reg(ctx, STENG1AX_CTRL2, (uint8_t *)&ctrl2, 1);
+    }
+  }
 
   if (ret == 0)
   {
-    md1_cfg.int_emb_func = val->emb_function;
-    md1_cfg.int_timestamp = val->timestamp;
+    ret = steng1ax_read_reg(ctx, STENG1AX_MD1_CFG, (uint8_t *)&md1_cfg, 1);
 
-    ret = steng1ax_write_reg(ctx, STENG1AX_MD1_CFG, (uint8_t *)&md1_cfg, 1);
+    if (ret == 0)
+    {
+      md1_cfg.int_emb_func = val->emb_function;
+      md1_cfg.int_timestamp = val->timestamp;
+
+      ret = steng1ax_write_reg(ctx, STENG1AX_MD1_CFG,
+                               (uint8_t *)&md1_cfg, 1);
+    }
   }
 
   return ret;
@@ -1037,7 +1219,8 @@ int32_t steng1ax_pin_int_route_set(const stmdev_ctx_t *ctx, steng1ax_pin_int_rou
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_pin_int_route_get(const stmdev_ctx_t *ctx, steng1ax_pin_int_route_t *val)
+int32_t steng1ax_pin_int_route_get(const stmdev_ctx_t *ctx,
+                                   steng1ax_pin_int_route_t *val)
 {
   steng1ax_ctrl1_t ctrl1;
   steng1ax_ctrl2_t ctrl2;
@@ -1050,11 +1233,13 @@ int32_t steng1ax_pin_int_route_get(const stmdev_ctx_t *ctx, steng1ax_pin_int_rou
 
   if (ret == 0)
   {
+    val->int_pin_en = ctrl1.int_pin_en;
     val->drdy = ctrl2.int_drdy;
     val->fifo_ovr = ctrl2.int_fifo_ovr;
     val->fifo_th = ctrl2.int_fifo_th;
     val->fifo_full = ctrl2.int_fifo_full;
     val->boot = ctrl2.int_boot;
+
     val->emb_function = md1_cfg.int_emb_func;
     val->timestamp = md1_cfg.int_timestamp;
   }
@@ -1066,24 +1251,30 @@ int32_t steng1ax_pin_int_route_get(const stmdev_ctx_t *ctx, steng1ax_pin_int_rou
   * @brief  routes embedded func interrupt signals on INT pin.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      routes embedded func interrupt signals on INT pin.
+  * @param  val      routes embedded func interrupt signals on INT 1 pin.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
 int32_t steng1ax_emb_pin_int_route_set(const stmdev_ctx_t *ctx,
-                                       steng1ax_emb_pin_int_route_t *val)
+                                       const steng1ax_emb_pin_int_route_t *val)
 {
   steng1ax_emb_func_int_t emb_func_int;
   steng1ax_md1_cfg_t md1_cfg;
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
-  ret += steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_INT, (uint8_t *)&emb_func_int, 1);
+  if (ret == 0)
+  {
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_INT,
+                            (uint8_t *)&emb_func_int, 1);
+  }
 
   if (ret == 0)
   {
     emb_func_int.int_fsm_lc = val->fsm_lc;
-    ret = steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_INT, (uint8_t *)&emb_func_int, 1);
+
+    ret = steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_INT,
+                             (uint8_t *)&emb_func_int, 1);
   }
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
 
@@ -1101,7 +1292,7 @@ int32_t steng1ax_emb_pin_int_route_set(const stmdev_ctx_t *ctx,
   * @brief  routes embedded func interrupt signals on INT pin.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      routes embedded func interrupt signals on INT pin.
+  * @param  val      routes embedded func interrupt signals on INT 1 pin.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -1112,11 +1303,17 @@ int32_t steng1ax_emb_pin_int_route_get(const stmdev_ctx_t *ctx,
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
-  ret += steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_INT, (uint8_t *)&emb_func_int, 1);
+  if (ret == 0)
+  {
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_INT,
+                            (uint8_t *)&emb_func_int, 1);
+  }
 
-  val->fsm_lc = emb_func_int.int_fsm_lc;
-
-  ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
+  if (ret == 0)
+  {
+    val->fsm_lc = emb_func_int.int_fsm_lc;
+  }
+  ret = steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
 
   return ret;
 }
@@ -1129,7 +1326,8 @@ int32_t steng1ax_emb_pin_int_route_get(const stmdev_ctx_t *ctx,
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_embedded_int_config_set(const stmdev_ctx_t *ctx, steng1ax_embedded_int_config_t val)
+int32_t steng1ax_embedded_int_cfg_set(const stmdev_ctx_t *ctx,
+                                      steng1ax_embedded_int_config_t val)
 {
   steng1ax_page_rw_t page_rw;
   int32_t ret;
@@ -1151,7 +1349,8 @@ int32_t steng1ax_embedded_int_config_set(const stmdev_ctx_t *ctx, steng1ax_embed
         break;
     }
 
-    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_PAGE_RW,
+                              (uint8_t *)&page_rw, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -1167,7 +1366,8 @@ int32_t steng1ax_embedded_int_config_set(const stmdev_ctx_t *ctx, steng1ax_embed
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_embedded_int_config_get(const stmdev_ctx_t *ctx, steng1ax_embedded_int_config_t *val)
+int32_t steng1ax_embedded_int_cfg_get(const stmdev_ctx_t *ctx,
+                                      steng1ax_embedded_int_config_t *val)
 {
   steng1ax_page_rw_t page_rw;
   int32_t ret;
@@ -1177,9 +1377,12 @@ int32_t steng1ax_embedded_int_config_get(const stmdev_ctx_t *ctx, steng1ax_embed
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_PAGE_RW, (uint8_t *)&page_rw, 1);
 
-    if (page_rw.emb_func_lir == 0U) {
+    if (page_rw.emb_func_lir == 0U)
+    {
       *val = STENG1AX_EMBEDDED_INT_LEVEL;
-   } else {
+    }
+    else
+    {
       *val = STENG1AX_EMBEDDED_INT_LATCHED;
     }
   }
@@ -1205,22 +1408,29 @@ int32_t steng1ax_embedded_int_config_get(const stmdev_ctx_t *ctx, steng1ax_embed
   * @brief  FIFO mode selection.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      BYPASS_MODE, FIFO_MODE, STREAM_TO_FIFO_MODE, BYPASS_TO_STREAM_MODE, STREAM_MODE, BYPASS_TO_FIFO_MODE,
+  * @param  val      BYPASS_MODE, FIFO_MODE, STREAM_TO_FIFO_MODE,
+  *                  BYPASS_TO_STREAM_MODE, STREAM_MODE, BYPASS_TO_FIFO_MODE,
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_fifo_mode_set(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t val)
+int32_t steng1ax_fifo_mode_set(const stmdev_ctx_t *ctx,
+                               steng1ax_fifo_mode_t val)
 {
   steng1ax_ctrl4_t ctrl4;
   steng1ax_fifo_ctrl_t fifo_ctrl;
   steng1ax_fifo_wtm_t fifo_wtm;
   steng1ax_fifo_batch_dec_t fifo_batch;
+  steng1ax_ah_eng_cfg2_t ah_eng_cfg2;
   int32_t ret;
 
   ret = steng1ax_read_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_CTRL, (uint8_t *)&fifo_ctrl, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_BATCH_DEC, (uint8_t *)&fifo_batch, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_CTRL,
+                           (uint8_t *)&fifo_ctrl, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_BATCH_DEC,
+                           (uint8_t *)&fifo_batch, 1);
   ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_WTM, (uint8_t *)&fifo_wtm, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG2,
+                           (uint8_t *)&ah_eng_cfg2, 1);
 
   if (ret == 0)
   {
@@ -1229,8 +1439,23 @@ int32_t steng1ax_fifo_mode_set(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t val
     {
       ctrl4.fifo_en = 1;
       fifo_ctrl.fifo_mode = ((uint8_t)val.operation & 0x7U);
+
+      /*
+       * fifo_en_adv must be set to 1 when the embedded function results and/or
+       * the AH / vAFE data at 3200 Hz ODR are intended to be stored in FIFO.
+       * It can be set to 0 in the other cases
+       */
+      if (ah_eng_cfg2.ah_eng_en == 0x1U)
+      {
+        fifo_ctrl.fifo_en_adv = 0x1U;
+      }
+      else
+      {
+        fifo_ctrl.fifo_en_adv = 0x0U;
+      }
     }
-    else {
+    else
+    {
       ctrl4.fifo_en = 0;
     }
 
@@ -1244,14 +1469,18 @@ int32_t steng1ax_fifo_mode_set(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t val
     fifo_ctrl.cfg_chg_en = val.cfg_change_in_fifo;
 
     /* set watermark */
-    if (val.watermark > 0U) {
+    if (val.watermark > 0U)
+    {
       fifo_ctrl.stop_on_fth = 1;
       fifo_wtm.fth = val.watermark;
     }
 
-    ret += steng1ax_write_reg(ctx, STENG1AX_FIFO_BATCH_DEC, (uint8_t *)&fifo_batch, 1);
-    ret += steng1ax_write_reg(ctx, STENG1AX_FIFO_WTM, (uint8_t *)&fifo_wtm, 1);
-    ret += steng1ax_write_reg(ctx, STENG1AX_FIFO_CTRL, (uint8_t *)&fifo_ctrl, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_FIFO_BATCH_DEC,
+                              (uint8_t *)&fifo_batch, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_FIFO_WTM,
+                              (uint8_t *)&fifo_wtm, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_FIFO_CTRL,
+                              (uint8_t *)&fifo_ctrl, 1);
     ret += steng1ax_write_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
   }
 
@@ -1262,11 +1491,13 @@ int32_t steng1ax_fifo_mode_set(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t val
   * @brief  FIFO mode selection.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      BYPASS_MODE, FIFO_MODE, STREAM_TO_FIFO_MODE, BYPASS_TO_STREAM_MODE, STREAM_MODE, BYPASS_TO_FIFO_MODE,
+  * @param  val      BYPASS_MODE, FIFO_MODE, STREAM_TO_FIFO_MODE,
+  *                  BYPASS_TO_STREAM_MODE, STREAM_MODE, BYPASS_TO_FIFO_MODE,
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_fifo_mode_get(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t *val)
+int32_t steng1ax_fifo_mode_get(const stmdev_ctx_t *ctx,
+                               steng1ax_fifo_mode_t *val)
 {
   steng1ax_ctrl4_t ctrl4;
   steng1ax_fifo_ctrl_t fifo_ctrl;
@@ -1275,24 +1506,28 @@ int32_t steng1ax_fifo_mode_get(const stmdev_ctx_t *ctx, steng1ax_fifo_mode_t *va
   int32_t ret;
 
   ret = steng1ax_read_reg(ctx, STENG1AX_CTRL4, (uint8_t *)&ctrl4, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_CTRL, (uint8_t *)&fifo_ctrl, 1);
-  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_BATCH_DEC, (uint8_t *)&fifo_batch, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_CTRL,
+                           (uint8_t *)&fifo_ctrl, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_BATCH_DEC,
+                           (uint8_t *)&fifo_batch, 1);
   ret += steng1ax_read_reg(ctx, STENG1AX_FIFO_WTM, (uint8_t *)&fifo_wtm, 1);
 
   if (ret == 0)
   {
     /* get FIFO mode */
-    if (ctrl4.fifo_en == 0U) {
+    if (ctrl4.fifo_en == 0U)
+    {
       val->operation = STENG1AX_FIFO_OFF;
     }
-    else {
-      val->operation = (enum steng1ax_operation)fifo_ctrl.fifo_mode;
+    else
+    {
+      val->operation = (enum steng1ax_operation_t)fifo_ctrl.fifo_mode;
     }
     val->cfg_change_in_fifo = fifo_ctrl.cfg_chg_en;
 
     /* get batching info */
-    val->batch.dec_ts = (enum steng1ax_dec_ts)fifo_batch.dec_ts_batch;
-    val->batch.bdr = (enum steng1ax_bdr)fifo_batch.bdr;
+    val->batch.dec_ts = (enum steng1ax_dec_ts_t)fifo_batch.dec_ts_batch;
+    val->batch.bdr = (enum steng1ax_bdr_t)fifo_batch.bdr;
 
     /* get watermark */
     val->watermark = fifo_wtm.fth;
@@ -1333,12 +1568,14 @@ int32_t steng1ax_fifo_wtm_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
   return ret;
 }
 
-int32_t steng1ax_fifo_sensor_tag_get(const stmdev_ctx_t *ctx, steng1ax_fifo_sensor_tag_t *val)
+int32_t steng1ax_fifo_sensor_tag_get(const stmdev_ctx_t *ctx,
+                                     steng1ax_fifo_sensor_tag_t *val)
 {
   steng1ax_fifo_data_out_tag_t fifo_tag;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_FIFO_DATA_OUT_TAG, (uint8_t *)&fifo_tag, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_FIFO_DATA_OUT_TAG,
+                          (uint8_t *)&fifo_tag, 1);
 
   *val = (steng1ax_fifo_sensor_tag_t) fifo_tag.tag_sensor;
 
@@ -1354,188 +1591,282 @@ int32_t steng1ax_fifo_out_raw_get(const stmdev_ctx_t *ctx, uint8_t *buff)
   return ret;
 }
 
-int32_t steng1ax_fifo_data_get(const stmdev_ctx_t *ctx, steng1ax_md_t *md,
+int32_t steng1ax_fifo_data_get(const stmdev_ctx_t *ctx,
+                               const steng1ax_md_t *md,
                                steng1ax_fifo_data_t *data)
 {
   steng1ax_fifo_data_out_tag_t fifo_tag;
   uint8_t fifo_raw[6];
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_FIFO_DATA_OUT_TAG, (uint8_t *)&fifo_tag, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_FIFO_DATA_OUT_TAG,
+                          (uint8_t *)&fifo_tag, 1);
   data->tag = fifo_tag.tag_sensor;
 
-  switch (fifo_tag.tag_sensor) {
-    case STENG1AX_AH_ENG_DATA_TAG:
+  switch (fifo_tag.tag_sensor)
+  {
+    case STENG1AX_TIMESTAMP_CFG_CHG_TAG:
       ret = steng1ax_fifo_out_raw_get(ctx, fifo_raw);
 
-      /* A FIFO word consists of 16-bits AH_ENG data  */
-      data->ah_eng.raw = (int16_t)fifo_raw[0] + (int16_t)fifo_raw[1] * 256;
+      data->cfg_chg.cfg_change = fifo_raw[0] >> 7;
+      data->cfg_chg.odr = (fifo_raw[0] >> 3) & 0xFU;
+      data->cfg_chg.bw = (fifo_raw[0] >> 1) & 0x3U;
+      data->cfg_chg.lp_hp = fifo_raw[0] & 0x1U;
+      data->cfg_chg.ah_en = fifo_raw[1] >> 7;
+      data->cfg_chg.fs = (fifo_raw[1] >> 5) & 0x3U;
+      data->cfg_chg.dec_ts = (fifo_raw[1] >> 3) & 0x3U;
+      data->cfg_chg.odr_xl_batch = fifo_raw[1] & 0x7U;
+
+      data->cfg_chg.timestamp = fifo_raw[5];
+      data->cfg_chg.timestamp = (data->cfg_chg.timestamp * 256U) +  fifo_raw[4];
+      data->cfg_chg.timestamp = (data->cfg_chg.timestamp * 256U) +  fifo_raw[3];
+      data->cfg_chg.timestamp = (data->cfg_chg.timestamp * 256U) +  fifo_raw[2];
+      break;
+    case STENG1AX_AH_ENG_DATA_TAG:
+      /* vAFE data (16 bit) if vafe_only mode is enabled */
+      ret = steng1ax_fifo_out_raw_get(ctx, fifo_raw);
+
+      data->ah_eng.raw = (int16_t)fifo_raw[0] + (int16_t)fifo_raw[1] * 256U;
       data->ah_eng.mv = steng1ax_from_lsb_to_mv(data->ah_eng.raw);
       break;
-     case STENG1AX_TIMESTAMP_CFG_CHG_TAG:
-       ret = steng1ax_fifo_out_raw_get(ctx, fifo_raw);
-
-       data->cfg_chg.cfg_change = fifo_raw[0] >> 7;
-       data->cfg_chg.odr = (fifo_raw[0] >> 3) & 0xFU;
-       data->cfg_chg.bw = (fifo_raw[0] >> 1) & 0x3U;
-       data->cfg_chg.lp_hp = fifo_raw[0] & 0x1U;
-       data->cfg_chg.qvar_en = fifo_raw[1] >> 7;
-       data->cfg_chg.fs = (fifo_raw[1] >> 5) & 0x3U;
-       data->cfg_chg.dec_ts = (fifo_raw[1] >> 3) & 0x3U;
-       data->cfg_chg.odr_xl_batch = fifo_raw[1] & 0x7U;
-
-       data->cfg_chg.timestamp = fifo_raw[5];
-       data->cfg_chg.timestamp = (data->cfg_chg.timestamp * 256U) +  fifo_raw[4];
-       data->cfg_chg.timestamp = (data->cfg_chg.timestamp * 256U) +  fifo_raw[3];
-       data->cfg_chg.timestamp = (data->cfg_chg.timestamp * 256U) +  fifo_raw[2];
-       break;
-
-     case STENG1AX_FIFO_EMPTY:
-     default:
-       break;
+    default:
+      /* do nothing */
+      break;
   }
 
   return ret;
 }
 
 /**
-  * @brief  Enables AH_ENG chain.[set]
+  * @brief  Configures AH_ENG chain.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Enables and configures AH_ENG chain.
+  * @param  val      Configures AH_ENG chain.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_ah_eng_mode_set(const stmdev_ctx_t *ctx, steng1ax_ah_eng_mode_t val)
+int32_t steng1ax_ah_eng_config_set(const stmdev_ctx_t *ctx,
+                                   steng1ax_ah_eng_config_t val)
 {
   steng1ax_ah_eng_cfg1_t cfg1;
   steng1ax_ah_eng_cfg2_t cfg2;
+  steng1ax_ah_eng_cfg3_t cfg3;
   int32_t ret;
 
   ret = steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG1, (uint8_t *)&cfg1, 1);
   ret += steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG2, (uint8_t *)&cfg2, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
 
   if (ret == 0)
   {
     cfg1.ah_eng_zin_dis_ah2_eng1 = val.ah_eng_zin_dis_1;
     cfg1.ah_eng_zin_dis_ah2_eng2 = val.ah_eng_zin_dis_2;
-    cfg2.ah_eng_en = val.ah_eng_en;
-    cfg2.ah_eng_gain = (uint8_t)val.ah_eng_gain;
-    cfg2.ah_eng_mode = (uint8_t)val.ah_eng_mode;
-    cfg2.ah_eng_zin = (uint8_t)val.ah_eng_zin;
 
-    ret = steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG1, (uint8_t *)&cfg1, 1);
-    ret += steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG2, (uint8_t *)&cfg2, 1);
+    switch (val.mode)
+    {
+      case STENG1AX_DIFFERENTIAL_MODE:
+        cfg2.ah_eng_mode = 0x0U;
+        break;
+      case STENG1AX_SINGLE_MODE_01:
+        cfg2.ah_eng_mode = 0x1U;
+        break;
+      case STENG1AX_SINGLE_MODE_10:
+        cfg2.ah_eng_mode = 0x2U;
+        break;
+      case STENG1AX_FORCED_RESET:
+        cfg2.ah_eng_mode = 0x3U;
+        break;
+      default:
+        cfg2.ah_eng_mode = 0x0U;
+        break;
+    }
+
+    switch (val.gain)
+    {
+      case STENG1AX_GAIN_2:
+        cfg2.ah_eng_gain = 0x0U;
+        break;
+      case STENG1AX_GAIN_4:
+        cfg2.ah_eng_gain = 0x1U;
+        break;
+      case STENG1AX_GAIN_8:
+        cfg2.ah_eng_gain = 0x2U;
+        break;
+      case STENG1AX_GAIN_16:
+        cfg2.ah_eng_gain = 0x3U;
+        break;
+      default:
+        cfg2.ah_eng_gain = 0x0U;
+        break;
+    }
+
+    switch (val.zin)
+    {
+      case STENG1AX_100MOhm:
+        cfg2.ah_eng_c_zin = 0x0U;
+        break;
+      case STENG1AX_200MOhm:
+        cfg2.ah_eng_c_zin = 0x1U;
+        break;
+      case STENG1AX_500MOhm:
+        cfg2.ah_eng_c_zin = 0x2U;
+        break;
+      case STENG1AX_1GOhm:
+        cfg2.ah_eng_c_zin = 0x3U;
+        break;
+      default:
+        cfg2.ah_eng_c_zin = 0x0U;
+        break;
+    }
   }
+
+  ret = steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG1, (uint8_t *)&cfg1, 1);
+  ret += steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG2, (uint8_t *)&cfg2, 1);
+  ret += steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
 
   return ret;
 }
 
 /**
-  * @brief  Enables AH_ENG chain.[get]
+  * @brief  Configures AH_ENG chain.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      Enables and configures AH_ENG chain.
+  * @param  val      Configures AH_BIO chain.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_ah_eng_mode_get(const stmdev_ctx_t *ctx, steng1ax_ah_eng_mode_t *val)
+int32_t steng1ax_ah_eng_config_get(const stmdev_ctx_t *ctx,
+                                   steng1ax_ah_eng_config_t *val)
 {
   steng1ax_ah_eng_cfg1_t cfg1;
   steng1ax_ah_eng_cfg2_t cfg2;
+  steng1ax_ah_eng_cfg3_t cfg3;
   int32_t ret;
 
   ret = steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG1, (uint8_t *)&cfg1, 1);
   ret += steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG2, (uint8_t *)&cfg2, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
+
+  if (ret == 0)
+  {
+
+    val->ah_eng_zin_dis_1 = cfg1.ah_eng_zin_dis_ah2_eng1;
+    val->ah_eng_zin_dis_2 = cfg1.ah_eng_zin_dis_ah2_eng2;
+
+    switch (cfg2.ah_eng_mode)
+    {
+      case 0x0:
+        val->mode = STENG1AX_DIFFERENTIAL_MODE;
+        break;
+      case 0x1:
+        val->mode = STENG1AX_SINGLE_MODE_01;
+        break;
+      case 0x2:
+        val->mode = STENG1AX_SINGLE_MODE_10;
+        break;
+      case 0x3:
+        val->mode = STENG1AX_FORCED_RESET;
+        break;
+      default:
+        val->mode = STENG1AX_DIFFERENTIAL_MODE;
+        break;
+    }
+  }
+
+  switch (cfg2.ah_eng_c_zin)
+  {
+    case 0x0:
+      val->zin = STENG1AX_100MOhm;
+      break;
+    case 0x1:
+      val->zin = STENG1AX_200MOhm;
+      break;
+    case 0x2:
+      val->zin = STENG1AX_500MOhm;
+      break;
+    case 0x3:
+      val->zin = STENG1AX_1GOhm;
+      break;
+    default:
+      val->zin = STENG1AX_100MOhm;
+      break;
+  }
 
   switch (cfg2.ah_eng_gain)
   {
-    case STENG1AX_GAIN_2:
-      val->ah_eng_gain = STENG1AX_GAIN_2;
+    case 0x0:
+      val->gain = STENG1AX_GAIN_2;
       break;
-
-    case STENG1AX_GAIN_4:
-      val->ah_eng_gain = STENG1AX_GAIN_4;
+    case 0x1:
+      val->gain = STENG1AX_GAIN_4;
       break;
-
-    case STENG1AX_GAIN_8:
-      val->ah_eng_gain = STENG1AX_GAIN_8;
+    case 0x2:
+      val->gain = STENG1AX_GAIN_8;
       break;
-
-    case STENG1AX_GAIN_16:
+    case 0x3:
+      val->gain = STENG1AX_GAIN_16;
+      break;
     default:
-      val->ah_eng_gain = STENG1AX_GAIN_16;
+      val->gain = STENG1AX_GAIN_2;
       break;
   }
-
-  switch (cfg2.ah_eng_zin)
-  {
-    case STENG1AX_100MOhm:
-      val->ah_eng_zin = STENG1AX_100MOhm;
-      break;
-
-    case STENG1AX_200MOhm:
-      val->ah_eng_zin = STENG1AX_200MOhm;
-      break;
-
-    case STENG1AX_500MOhm:
-      val->ah_eng_zin = STENG1AX_500MOhm;
-      break;
-
-    case STENG1AX_1GOhm:
-    default:
-      val->ah_eng_zin = STENG1AX_1GOhm;
-      break;
-  }
-
-  switch (cfg2.ah_eng_mode)
-  {
-    case STENG1AX_MODE_DIFFERENTIAL:
-      val->ah_eng_mode = STENG1AX_MODE_DIFFERENTIAL;
-      break;
-
-    case STENG1AX_MODE_SINGLE_ENDED_I1_FLOAT:
-      val->ah_eng_mode = STENG1AX_MODE_SINGLE_ENDED_I1_FLOAT;
-      break;
-
-    case STENG1AX_MODE_SINGLE_ENDED_I2_FLOAT:
-      val->ah_eng_mode = STENG1AX_MODE_SINGLE_ENDED_I2_FLOAT;
-      break;
-
-    case STENG1AX_MODE_RESET:
-    default:
-      val->ah_eng_mode = STENG1AX_MODE_RESET;
-      break;
-  }
-
-  val->ah_eng_zin_dis_1 = cfg1.ah_eng_zin_dis_ah2_eng1;
-  val->ah_eng_zin_dis_2 = cfg1.ah_eng_zin_dis_ah2_eng2;
-  val->ah_eng_en = cfg2.ah_eng_en;
 
   return ret;
 }
 
 /**
-  * @brief  Reset AH_ENG chain
+  * @brief  Enable sensor
   *
   * @param  ctx      read / write interface definitions
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t steng1ax_ah_eng_active(const stmdev_ctx_t *ctx)
+int32_t steng1ax_enable_sensor(const stmdev_ctx_t *ctx)
 {
-  steng1ax_ah_eng_cfg3_t cfg3 = {0};
+  steng1ax_ah_eng_cfg2_t cfg2;
   int32_t ret;
 
-  cfg3.ah_eng_active = 1U;
-  ret = steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG2, (uint8_t *)&cfg2, 1);
+  cfg2.ah_eng_en = 1;
+  ret += steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG2, (uint8_t *)&cfg2, 1);
 
-  if (ctx->mdelay != NULL) {
+  return ret;
+}
+
+/**
+  * @brief  Device active mode when it is set in the AH / vAFE only state[set]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      1: enable active state - 0: disable active state
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t steng1ax_ah_eng_active(const stmdev_ctx_t *ctx, uint8_t filter_on)
+{
+  steng1ax_ah_eng_cfg3_t cfg3;
+  steng1ax_ctrl3_t ctrl3;
+  int32_t ret;
+
+  ret = steng1ax_read_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
+  cfg3.ah_eng_active = 1;
+  ret += steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
+
+  if (ctx->mdelay != NULL)
+  {
     ctx->mdelay(10);
   }
 
-  cfg3.ah_eng_active = 0U;
-  ret = steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
+  ret += steng1ax_read_reg(ctx, STENG1AX_CTRL3, (uint8_t *)&ctrl3, 1);
+  ctrl3.lpf0_en = filter_on;
+  ret += steng1ax_write_reg(ctx, STENG1AX_CTRL3, (uint8_t *)&ctrl3, 1);
+
+  cfg3.ah_eng_active = 0;
+  ret += steng1ax_write_reg(ctx, STENG1AX_AH_ENG_CFG3, (uint8_t *)&cfg3, 1);
+
+  if (ctx->mdelay != NULL)
+  {
+    ctx->mdelay(10);
+  }
 
   return ret;
 }
@@ -1561,12 +1892,14 @@ int32_t steng1ax_timestamp_set(const stmdev_ctx_t *ctx, uint8_t val)
   steng1ax_interrupt_cfg_t int_cfg;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_INTERRUPT_CFG, (uint8_t *)&int_cfg, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_INTERRUPT_CFG,
+                          (uint8_t *)&int_cfg, 1);
 
   if (ret == 0)
   {
     int_cfg.timestamp_en = (uint8_t)val;
-    ret = steng1ax_write_reg(ctx, STENG1AX_INTERRUPT_CFG, (uint8_t *)&int_cfg, 1);
+    ret = steng1ax_write_reg(ctx, STENG1AX_INTERRUPT_CFG,
+                             (uint8_t *)&int_cfg, 1);
   }
 
   return ret;
@@ -1585,7 +1918,8 @@ int32_t steng1ax_timestamp_get(const stmdev_ctx_t *ctx, uint8_t *val)
   steng1ax_interrupt_cfg_t int_cfg;
   int32_t ret;
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_INTERRUPT_CFG, (uint8_t *)&int_cfg, 1);
+  ret = steng1ax_read_reg(ctx, STENG1AX_INTERRUPT_CFG,
+                          (uint8_t *)&int_cfg, 1);
   *val = int_cfg.timestamp_en;
 
   return ret;
@@ -1648,7 +1982,7 @@ int32_t steng1ax_long_cnt_flag_data_ready_get(const stmdev_ctx_t *ctx,
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_STATUS,
-                              (uint8_t *)&emb_func_status, 1);
+                            (uint8_t *)&emb_func_status, 1);
 
     *val = emb_func_status.is_fsm_lc;
   }
@@ -1676,12 +2010,12 @@ int32_t steng1ax_emb_fsm_en_set(const stmdev_ctx_t *ctx, uint8_t val)
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
-                              (uint8_t *)&emb_func_en_b, 1);
+                            (uint8_t *)&emb_func_en_b, 1);
 
     emb_func_en_b.fsm_en = (uint8_t)val;
 
     ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
-                               (uint8_t *)&emb_func_en_b, 1);
+                              (uint8_t *)&emb_func_en_b, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -1707,12 +2041,12 @@ int32_t steng1ax_emb_fsm_en_get(const stmdev_ctx_t *ctx, uint8_t *val)
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
-                              (uint8_t *)&emb_func_en_b, 1);
+                            (uint8_t *)&emb_func_en_b, 1);
 
     *val = emb_func_en_b.fsm_en;
 
     ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
-                                (uint8_t *)&emb_func_en_b, 1);
+                              (uint8_t *)&emb_func_en_b, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -1729,23 +2063,43 @@ int32_t steng1ax_emb_fsm_en_get(const stmdev_ctx_t *ctx, uint8_t *val)
   *
   */
 int32_t steng1ax_fsm_enable_set(const stmdev_ctx_t *ctx,
-                                  steng1ax_emb_fsm_enable_t *val)
+                                steng1ax_emb_fsm_enable_t *val)
 {
   steng1ax_emb_func_en_b_t emb_func_en_b;
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
-  ret += steng1ax_write_reg(ctx, STENG1AX_FSM_ENABLE, (uint8_t *)&val->fsm_enable, 1);
-  if (ret != 0) { return ret; }
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B, (uint8_t *)&emb_func_en_b, 1);
+  if (ret == 0)
+  {
+    ret = steng1ax_write_reg(ctx, STENG1AX_FSM_ENABLE,
+                             (uint8_t *)&val->fsm_enable, 1);
+  }
 
-  emb_func_en_b.fsm_en = val->fsm_enable.fsm1_en | val->fsm_enable.fsm2_en |
-                         val->fsm_enable.fsm3_en | val->fsm_enable.fsm4_en |
-                         val->fsm_enable.fsm5_en | val->fsm_enable.fsm6_en |
-                         val->fsm_enable.fsm7_en | val->fsm_enable.fsm8_en;
+  if (ret == 0)
+  {
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
+                            (uint8_t *)&emb_func_en_b, 1);
 
-  ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_B, (uint8_t *)&emb_func_en_b, 1);
+    if ((val->fsm_enable.fsm1_en |
+         val->fsm_enable.fsm2_en |
+         val->fsm_enable.fsm3_en |
+         val->fsm_enable.fsm4_en |
+         val->fsm_enable.fsm5_en |
+         val->fsm_enable.fsm6_en |
+         val->fsm_enable.fsm7_en |
+         val->fsm_enable.fsm8_en) != PROPERTY_DISABLE)
+    {
+      emb_func_en_b.fsm_en = PROPERTY_ENABLE;
+    }
+    else
+    {
+      emb_func_en_b.fsm_en = PROPERTY_DISABLE;
+    }
+
+    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
+                              (uint8_t *)&emb_func_en_b, 1);
+  }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
 
@@ -1761,7 +2115,7 @@ int32_t steng1ax_fsm_enable_set(const stmdev_ctx_t *ctx,
   *
   */
 int32_t steng1ax_fsm_enable_get(const stmdev_ctx_t *ctx,
-                                  steng1ax_emb_fsm_enable_t *val)
+                                steng1ax_emb_fsm_enable_t *val)
 {
   int32_t ret;
 
@@ -1770,7 +2124,7 @@ int32_t steng1ax_fsm_enable_get(const stmdev_ctx_t *ctx,
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_FSM_ENABLE,
-                              (uint8_t *)&val->fsm_enable, 1);
+                            (uint8_t *)&val->fsm_enable, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -1842,10 +2196,10 @@ int32_t steng1ax_long_cnt_get(const stmdev_ctx_t *ctx, uint16_t *val)
   *
   */
 int32_t steng1ax_fsm_status_get(const stmdev_ctx_t *ctx,
-                                  steng1ax_fsm_status_mainpage_t *val)
+                                steng1ax_fsm_status_mainpage_t *val)
 {
   return steng1ax_read_reg(ctx, STENG1AX_FSM_STATUS_MAINPAGE,
-                             (uint8_t *) val, 1);
+                           (uint8_t *) val, 1);
 }
 
 /**
@@ -1884,18 +2238,18 @@ int32_t steng1ax_fsm_data_rate_set(const stmdev_ctx_t *ctx,
                                    steng1ax_fsm_val_odr_t val)
 {
   steng1ax_fsm_odr_t fsm_odr_reg;
-  int32_t ret;
+  int32_t ret = 0;
 
-  ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
+  ret += steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
 
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_FSM_ODR,
-                              (uint8_t *)&fsm_odr_reg, 1);
+                            (uint8_t *)&fsm_odr_reg, 1);
 
-    fsm_odr_reg.fsm_odr = (uint8_t)val;
+    fsm_odr_reg.fsm_odr = (uint8_t)val & 0xfU;
     ret += steng1ax_write_reg(ctx, STENG1AX_FSM_ODR,
-                                (uint8_t *)&fsm_odr_reg, 1);
+                              (uint8_t *)&fsm_odr_reg, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -1918,47 +2272,37 @@ int32_t steng1ax_fsm_data_rate_get(const stmdev_ctx_t *ctx,
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
-
-  if (ret == 0)
-  {
-    ret = steng1ax_read_reg(ctx, STENG1AX_FSM_ODR,
-                              (uint8_t *)&fsm_odr_reg, 1);
-  }
-
+  ret += steng1ax_read_reg(ctx, STENG1AX_FSM_ODR,
+                           (uint8_t *)&fsm_odr_reg, 1);
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
+
+  if (ret != 0)
+  {
+    return ret;
+  }
 
   switch (fsm_odr_reg.fsm_odr)
   {
-    case STENG1AX_ODR_FSM_12Hz5:
-      *val = STENG1AX_ODR_FSM_12Hz5;
+    case 0:
+      *val = STENG1AX_ODR_FSM_VAFE_50Hz;
       break;
-
-    case STENG1AX_ODR_FSM_25Hz:
-      *val = STENG1AX_ODR_FSM_25Hz;
+    case 1:
+      *val = STENG1AX_ODR_FSM_VAFE_100Hz;
       break;
-
-    case STENG1AX_ODR_FSM_50Hz:
-      *val = STENG1AX_ODR_FSM_50Hz;
+    case 2:
+      *val = STENG1AX_ODR_FSM_VAFE_200Hz;
       break;
-
-    case STENG1AX_ODR_FSM_100Hz:
-      *val = STENG1AX_ODR_FSM_100Hz;
+    case 3:
+      *val = STENG1AX_ODR_FSM_VAFE_400Hz;
       break;
-
-    case STENG1AX_ODR_FSM_200Hz:
-      *val = STENG1AX_ODR_FSM_200Hz;
+    case 4:
+      *val = STENG1AX_ODR_FSM_VAFE_800Hz;
       break;
-
-    case STENG1AX_ODR_FSM_400Hz:
-      *val = STENG1AX_ODR_FSM_400Hz;
+    case 5:
+      *val = STENG1AX_ODR_FSM_VAFE_1600Hz;
       break;
-
-    case STENG1AX_ODR_FSM_800Hz:
-      *val = STENG1AX_ODR_FSM_800Hz;
-      break;
-
     default:
-      *val = STENG1AX_ODR_FSM_12Hz5;
+      *val = STENG1AX_ODR_FSM_VAFE_50Hz;
       break;
   }
 
@@ -1983,12 +2327,12 @@ int32_t steng1ax_fsm_init_set(const stmdev_ctx_t *ctx, uint8_t val)
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_INIT_B,
-                              (uint8_t *)&emb_func_init_b, 1);
+                            (uint8_t *)&emb_func_init_b, 1);
 
     emb_func_init_b.fsm_init = (uint8_t)val;
 
     ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_INIT_B,
-                               (uint8_t *)&emb_func_init_b, 1);
+                              (uint8_t *)&emb_func_init_b, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -2014,7 +2358,7 @@ int32_t steng1ax_fsm_init_get(const stmdev_ctx_t *ctx, uint8_t *val)
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_INIT_B,
-                              (uint8_t *)&emb_func_init_b, 1);
+                            (uint8_t *)&emb_func_init_b, 1);
 
     *val = emb_func_init_b.fsm_init;
   }
@@ -2034,16 +2378,18 @@ int32_t steng1ax_fsm_init_get(const stmdev_ctx_t *ctx, uint8_t *val)
   */
 int32_t steng1ax_fsm_fifo_en_set(const stmdev_ctx_t *ctx, uint8_t val)
 {
-  steng1ax_emb_func_fifo_en_t emb_fifo;
+  steng1ax_emb_func_fifo_en_t fifo_reg;
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
 
   if (ret == 0)
   {
-    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN, (uint8_t *)&emb_fifo, 1);
-    emb_fifo.fsm_fifo_en = (uint8_t)val;
-    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN, (uint8_t *)&emb_fifo, 1);
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN,
+                            (uint8_t *)&fifo_reg, 1);
+    fifo_reg.fsm_fifo_en = val;
+    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN,
+                              (uint8_t *)&fifo_reg, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -2055,19 +2401,23 @@ int32_t steng1ax_fsm_fifo_en_set(const stmdev_ctx_t *ctx, uint8_t val)
   * @brief  FSM FIFO en bit.[get]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Read the value of fsm_fifo_en in reg STENG1AX_EMB_FUNC_FIFO_EN
+  * @param  val    Get the value of fsm_fifo_en in reg STENG1AX_EMB_FUNC_FIFO_EN
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
 int32_t steng1ax_fsm_fifo_en_get(const stmdev_ctx_t *ctx, uint8_t *val)
 {
-  steng1ax_emb_func_fifo_en_t emb_fifo;
+  steng1ax_emb_func_fifo_en_t fifo_reg;
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN, (uint8_t *)&emb_fifo, 1);
-  *val = emb_fifo.fsm_fifo_en;
+  if (ret == 0)
+  {
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN,
+                            (uint8_t *)&fifo_reg, 1);
+    *val = fifo_reg.fsm_fifo_en;
+  }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
 
@@ -2086,7 +2436,7 @@ int32_t steng1ax_fsm_fifo_en_get(const stmdev_ctx_t *ctx, uint8_t *val)
   *
   */
 int32_t steng1ax_long_cnt_int_value_set(const stmdev_ctx_t *ctx,
-                                          uint16_t val)
+                                        uint16_t val)
 {
   uint8_t buff[2];
   int32_t ret;
@@ -2126,16 +2476,15 @@ int32_t steng1ax_long_cnt_int_value_get(const stmdev_ctx_t *ctx,
   * @brief  FSM number of programs register.[set]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that contains data to write
+  * @param  val    Buffer that contains data to write
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
-int32_t steng1ax_fsm_number_of_programs_set(const stmdev_ctx_t *ctx,
-                                            uint8_t *buff)
+int32_t steng1ax_fsm_programs_num_set(const stmdev_ctx_t *ctx, uint8_t val)
 {
   int32_t ret;
 
-  ret = steng1ax_ln_pg_write(ctx, STENG1AX_FSM_PROGRAMS, buff, 1);
+  ret = steng1ax_ln_pg_write(ctx, STENG1AX_FSM_PROGRAMS, &val, 1);
 
   return ret;
 }
@@ -2144,16 +2493,15 @@ int32_t steng1ax_fsm_number_of_programs_set(const stmdev_ctx_t *ctx,
   * @brief  FSM number of programs register.[get]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
+  * @param  val    Buffer that stores data read
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
-int32_t steng1ax_fsm_number_of_programs_get(const stmdev_ctx_t *ctx,
-                                            uint8_t *buff)
+int32_t steng1ax_fsm_programs_num_get(const stmdev_ctx_t *ctx, uint8_t *val)
 {
   int32_t ret;
 
-  ret = steng1ax_ln_pg_read(ctx, STENG1AX_FSM_PROGRAMS, buff, 1);
+  ret = steng1ax_ln_pg_read(ctx, STENG1AX_FSM_PROGRAMS, val, 1);
 
   return ret;
 }
@@ -2234,10 +2582,12 @@ int32_t steng1ax_mlc_set(const stmdev_ctx_t *ctx, steng1ax_mlc_mode_t val)
 
   if (ret == 0)
   {
-    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_A, (uint8_t *)&emb_en_a, 1);
-    ret += steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B, (uint8_t *)&emb_en_b, 1);
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_A,
+                            (uint8_t *)&emb_en_a, 1);
+    ret += steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
+                             (uint8_t *)&emb_en_b, 1);
 
-    switch(val)
+    switch (val)
     {
       case STENG1AX_MLC_OFF:
         emb_en_a.mlc_before_fsm_en = 0;
@@ -2252,11 +2602,14 @@ int32_t steng1ax_mlc_set(const stmdev_ctx_t *ctx, steng1ax_mlc_mode_t val)
         emb_en_b.mlc_en = 0;
         break;
       default:
+        /* do nothing */
         break;
     }
 
-    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_A, (uint8_t *)&emb_en_a, 1);
-    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_B, (uint8_t *)&emb_en_b, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_A,
+                              (uint8_t *)&emb_en_a, 1);
+    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
+                              (uint8_t *)&emb_en_b, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -2283,8 +2636,10 @@ int32_t steng1ax_mlc_get(const stmdev_ctx_t *ctx, steng1ax_mlc_mode_t *val)
 
   if (ret == 0)
   {
-    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_A, (uint8_t *)&emb_en_a, 1);
-    ret += steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B, (uint8_t *)&emb_en_b, 1);
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_A,
+                            (uint8_t *)&emb_en_a, 1);
+    ret += steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_EN_B,
+                             (uint8_t *)&emb_en_b, 1);
 
     if (emb_en_a.mlc_before_fsm_en == 0U && emb_en_b.mlc_en == 0U)
     {
@@ -2317,10 +2672,10 @@ int32_t steng1ax_mlc_get(const stmdev_ctx_t *ctx, steng1ax_mlc_mode_t *val)
   *
   */
 int32_t steng1ax_mlc_status_get(const stmdev_ctx_t *ctx,
-                                  steng1ax_mlc_status_mainpage_t *val)
+                                steng1ax_mlc_status_mainpage_t *val)
 {
   return steng1ax_read_reg(ctx, STENG1AX_MLC_STATUS_MAINPAGE,
-                             (uint8_t *) val, 1);
+                           (uint8_t *) val, 1);
 }
 
 /**
@@ -2355,24 +2710,22 @@ int32_t steng1ax_mlc_out_get(const stmdev_ctx_t *ctx, uint8_t *buff)
   *
   */
 int32_t steng1ax_mlc_data_rate_set(const stmdev_ctx_t *ctx,
-                                     steng1ax_mlc_odr_val_t val)
+                                   steng1ax_mlc_odr_val_t val)
 {
   steng1ax_mlc_odr_t reg;
-  int32_t ret;
+  int32_t ret = 0;
 
-  ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
+  ret += steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
 
   if (ret == 0)
   {
     ret = steng1ax_read_reg(ctx, STENG1AX_MLC_ODR, (uint8_t *)&reg, 1);
-    reg.mlc_odr = (uint8_t)val;
+
+    reg.mlc_odr = (uint8_t)val & 0xfU;
     ret += steng1ax_write_reg(ctx, STENG1AX_MLC_ODR, (uint8_t *)&reg, 1);
   }
 
-  if (ret == 0)
-  {
-    ret = steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
-  }
+  ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
 
   return ret;
 }
@@ -2386,12 +2739,12 @@ int32_t steng1ax_mlc_data_rate_set(const stmdev_ctx_t *ctx,
   *
   */
 int32_t steng1ax_mlc_data_rate_get(const stmdev_ctx_t *ctx,
-                                     steng1ax_mlc_odr_val_t *val)
+                                   steng1ax_mlc_odr_val_t *val)
 {
   steng1ax_mlc_odr_t reg;
-  int32_t ret;
+  int32_t ret = 0;
 
-  ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
+  ret += steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
 
   if (ret == 0)
   {
@@ -2399,28 +2752,26 @@ int32_t steng1ax_mlc_data_rate_get(const stmdev_ctx_t *ctx,
 
     switch (reg.mlc_odr)
     {
-      case STENG1AX_ODR_PRGS_12Hz5:
-        *val = STENG1AX_ODR_PRGS_12Hz5;
+      case 0:
+        *val = STENG1AX_ODR_PRGS_VAFE_50Hz;
         break;
-
-      case STENG1AX_ODR_PRGS_25Hz:
-        *val = STENG1AX_ODR_PRGS_25Hz;
+      case 1:
+        *val = STENG1AX_ODR_PRGS_VAFE_100Hz;
         break;
-
-      case STENG1AX_ODR_PRGS_50Hz:
-        *val = STENG1AX_ODR_PRGS_50Hz;
+      case 2:
+        *val = STENG1AX_ODR_PRGS_VAFE_200Hz;
         break;
-
-      case STENG1AX_ODR_PRGS_100Hz:
-        *val = STENG1AX_ODR_PRGS_100Hz;
+      case 3:
+        *val = STENG1AX_ODR_PRGS_VAFE_400Hz;
         break;
-
-      case STENG1AX_ODR_PRGS_200Hz:
-        *val = STENG1AX_ODR_PRGS_200Hz;
+      case 4:
+        *val = STENG1AX_ODR_PRGS_VAFE_800Hz;
         break;
-
+      case 5:
+        *val = STENG1AX_ODR_PRGS_VAFE_1600Hz;
+        break;
       default:
-        *val = STENG1AX_ODR_PRGS_12Hz5;
+        *val = STENG1AX_ODR_PRGS_VAFE_50Hz;
         break;
     }
   }
@@ -2440,16 +2791,18 @@ int32_t steng1ax_mlc_data_rate_get(const stmdev_ctx_t *ctx,
   */
 int32_t steng1ax_mlc_fifo_en_set(const stmdev_ctx_t *ctx, uint8_t val)
 {
-  steng1ax_emb_func_fifo_en_t emb_fifo;
+  steng1ax_emb_func_fifo_en_t fifo_reg;
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
 
   if (ret == 0)
   {
-    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN, (uint8_t *)&emb_fifo, 1);
-    emb_fifo.mlc_fifo_en = (uint8_t)val;
-    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN, (uint8_t *)&emb_fifo, 1);
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN,
+                            (uint8_t *)&fifo_reg, 1);
+    fifo_reg.mlc_fifo_en = val;
+    ret += steng1ax_write_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN,
+                              (uint8_t *)&fifo_reg, 1);
   }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
@@ -2461,19 +2814,23 @@ int32_t steng1ax_mlc_fifo_en_set(const stmdev_ctx_t *ctx, uint8_t val)
   * @brief  MLC FIFO en bit.[get]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Read the value of mlc_fifo_en in reg STENG1AX_EMB_FUNC_FIFO_EN
+  * @param  val    Get the value of mlc_fifo_en in reg STENG1AX_EMB_FUNC_FIFO_EN
   * @retval        Interface status (MANDATORY: return 0 -> no Error).
   *
   */
 int32_t steng1ax_mlc_fifo_en_get(const stmdev_ctx_t *ctx, uint8_t *val)
 {
-  steng1ax_emb_func_fifo_en_t emb_fifo;
+  steng1ax_emb_func_fifo_en_t fifo_reg;
   int32_t ret;
 
   ret = steng1ax_mem_bank_set(ctx, STENG1AX_EMBED_FUNC_MEM_BANK);
 
-  ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN, (uint8_t *)&emb_fifo, 1);
-  *val = emb_fifo.mlc_fifo_en;
+  if (ret == 0)
+  {
+    ret = steng1ax_read_reg(ctx, STENG1AX_EMB_FUNC_FIFO_EN,
+                            (uint8_t *)&fifo_reg, 1);
+    *val = fifo_reg.mlc_fifo_en;
+  }
 
   ret += steng1ax_mem_bank_set(ctx, STENG1AX_MAIN_MEM_BANK);
 
