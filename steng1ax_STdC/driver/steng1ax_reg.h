@@ -1598,7 +1598,6 @@ int32_t steng1ax_spi_mode_get(const stmdev_ctx_t *ctx,
 
 typedef struct
 {
-  uint8_t int_pin_en                   : 1; /* Interrupt on INT pin */
   uint8_t drdy                         : 1; /* Accelerometer data ready */
   uint8_t boot                         : 1; /* Restoring calibration parameters */
   uint8_t fifo_th                      : 1; /* FIFO threshold reached */
