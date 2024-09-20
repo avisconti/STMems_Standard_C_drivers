@@ -1167,17 +1167,11 @@ int32_t steng1ax_pin_int_route_set(const stmdev_ctx_t *ctx,
   steng1ax_ctrl1_t ctrl1;
   steng1ax_ctrl2_t ctrl2;
   steng1ax_md1_cfg_t md1_cfg;
-  uint8_t set_int = 0U;
   int32_t ret;
 
-  set_int = (val->fifo_ovr == 1) || (val->fifo_th == 1) || (val->fifo_full == 1);
-
-  if (set_int)
-  {
-    ret = steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
-    ctrl1.int_pin_en = PROPERTY_ENABLE;
-    ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
-  }
+  ret = steng1ax_read_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
+  ctrl1.int_pin_en = PROPERTY_ENABLE;
+  ret += steng1ax_write_reg(ctx, STENG1AX_CTRL1, (uint8_t *)&ctrl1, 1);
 
   if (ret == 0)
   {
