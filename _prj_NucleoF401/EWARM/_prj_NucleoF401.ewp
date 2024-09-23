@@ -453,6 +453,7 @@
                     <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\ism330bx\tilt_angle_mode0</state>
                     <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\ism330bx\Vibration monitoring</state>
                     <state>C:\Users\visconta\Projects\STdC\lps28dfw5_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\st1vafe3bx_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2939,6 +2940,21 @@
             <name>lsm9ds1</name>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm9ds1_STdC\driver\lsm9ds1_reg.c</name>
+            </file>
+        </group>
+        <group>
+            <name>st1vafe3bx</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\examples\st1vafe3bx_read_data_drdy.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\examples\st1vafe3bx_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\examples\st1vafe3bx_read_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\driver\st1vafe3bx_reg.c</name>
             </file>
         </group>
         <group>
