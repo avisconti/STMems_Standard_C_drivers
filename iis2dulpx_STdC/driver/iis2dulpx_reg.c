@@ -519,7 +519,7 @@ int32_t iis2dulpx_mode_get(const stmdev_ctx_t *ctx, iis2dulpx_md_t *val)
       val->odr = IIS2DULPX_25Hz_ULP;
       break;
     case 0x04:
-      val->odr = IIS2DULPX_6Hz_LP;
+      val->odr = (ctrl3.hp_en == 0x1U) ? IIS2DULPX_6Hz_HP : IIS2DULPX_6Hz_LP;
       break;
     case 0x05:
       val->odr = (ctrl3.hp_en == 0x1U) ? IIS2DULPX_12Hz5_HP : IIS2DULPX_12Hz5_LP;
