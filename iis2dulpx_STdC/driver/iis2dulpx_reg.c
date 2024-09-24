@@ -400,13 +400,13 @@ int32_t iis2dulpx_mode_set(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *val)
       switch (val->bw)
       {
         default:
+        case IIS2DULPX_ODR_div_2:
         case IIS2DULPX_ODR_div_4:
         case IIS2DULPX_ODR_div_8:
-        case IIS2DULPX_ODR_div_16:
           /* value not allowed */
           ret = -1;
           break;
-        case IIS2DULPX_ODR_div_2:
+        case IIS2DULPX_ODR_div_16:
           ctrl5.bw = 0x3;
           break;
       }
@@ -415,15 +415,15 @@ int32_t iis2dulpx_mode_set(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *val)
       switch (val->bw)
       {
         default:
-        case IIS2DULPX_ODR_div_8:
-        case IIS2DULPX_ODR_div_16:
+        case IIS2DULPX_ODR_div_2:
+        case IIS2DULPX_ODR_div_4:
           /* value not allowed */
           ret = -1;
           break;
-        case IIS2DULPX_ODR_div_2:
+        case IIS2DULPX_ODR_div_8:
           ctrl5.bw = 0x2;
           break;
-        case IIS2DULPX_ODR_div_4:
+        case IIS2DULPX_ODR_div_16:
           ctrl5.bw = 0x3;
           break;
       }
@@ -432,17 +432,17 @@ int32_t iis2dulpx_mode_set(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *val)
       switch (val->bw)
       {
         default:
-        case IIS2DULPX_ODR_div_16:
+        case IIS2DULPX_ODR_div_2:
           /* value not allowed */
           ret = -1;
           break;
-        case IIS2DULPX_ODR_div_2:
+        case IIS2DULPX_ODR_div_4:
           ctrl5.bw = 0x1;
           break;
-        case IIS2DULPX_ODR_div_4:
+        case IIS2DULPX_ODR_div_8:
           ctrl5.bw = 0x2;
           break;
-        case IIS2DULPX_ODR_div_8:
+        case IIS2DULPX_ODR_div_16:
           ctrl5.bw = 0x3;
           break;
       }
