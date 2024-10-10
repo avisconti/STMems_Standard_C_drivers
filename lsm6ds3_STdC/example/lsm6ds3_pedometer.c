@@ -170,7 +170,7 @@ void example_main_lsm6ds3(void)
   while (1) {
       /* Read steps */
       lsm6ds3_number_of_steps_get(&dev_ctx, (uint8_t*)&g_steps);
-      sprintf((char *)tx_buffer,
+      snprintf((char *)tx_buffer, sizeof(tx_buffer),
               "Step Count:%d\r\n",
 			  g_steps);
       tx_com(tx_buffer, strlen((char const *)tx_buffer));

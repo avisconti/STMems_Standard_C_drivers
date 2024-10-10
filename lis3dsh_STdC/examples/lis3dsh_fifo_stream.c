@@ -205,7 +205,7 @@ void lis3dsh_fifo_stream(void)
 
       /* print sensor data  */
       for (i = 0; i < reg.fifo_src.fss; i++) {
-        sprintf((char *)tx_buffer,
+        snprintf((char *)tx_buffer, sizeof(tx_buffer),
                 "Acceleration [mg]:%4.2f\t%4.2f\t%4.2f\r\n",
                 lis3dsh_from_fs4_to_mg(fifo_data[i].i16[0]),
                 lis3dsh_from_fs4_to_mg(fifo_data[i].i16[1]),

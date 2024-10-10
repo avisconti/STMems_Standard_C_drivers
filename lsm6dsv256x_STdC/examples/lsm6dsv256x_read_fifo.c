@@ -198,7 +198,7 @@ static void lsm6dsv256x_fifo_thread(void)
         break;
 
       case LSM6DSV256X_TIMESTAMP_TAG:
-        sprintf((char *)tx_buffer, "TIMESTAMP [ms] %d\r\n", *ts);
+        snprintf((char *)tx_buffer, sizeof(tx_buffer), "TIMESTAMP [ms] %d\r\n", *ts);
         tx_com(tx_buffer, strlen((char const *)tx_buffer));
 
         /* print media low-g xl data */
@@ -207,7 +207,7 @@ static void lsm6dsv256x_fifo_thread(void)
           acceleration_mg[1] = lowg_xl_sum[1] / lowg_xl_cnt;
           acceleration_mg[2] = lowg_xl_sum[2] / lowg_xl_cnt;
 
-          sprintf((char *)tx_buffer, "lg xl (media of %d samples) [mg]:%4.2f\t%4.2f\t%4.2f\r\n",
+          snprintf((char *)tx_buffer, sizeof(tx_buffer), "lg xl (media of %d samples) [mg]:%4.2f\t%4.2f\t%4.2f\r\n",
                   lowg_xl_cnt, acceleration_mg[0], acceleration_mg[1], acceleration_mg[2]);
           tx_com(tx_buffer, strlen((char const *)tx_buffer));
           lowg_xl_sum[0] = lowg_xl_sum[1] = lowg_xl_sum[2] = 0.0;
@@ -220,7 +220,7 @@ static void lsm6dsv256x_fifo_thread(void)
           acceleration_mg[1] = hg_xl_sum[1] / hg_xl_cnt;
           acceleration_mg[2] = hg_xl_sum[2] / hg_xl_cnt;
 
-          sprintf((char *)tx_buffer, "hg xl (media of %d samples) [mg]:%4.2f\t%4.2f\t%4.2f\r\n",
+          snprintf((char *)tx_buffer, sizeof(tx_buffer), "hg xl (media of %d samples) [mg]:%4.2f\t%4.2f\t%4.2f\r\n",
                   hg_xl_cnt, acceleration_mg[0], acceleration_mg[1], acceleration_mg[2]);
           tx_com(tx_buffer, strlen((char const *)tx_buffer));
           hg_xl_sum[0] = hg_xl_sum[1] = hg_xl_sum[2] = 0.0;
@@ -233,7 +233,7 @@ static void lsm6dsv256x_fifo_thread(void)
           angular_rate_mdps[1] = gyro_sum[1] / gyro_cnt;
           angular_rate_mdps[2] = gyro_sum[2] / gyro_cnt;
 
-          sprintf((char *)tx_buffer, "gyro (media of %d samples) [mdps]:%4.2f\t%4.2f\t%4.2f\r\n\r\n",
+          snprintf((char *)tx_buffer, sizeof(tx_buffer), "gyro (media of %d samples) [mdps]:%4.2f\t%4.2f\t%4.2f\r\n\r\n",
                   gyro_cnt, angular_rate_mdps[0], angular_rate_mdps[1], angular_rate_mdps[2]);
           tx_com(tx_buffer, strlen((char const *)tx_buffer));
           gyro_sum[0] = gyro_sum[1] = gyro_sum[2] = 0.0;
@@ -242,7 +242,7 @@ static void lsm6dsv256x_fifo_thread(void)
         break;
 
       default:
-        sprintf((char *)tx_buffer, "[%02x] UNHANDLED TAG \r\n", f_data.tag);
+        snprintf((char *)tx_buffer, sizeof(tx_buffer), "[%02x] UNHANDLED TAG \r\n", f_data.tag);
         tx_com(tx_buffer, strlen((char const *)tx_buffer));
         break;
       }

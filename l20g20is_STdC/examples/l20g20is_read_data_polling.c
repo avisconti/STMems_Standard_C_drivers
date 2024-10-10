@@ -151,7 +151,7 @@ void l20g20is_read_data_polling(void)
       angular_rate_mdps[1] = l20g20is_from_fs200dps_to_mdps(
                                data_raw_angular_rate[1]);
       angular_rate_mdps[2] = 0x00;
-      sprintf((char *)tx_buffer, "[mdps]:%4.2f\t%4.2f\t%4.2f\r\n",
+      snprintf((char *)tx_buffer, sizeof(tx_buffer), "[mdps]:%4.2f\t%4.2f\t%4.2f\r\n",
               angular_rate_mdps[0], angular_rate_mdps[1], angular_rate_mdps[2]);
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
     }

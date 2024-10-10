@@ -200,7 +200,7 @@ void lsm6dsvd_fifo(void)
 
     if (fifo_status.fifo_th == 1) {
       num = fifo_status.fifo_level;
-      sprintf((char *)tx_buffer, "-- FIFO num %d \r\n", num);
+      snprintf((char *)tx_buffer, sizeof(tx_buffer), "-- FIFO num %d \r\n", num);
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
 
       while (num--) {
@@ -214,7 +214,7 @@ void lsm6dsvd_fifo(void)
 
         switch (f_data.tag) {
           case LSM6DSVD_XL_NC_TAG:
-            sprintf((char *)tx_buffer, "ACC [mg]:\t%4.2f\t%4.2f\t%4.2f\r\n",
+            snprintf((char *)tx_buffer, sizeof(tx_buffer), "ACC [mg]:\t%4.2f\t%4.2f\t%4.2f\r\n",
                   lsm6dsvd_from_fs2_to_mg(*datax),
                   lsm6dsvd_from_fs2_to_mg(*datay),
                   lsm6dsvd_from_fs2_to_mg(*dataz));
@@ -222,7 +222,7 @@ void lsm6dsvd_fifo(void)
             break;
 
           case LSM6DSVD_GY_NC_TAG:
-            sprintf((char *)tx_buffer, "GYR [mdps]:\t%4.2f\t%4.2f\t%4.2f\r\n",
+            snprintf((char *)tx_buffer, sizeof(tx_buffer), "GYR [mdps]:\t%4.2f\t%4.2f\t%4.2f\r\n",
                   lsm6dsvd_from_fs2000_to_mdps(*datax),
                   lsm6dsvd_from_fs2000_to_mdps(*datay),
                   lsm6dsvd_from_fs2000_to_mdps(*dataz));
@@ -235,7 +235,7 @@ void lsm6dsvd_fifo(void)
         }
       }
 
-      sprintf((char *)tx_buffer, "------ \r\n\r\n");
+      snprintf((char *)tx_buffer, sizeof(tx_buffer), "------ \r\n\r\n");
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
     }
   }

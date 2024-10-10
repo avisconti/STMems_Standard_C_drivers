@@ -191,7 +191,7 @@ void lsm6dsvd_pedometer(void)
     if (all_sources.step_detector) {
       /* Read steps */
       lsm6dsvd_stpcnt_steps_get(&dev_ctx, &steps);
-      sprintf((char *)tx_buffer, "steps :%d\r\n", steps);
+      snprintf((char *)tx_buffer, sizeof(tx_buffer), "steps :%d\r\n", steps);
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
     }
   }

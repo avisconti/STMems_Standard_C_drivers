@@ -186,7 +186,7 @@ void steng1ax_read_data_polling(void)
       steng1ax_ah_eng_data_get(&dev_ctx, &data);
 
       /* print ENG data  */
-      sprintf((char*)tx_buffer, "QVAR [LSB]: %d\r\n", data.raw);
+      snprintf((char*)tx_buffer, sizeof(tx_buffer), "QVAR [LSB]: %d\r\n", data.raw);
       tx_com(tx_buffer, strlen((char const*)tx_buffer));
     }
   }

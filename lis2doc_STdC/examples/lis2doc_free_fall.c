@@ -181,7 +181,7 @@ void lis2doc_free_fall(void)
     lis2doc_all_sources_get(&dev_ctx, &src);
 
     if (src.wake_up_src.ff_ia) {
-      sprintf((char *)tx_buffer, "free fall detected\r\n");
+      snprintf((char *)tx_buffer, sizeof(tx_buffer), "free fall detected\r\n");
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
     }
   }

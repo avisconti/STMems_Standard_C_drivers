@@ -197,7 +197,7 @@ void steng1ax_read_data_drdy(void)
       steng1ax_ah_eng_data_get(&dev_ctx, &data);
 
       /* print ENG data  */
-      sprintf((char*)tx_buffer, "ENG: %4.2f\r\n", data.mv);
+      snprintf((char*)tx_buffer, sizeof(tx_buffer), "ENG: %4.2f\r\n", data.mv);
       tx_com(tx_buffer, strlen((char const*)tx_buffer));
     }
   }

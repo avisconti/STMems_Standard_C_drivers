@@ -228,7 +228,7 @@ void lsm6dsv320x_hg_wakeup(void)
             axis |= AXIS_Z;
           }
 
-          sprintf((char *)tx_buffer,"WAKEUP event on X: %d, Y = %d, Z= %d\r\n",
+          snprintf((char *)tx_buffer, sizeof(tx_buffer),"WAKEUP event on X: %d, Y = %d, Z= %d\r\n",
                   (axis & AXIS_X) ? 1 : 0,
                   (axis & AXIS_Y) ? 1 : 0,
                   (axis & AXIS_Z) ? 1 : 0);

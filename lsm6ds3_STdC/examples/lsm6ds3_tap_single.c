@@ -199,7 +199,7 @@ void example_main_tap_single_lsm6ds3(void)
     lsm6ds3_all_sources_get(&dev_ctx, &all_source);
 
     if (all_source.tap_src.single_tap) {
-      sprintf((char *)tx_buffer, "Tap Detected\r\n");
+      snprintf((char *)tx_buffer, sizeof(tx_buffer), "Tap Detected\r\n");
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
     }
   }
