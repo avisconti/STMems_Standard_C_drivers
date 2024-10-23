@@ -2795,6 +2795,9 @@
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fifo_irq.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fifo_stepcnt.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_free_fall.c</name>
             </file>
             <file>
@@ -2805,6 +2808,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_mlc_gym.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_pedometer.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_qvar_read_data_polling.c</name>
@@ -2828,10 +2834,16 @@
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_sensor_hub.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_sig_mot.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_single_double_tap.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_six_d_position.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_tilt.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_wakeup.c</name>
