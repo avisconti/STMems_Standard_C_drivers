@@ -3022,6 +3022,12 @@
             <file>
                 <name>$PROJ_DIR$\..\..\sths34pf80_STdC\examples\sths34pf80_tmos_presence_detection.c</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\sths34pf80_STdC\examples\sths34pf80_tmos_sleep_app.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\sths34pf80_STdC\examples\sths34pf80_tmos_tamb_shock_reset.c</name>
+            </file>
         </group>
         <group>
             <name>stts22h</name>
