@@ -1,7 +1,7 @@
 /*
  ******************************************************************************
- * @file    sths34pf80_tmos_data_polling.c
- * @author  MEMS Software Solutions Team
+ * @file    sths34pf80_tmos_tamb_shock_reset.c
+ * @author  AME MEMS Applications Team
  * @brief   This file show the simplest way to get data from sensor.
  *
  ******************************************************************************
@@ -104,6 +104,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 static uint8_t tx_buffer[1000];
+static stmdev_ctx_t dev_ctx;
+static int wakeup_thread = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -122,14 +124,17 @@ static void tx_com( uint8_t *tx_buffer, uint16_t len );
 static void platform_delay(uint32_t ms);
 static void platform_init(void);
 
-/* Main Example --------------------------------------------------------------*/
-void sths34pf80_tmos_data_polling(void)
+/* Interrupt handler  --------------------------------------------------------*/
+void sths34pf80_tmos_tamb_shock_reset_handler(void)
 {
-  stmdev_ctx_t dev_ctx;
+  wakeup_thread = 1;
+}
+
+/* Main Example --------------------------------------------------------------*/
+void sths34pf80_tmos_tamb_shock_reset(void)
+{
   uint8_t whoami;
   sths34pf80_lpf_bandwidth_t lpf_m, lpf_p, lpf_p_m, lpf_a_t;
-  sths34pf80_drdy_status_t status;
-  sths34pf80_func_status_t func_status;
 
   /* Initialize mems driver interface */
   dev_ctx.write_reg = platform_write;
@@ -162,39 +167,82 @@ void sths34pf80_tmos_data_polling(void)
           "lpf_m: %02d, lpf_p: %02d, lpf_p_m: %02d, lpf_a_t: %02d\r\n", lpf_m, lpf_p, lpf_p_m, lpf_a_t);
   tx_com(tx_buffer, strlen((char const *)tx_buffer));
 
-  snprintf((char *)tx_buffer, sizeof(tx_buffer),
-		  "TObj, TAmb, TPres, Pres_Flag, TMot, Mot_Flag, TAmbShock, TAmbShock_Flag\r\n");
-  tx_com(tx_buffer, strlen((char const *)tx_buffer));
-
   /* Set BDU */
   sths34pf80_block_data_update_set(&dev_ctx, 1);
 
+  /* Set tambient shock threshold and hysteresis values */
+  sths34pf80_tambient_shock_threshold_set(&dev_ctx, 35);
+  sths34pf80_tambient_shock_hysteresis_set(&dev_ctx, 5);
+
+  sths34pf80_presence_threshold_set(&dev_ctx, 200);
+  sths34pf80_presence_hysteresis_set(&dev_ctx, 20);
+  sths34pf80_motion_threshold_set(&dev_ctx, 300);
+  sths34pf80_motion_hysteresis_set(&dev_ctx, 30);
+
+  sths34pf80_algo_reset(&dev_ctx);
+
+  /* Set interrupt */
+  sths34pf80_int_or_set(&dev_ctx, STHS34PF80_INT_ALL);
+  sths34pf80_route_int_set(&dev_ctx, STHS34PF80_INT_OR);
+
   /* Set ODR */
-  sths34pf80_odr_set(&dev_ctx, STHS34PF80_ODR_AT_30Hz);
+  sths34pf80_odr_set(&dev_ctx, STHS34PF80_ODR_AT_15Hz);
 
-  /* Read samples in polling mode (no int) */
-  while(1)
-  {
-    sths34pf80_drdy_status_get(&dev_ctx, &status);
-    if (status.drdy) {
-      int16_t tobject;
-      int16_t tambient;
-      int16_t tpres;
-      int16_t tmot;
-      int16_t tambshock;
+  /* Presence event detected in irq handler */
+  while(1) {
+    sths34pf80_func_status_t func_status;
+    uint8_t motion;
+    uint8_t presence;
+    uint8_t tambshock;
 
-      sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
-      sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
-      sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
-      sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
-      sths34pf80_tamb_shock_raw_get(&dev_ctx, &tambshock);
+    /* handle event in a "thread" alike code */
+    if (wakeup_thread) {
+      wakeup_thread = 0;
+      motion = 0;
+      presence = 0;
+      tambshock = 0;
 
-      sths34pf80_func_status_get(&dev_ctx, &func_status);
+      do {
+        sths34pf80_func_status_get(&dev_ctx, &func_status);
 
-      snprintf((char *)tx_buffer, sizeof(tx_buffer),
-               "%d, %d, %d, %d, %d, %d, %d, %d\r\n",
-               tobject, tambient, tpres, func_status.pres_flag, tmot, func_status.mot_flag, tambshock, func_status.tamb_shock_flag);
-      tx_com(tx_buffer, strlen((char const *)tx_buffer));
+        if (func_status.pres_flag != presence) {
+          presence = func_status.pres_flag;
+
+          if (presence) {
+            snprintf((char *)tx_buffer, sizeof(tx_buffer), "Start of Presence\r\n");
+            tx_com(tx_buffer, strlen((char const *)tx_buffer));
+          } else {
+            snprintf((char *)tx_buffer, sizeof(tx_buffer), "End of Presence\r\n");
+            tx_com(tx_buffer, strlen((char const *)tx_buffer));
+          }
+        }
+
+        if (func_status.mot_flag != motion) {
+          motion = func_status.mot_flag;
+
+          if (motion) {
+            snprintf((char *)tx_buffer, sizeof(tx_buffer), "Motion Detected!\r\n");
+            tx_com(tx_buffer, strlen((char const *)tx_buffer));
+          }
+        }
+
+        if (func_status.tamb_shock_flag != tambshock) {
+       	  tambshock = func_status.tamb_shock_flag;
+
+		  if (tambshock)
+		  {
+			sprintf((char *)tx_buffer, "TAmbient Shock Detected! Clear FoV for reset operation! \r\n");
+			tx_com(tx_buffer, strlen((char const *)tx_buffer));
+
+			platform_delay(5000);
+
+			sths34pf80_algo_reset(&dev_ctx);
+
+			sprintf((char *)tx_buffer, "Emb Algorithm Reset Performed!!\r\n");
+				   tx_com(tx_buffer, strlen((char const *)tx_buffer));
+          }
+        }
+      } while (func_status.pres_flag);
     }
   }
 }
@@ -326,7 +374,6 @@ static void platform_delay(uint32_t ms)
 static void platform_init(void)
 {
 #if defined(STEVAL_MKI109V3)
-  /* MKI109V3: Vdd and Vddio power supply values */
   TIM3->CCR1 = PWM_1V8;
   TIM3->CCR2 = PWM_1V8;
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);

@@ -1,7 +1,7 @@
 /*
  ******************************************************************************
- * @file    sths34pf80_tmos_data_polling.c
- * @author  MEMS Software Solutions Team
+ * @file    sths34pf80_tmos_sleep_app.c
+ * @author  AME MEMS Applications Team
  * @brief   This file show the simplest way to get data from sensor.
  *
  ******************************************************************************
@@ -102,8 +102,28 @@
 /* Private macro -------------------------------------------------------------*/
 #define    BOOT_TIME         10 //ms
 
+// SW timer value to assess end of movement [s]
+#define    SW_PRES_TIMER		15
+
+#define MOT_THS_ALGO_MOT   100    // Embedded motion threshold of the motion-based algorithm [LSB]
+#define MOT_THS_ALGO_PRES  200    // Embedded motion threshold of the presence-based algorithm [LSB]
+#define HYST_COEFF         0.2    // Embedded common hysteresis coefficient [-]
+
+/* Private types ---------------------------------------------------------*/
+ // Define the State type
+ typedef enum {
+     STATE_0,
+     STATE_1
+ } State;
+
+
 /* Private variables ---------------------------------------------------------*/
 static uint8_t tx_buffer[1000];
+static stmdev_ctx_t dev_ctx;
+static int wakeup_thread = 0;
+
+static State current_state = STATE_0;
+static volatile uint8_t counter = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -122,14 +142,38 @@ static void tx_com( uint8_t *tx_buffer, uint16_t len );
 static void platform_delay(uint32_t ms);
 static void platform_init(void);
 
-/* Main Example --------------------------------------------------------------*/
-void sths34pf80_tmos_data_polling(void)
+static void sths34pf80_tmos_sleep_app_state_0_run(void);
+static void sths34pf80_tmos_sleep_app_state_1_set(void);
+
+/* Timer handler  --------------------------------------------------------*/
+void sths34pf80_tmos_sleep_app_handler_timer(void)
 {
-  stmdev_ctx_t dev_ctx;
+  switch (current_state) {
+    case STATE_0:
+      counter++;
+      break;
+    default:
+      break;
+  }
+}
+
+/* Interrupt handler  --------------------------------------------------------*/
+void sths34pf80_tmos_sleep_app_handler_interrupt(void)
+{
+  switch (current_state) {
+	case STATE_1:
+      wakeup_thread = 1;
+      break;
+
+	default:
+      break;
+  }
+}
+
+/* Main Example --------------------------------------------------------------*/
+void sths34pf80_tmos_sleep_app(void)
+{
   uint8_t whoami;
-  sths34pf80_lpf_bandwidth_t lpf_m, lpf_p, lpf_p_m, lpf_a_t;
-  sths34pf80_drdy_status_t status;
-  sths34pf80_func_status_t func_status;
 
   /* Initialize mems driver interface */
   dev_ctx.write_reg = platform_write;
@@ -146,56 +190,129 @@ void sths34pf80_tmos_data_polling(void)
   /* Check device ID */
   sths34pf80_device_id_get(&dev_ctx, &whoami);
   if (whoami != STHS34PF80_ID)
-    while(1);
+	while (1);
 
   /* Set averages (AVG_TAMB = 8, AVG_TMOS = 32) */
   sths34pf80_avg_tobject_num_set(&dev_ctx, STHS34PF80_AVG_TMOS_32);
   sths34pf80_avg_tambient_num_set(&dev_ctx, STHS34PF80_AVG_T_8);
 
-  /* read filters */
-  sths34pf80_lpf_m_bandwidth_get(&dev_ctx, &lpf_m);
-  sths34pf80_lpf_p_bandwidth_get(&dev_ctx, &lpf_p);
-  sths34pf80_lpf_p_m_bandwidth_get(&dev_ctx, &lpf_p_m);
-  sths34pf80_lpf_a_t_bandwidth_get(&dev_ctx, &lpf_a_t);
-
-  snprintf((char *)tx_buffer, sizeof(tx_buffer),
-          "lpf_m: %02d, lpf_p: %02d, lpf_p_m: %02d, lpf_a_t: %02d\r\n", lpf_m, lpf_p, lpf_p_m, lpf_a_t);
-  tx_com(tx_buffer, strlen((char const *)tx_buffer));
-
-  snprintf((char *)tx_buffer, sizeof(tx_buffer),
-		  "TObj, TAmb, TPres, Pres_Flag, TMot, Mot_Flag, TAmbShock, TAmbShock_Flag\r\n");
-  tx_com(tx_buffer, strlen((char const *)tx_buffer));
-
   /* Set BDU */
   sths34pf80_block_data_update_set(&dev_ctx, 1);
 
+  snprintf((char *)tx_buffer, sizeof(tx_buffer),
+  		  "TObj, TAmb, TPres, TMot, Pres_Flag, Mot_Flag, SW_PRES_FLAG, MOT_COUNTER\r\n");
+  tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  platform_delay(100);
+
   /* Set ODR */
-  sths34pf80_odr_set(&dev_ctx, STHS34PF80_ODR_AT_30Hz);
+  sths34pf80_odr_set(&dev_ctx, STHS34PF80_ODR_AT_15Hz);
 
-  /* Read samples in polling mode (no int) */
-  while(1)
-  {
-    sths34pf80_drdy_status_get(&dev_ctx, &status);
-    if (status.drdy) {
-      int16_t tobject;
-      int16_t tambient;
-      int16_t tpres;
-      int16_t tmot;
-      int16_t tambshock;
+  while (1) {
+    switch (current_state) {
+      case STATE_0:
+        sths34pf80_tmos_sleep_app_state_0_run();
+        break;
 
-      sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
-      sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
-      sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
-      sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
-      sths34pf80_tamb_shock_raw_get(&dev_ctx, &tambshock);
+      case STATE_1:
+        sths34pf80_tmos_sleep_app_state_1_set();
+        break;
 
-      sths34pf80_func_status_get(&dev_ctx, &func_status);
-
-      snprintf((char *)tx_buffer, sizeof(tx_buffer),
-               "%d, %d, %d, %d, %d, %d, %d, %d\r\n",
-               tobject, tambient, tpres, func_status.pres_flag, tmot, func_status.mot_flag, tambshock, func_status.tamb_shock_flag);
-      tx_com(tx_buffer, strlen((char const *)tx_buffer));
+      default:
+    	break;
     }
+  }
+}
+
+static void sths34pf80_tmos_sleep_app_state_0_run(void)
+{
+  // Check for motion detection
+  sths34pf80_drdy_status_t status;
+  sths34pf80_func_status_t func_status;
+
+  uint8_t motion_flag = 0;
+
+  /* Read samples in drdy mode */
+  sths34pf80_drdy_status_get(&dev_ctx, &status);
+  if (status.drdy) {
+	int16_t tobject;
+	int16_t tambient;
+	int16_t tpres;
+	int16_t tmot;
+
+	sths34pf80_func_status_get(&dev_ctx, &func_status);
+	sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
+	sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
+	sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
+	sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
+
+	if (func_status.mot_flag) {
+	  motion_flag = 1;
+	}
+
+	snprintf((char *)tx_buffer, sizeof(tx_buffer),
+			"%d, %d, %d, %d, %d, %d, %d, %d\r\n",
+	        tobject, tambient, tpres, tmot, func_status.pres_flag, func_status.mot_flag, func_status.mot_flag, counter);
+	tx_com(tx_buffer, strlen((char const *)tx_buffer));
+  }
+
+  if (motion_flag == 1) {
+    if (current_state == STATE_0) {
+      counter = 0;
+    }
+  }
+  else if (counter == SW_PRES_TIMER) {
+    sths34pf80_algo_reset(&dev_ctx);
+
+    snprintf((char *)tx_buffer, sizeof(tx_buffer),
+    		"Algo reset performed.\r\n");
+    tx_com(tx_buffer, strlen((char const *)tx_buffer));
+
+    current_state = STATE_1;
+
+    platform_delay(1000);
+  }
+}
+
+static void sths34pf80_tmos_sleep_app_state_1_set(void)
+{
+  sths34pf80_presence_threshold_set(&dev_ctx, 100);
+  sths34pf80_presence_hysteresis_set(&dev_ctx, 40);
+  sths34pf80_motion_threshold_set(&dev_ctx, 120);
+  sths34pf80_motion_hysteresis_set(&dev_ctx, 40);
+
+  sths34pf80_tobject_algo_compensation_set(&dev_ctx, 1);
+
+  /* Set interrupt */
+  sths34pf80_route_int_set(&dev_ctx, STHS34PF80_INT_DRDY);
+
+  /* Read samples in drdy handler */
+  while (1) {
+	sths34pf80_func_status_t func_status;
+	sths34pf80_drdy_status_t status;
+
+	int16_t tobject;
+	int16_t tambient;
+	int16_t tpres;
+	int16_t tmot;
+
+	if (wakeup_thread) {
+      wakeup_thread = 0;
+
+      sths34pf80_drdy_status_get(&dev_ctx, &status);
+
+	  if (status.drdy) {
+		sths34pf80_func_status_get(&dev_ctx, &func_status);
+		sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
+		sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
+		sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
+		sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
+
+		snprintf((char *)tx_buffer, sizeof(tx_buffer),
+				"%d, %d, %d, %d, %d, %d, %d, %d\r\n",
+				tobject, tambient, tpres, tmot, func_status.pres_flag, func_status.mot_flag, func_status.pres_flag, counter);
+		tx_com(tx_buffer, strlen((char const *)tx_buffer));
+	  }
+	}
   }
 }
 
@@ -326,7 +443,6 @@ static void platform_delay(uint32_t ms)
 static void platform_init(void)
 {
 #if defined(STEVAL_MKI109V3)
-  /* MKI109V3: Vdd and Vddio power supply values */
   TIM3->CCR1 = PWM_1V8;
   TIM3->CCR2 = PWM_1V8;
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);

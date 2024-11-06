@@ -1,14 +1,14 @@
 /*
  ******************************************************************************
- * @file    tmos_presence_detection.c
- * @author  Sensors Software Solution Team
+ * @file    sths34pf80_tmos_presence_detection.c
+ * @author  MEMS Software Solutions Team
  * @brief   This file show the simplest way to get data from sensor.
  *
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
- * All rights reserved.</center></h2>
+ * Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.
  *
  * This software component is licensed by ST under BSD 3-Clause license,
  * the "License"; You may not use this file except in compliance with the
@@ -61,7 +61,6 @@
  *            header file of the driver (_reg.h).
  */
 
-
 #if defined(STEVAL_MKI109V3)
 /* MKI109V3: Define communication interface */
 #define SENSOR_BUS hspi2
@@ -105,7 +104,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 static uint8_t tx_buffer[1000];
-//static sths34pf80_data_t data;
+static stmdev_ctx_t dev_ctx;
+static int wakeup_thread = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -124,9 +124,7 @@ static void tx_com( uint8_t *tx_buffer, uint16_t len );
 static void platform_delay(uint32_t ms);
 static void platform_init(void);
 
-static stmdev_ctx_t dev_ctx;
-static int wakeup_thread = 0;
-
+/* Interrupt handler  --------------------------------------------------------*/
 void sths34pf80_tmos_presence_detection_handler(void)
 {
   wakeup_thread = 1;
@@ -201,8 +199,7 @@ void sths34pf80_tmos_presence_detection(void)
       do {
         sths34pf80_func_status_get(&dev_ctx, &func_status);
 
-        if (func_status.pres_flag != presence)
-        {
+        if (func_status.pres_flag != presence) {
           presence = func_status.pres_flag;
 
           if (presence) {
@@ -214,8 +211,7 @@ void sths34pf80_tmos_presence_detection(void)
           }
         }
 
-        if (func_status.mot_flag != motion)
-        {
+        if (func_status.mot_flag != motion) {
           motion = func_status.mot_flag;
 
           if (motion) {
