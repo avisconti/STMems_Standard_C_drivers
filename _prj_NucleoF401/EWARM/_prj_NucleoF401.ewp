@@ -454,6 +454,7 @@
                     <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\ism330bx\Vibration monitoring</state>
                     <state>C:\Users\visconta\Projects\STdC\lps28dfw5_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\st1vafe3bx_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\STMems_Machine_Learning_Core\application_examples\st1vafe3bx\6D position recognition</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -2957,6 +2958,9 @@
         <group>
             <name>st1vafe3bx</name>
             <file>
+                <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\examples\st1vafe3bx_mlc_six_d_position.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\examples\st1vafe3bx_read_data_drdy.c</name>
             </file>
             <file>
@@ -2964,6 +2968,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\examples\st1vafe3bx_read_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\examples\st1vafe3bx_read_xl_fifo.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\st1vafe3bx_STdC\driver\st1vafe3bx_reg.c</name>
