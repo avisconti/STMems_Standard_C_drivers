@@ -6,7 +6,7 @@
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+ * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
  * All rights reserved.</center></h2>
  *
  * This software component is licensed by ST under BSD 3-Clause license,
@@ -46,11 +46,18 @@
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t __weak lps28dfw5_read_reg(stmdev_ctx_t *ctx, uint8_t reg, uint8_t *data,
-                                 uint16_t len)
+int32_t __weak lps28dfw5_read_reg(const stmdev_ctx_t *ctx, uint8_t reg, uint8_t *data,
+                                  uint16_t len)
 {
   int32_t ret;
+
+  if (ctx == NULL)
+  {
+    return -1;
+  }
+
   ret = ctx->read_reg(ctx->handle, reg, data, len);
+
   return ret;
 }
 
@@ -64,11 +71,18 @@ int32_t __weak lps28dfw5_read_reg(stmdev_ctx_t *ctx, uint8_t reg, uint8_t *data,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t __weak lps28dfw5_write_reg(stmdev_ctx_t *ctx, uint8_t reg, uint8_t *data,
-                                  uint16_t len)
+int32_t __weak lps28dfw5_write_reg(const stmdev_ctx_t *ctx, uint8_t reg, uint8_t *data,
+                                   uint16_t len)
 {
   int32_t ret;
+
+  if (ctx == NULL)
+  {
+    return -1;
+  }
+
   ret = ctx->write_reg(ctx->handle, reg, data, len);
+
   return ret;
 }
 
@@ -156,7 +170,7 @@ float_t lps28dfw5_from_lsb_to_celsius(int16_t lsb)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_id_get(stmdev_ctx_t *ctx, lps28dfw5_id_t *val)
+int32_t lps28dfw5_id_get(const stmdev_ctx_t *ctx, lps28dfw5_id_t *val)
 {
   uint8_t reg;
   int32_t ret;
@@ -171,7 +185,7 @@ int32_t lps28dfw5_id_get(stmdev_ctx_t *ctx, lps28dfw5_id_t *val)
   * @brief  Device ID FS.[get]
   *
   * @param  ctx   communication interface handler.(ptr)
-  * @param  val   FS ID values: LPS28DFW5_FS_4BAR or LPS28DFW5_FS_5BAR
+  * @param  val   FS ID values: 4BAR or 5BAR
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -183,14 +197,15 @@ int32_t lps28dfw5_id_fs_get(stmdev_ctx_t *ctx, lps28dfw5_id_fs_val_t *val)
   ret = lps28dfw5_read_reg(ctx, LPS28DFW5_ID_FS, (uint8_t *)&reg, 1);
   if (ret == 0)
   {
-    switch(reg.id_fs) {
-    default:
-    case 0:
-      *val = LPS28DFW5_FS_4BAR;
-      break;
-    case 1:
-      *val = LPS28DFW5_FS_5BAR;
-      break;
+    switch (reg.id_fs)
+    {
+      default:
+      case 0:
+        *val = LPS28DFW5_FS_4BAR;
+        break;
+      case 1:
+        *val = LPS28DFW5_FS_5BAR;
+        break;
     }
   }
 
@@ -205,9 +220,9 @@ int32_t lps28dfw5_id_fs_get(stmdev_ctx_t *ctx, lps28dfw5_id_fs_val_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_bus_mode_set(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
+int32_t lps28dfw5_bus_mode_set(const stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
 {
-  lps28dfw5_i3c_if_ctrl_add_t i3c_if_ctrl_add;
+  lps28dfw5_i3c_if_ctrl_t i3c_if_ctrl;
   lps28dfw5_if_ctrl_t if_ctrl;
   int32_t ret;
 
@@ -217,18 +232,22 @@ int32_t lps28dfw5_bus_mode_set(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
     if_ctrl.int_en_i3c = ((uint8_t)val->interface & 0x04U) >> 2;
     ret = lps28dfw5_write_reg(ctx, LPS28DFW5_IF_CTRL, (uint8_t *)&if_ctrl, 1);
   }
+
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  ret = lps28dfw5_read_reg(ctx, LPS28DFW5_I3C_IF_CTRL,
+                           (uint8_t *)&i3c_if_ctrl, 1);
   if (ret == 0)
   {
-    ret = lps28dfw5_read_reg(ctx, LPS28DFW5_I3C_IF_CTRL_ADD,
-                            (uint8_t *)&i3c_if_ctrl_add, 1);
+    i3c_if_ctrl.asf_on = (uint8_t)val->filter & 0x01U;
+    i3c_if_ctrl.I3C_Bus_Avb_Sel = (uint8_t)val->bus_avb_time & 0x03U;
+    ret = lps28dfw5_write_reg(ctx, LPS28DFW5_I3C_IF_CTRL,
+                              (uint8_t *)&i3c_if_ctrl, 1);
   }
-  if (ret == 0)
-  {
-    i3c_if_ctrl_add.asf_on = (uint8_t)val->filter & 0x01U;
-    i3c_if_ctrl_add.I3C_Bus_Avb_Sel = (uint8_t)val->bus_avb_time & 0x03U;
-    ret = lps28dfw5_write_reg(ctx, LPS28DFW5_I3C_IF_CTRL_ADD,
-                             (uint8_t *)&i3c_if_ctrl_add, 1);
-  }
+
   return ret;
 }
 
@@ -240,17 +259,16 @@ int32_t lps28dfw5_bus_mode_set(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_bus_mode_get(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
+int32_t lps28dfw5_bus_mode_get(const stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
 {
-  lps28dfw5_i3c_if_ctrl_add_t i3c_if_ctrl_add;
+  lps28dfw5_i3c_if_ctrl_t i3c_if_ctrl;
   lps28dfw5_if_ctrl_t if_ctrl;
   int32_t ret;
 
-  ret = lps28dfw5_read_reg(ctx, LPS28DFW5_IF_CTRL, (uint8_t *)&if_ctrl, 1);
+  ret = lps28dfw5_read_reg(ctx, LPS28DFW5_I3C_IF_CTRL, (uint8_t *)&i3c_if_ctrl, 1);
   if (ret == 0)
   {
-    ret = lps28dfw5_read_reg(ctx, LPS28DFW5_I3C_IF_CTRL_ADD,
-                            (uint8_t *)&i3c_if_ctrl_add, 1);
+    ret = lps28dfw5_read_reg(ctx, LPS28DFW5_IF_CTRL, (uint8_t *)&if_ctrl, 1);
 
     switch (if_ctrl.int_en_i3c << 2)
     {
@@ -265,7 +283,7 @@ int32_t lps28dfw5_bus_mode_get(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
         break;
     }
 
-    switch (i3c_if_ctrl_add.asf_on)
+    switch (i3c_if_ctrl.asf_on)
     {
       case LPS28DFW5_AUTO:
         val->filter = LPS28DFW5_AUTO;
@@ -278,7 +296,7 @@ int32_t lps28dfw5_bus_mode_get(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
         break;
     }
 
-    switch (i3c_if_ctrl_add.I3C_Bus_Avb_Sel)
+    switch (i3c_if_ctrl.I3C_Bus_Avb_Sel)
     {
       case LPS28DFW5_BUS_AVB_TIME_50us:
         val->bus_avb_time = LPS28DFW5_BUS_AVB_TIME_50us;
@@ -297,6 +315,7 @@ int32_t lps28dfw5_bus_mode_get(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
         break;
     }
   }
+
   return ret;
 }
 
@@ -308,7 +327,7 @@ int32_t lps28dfw5_bus_mode_get(stmdev_ctx_t *ctx, lps28dfw5_bus_mode_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_init_set(stmdev_ctx_t *ctx, lps28dfw5_init_t val)
+int32_t lps28dfw5_init_set(const stmdev_ctx_t *ctx, lps28dfw5_init_t val)
 {
   lps28dfw5_ctrl_reg2_t ctrl_reg2;
   lps28dfw5_ctrl_reg3_t ctrl_reg3;
@@ -326,12 +345,12 @@ int32_t lps28dfw5_init_set(stmdev_ctx_t *ctx, lps28dfw5_init_t val)
       case LPS28DFW5_BOOT:
         ctrl_reg2.boot = PROPERTY_ENABLE;
         ret = lps28dfw5_write_reg(ctx, LPS28DFW5_CTRL_REG2,
-                                 (uint8_t *)&ctrl_reg2, 1);
+                                  (uint8_t *)&ctrl_reg2, 1);
         break;
       case LPS28DFW5_RESET:
         ctrl_reg2.swreset = PROPERTY_ENABLE;
         ret = lps28dfw5_write_reg(ctx, LPS28DFW5_CTRL_REG2,
-                                 (uint8_t *)&ctrl_reg2, 1);
+                                  (uint8_t *)&ctrl_reg2, 1);
         break;
       case LPS28DFW5_DRV_RDY:
         ctrl_reg2.bdu = PROPERTY_ENABLE;
@@ -343,7 +362,7 @@ int32_t lps28dfw5_init_set(stmdev_ctx_t *ctx, lps28dfw5_init_t val)
       default:
         ctrl_reg2.swreset = PROPERTY_ENABLE;
         ret = lps28dfw5_write_reg(ctx, LPS28DFW5_CTRL_REG2,
-                                 (uint8_t *)&ctrl_reg2, 1);
+                                  (uint8_t *)&ctrl_reg2, 1);
         break;
     }
   }
@@ -358,7 +377,7 @@ int32_t lps28dfw5_init_set(stmdev_ctx_t *ctx, lps28dfw5_init_t val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_status_get(stmdev_ctx_t *ctx, lps28dfw5_stat_t *val)
+int32_t lps28dfw5_status_get(const stmdev_ctx_t *ctx, lps28dfw5_stat_t *val)
 {
   lps28dfw5_interrupt_cfg_t interrupt_cfg;
   lps28dfw5_int_source_t int_source;
@@ -367,7 +386,7 @@ int32_t lps28dfw5_status_get(stmdev_ctx_t *ctx, lps28dfw5_stat_t *val)
   int32_t ret;
 
   ret = lps28dfw5_read_reg(ctx, LPS28DFW5_CTRL_REG2,
-                          (uint8_t *)&ctrl_reg2, 1);
+                           (uint8_t *)&ctrl_reg2, 1);
   if (ret == 0)
   {
     ret = lps28dfw5_read_reg(ctx, LPS28DFW5_INT_SOURCE, (uint8_t *)&int_source, 1);
@@ -379,7 +398,7 @@ int32_t lps28dfw5_status_get(stmdev_ctx_t *ctx, lps28dfw5_stat_t *val)
   if (ret == 0)
   {
     ret = lps28dfw5_read_reg(ctx, LPS28DFW5_INTERRUPT_CFG,
-                            (uint8_t *)&interrupt_cfg, 1);
+                             (uint8_t *)&interrupt_cfg, 1);
   }
   val->sw_reset  = ctrl_reg2.swreset;
   val->boot      = int_source.boot_on;
@@ -401,7 +420,7 @@ int32_t lps28dfw5_status_get(stmdev_ctx_t *ctx, lps28dfw5_stat_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_pin_conf_set(stmdev_ctx_t *ctx, lps28dfw5_pin_conf_t *val)
+int32_t lps28dfw5_pin_conf_set(const stmdev_ctx_t *ctx, lps28dfw5_pin_conf_t *val)
 {
   lps28dfw5_ctrl_reg3_t ctrl_reg3;
   lps28dfw5_if_ctrl_t if_ctrl;
@@ -436,7 +455,7 @@ int32_t lps28dfw5_pin_conf_set(stmdev_ctx_t *ctx, lps28dfw5_pin_conf_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_pin_conf_get(stmdev_ctx_t *ctx, lps28dfw5_pin_conf_t *val)
+int32_t lps28dfw5_pin_conf_get(const stmdev_ctx_t *ctx, lps28dfw5_pin_conf_t *val)
 {
   lps28dfw5_ctrl_reg3_t ctrl_reg3;
   lps28dfw5_if_ctrl_t if_ctrl;
@@ -449,8 +468,8 @@ int32_t lps28dfw5_pin_conf_get(stmdev_ctx_t *ctx, lps28dfw5_pin_conf_t *val)
   }
 
   val->int_pull_down = ~if_ctrl.int_pd_dis;
-  val->sda_pull_up  = if_ctrl.sda_pu_en;
   val->int_push_pull  = ~ctrl_reg3.pp_od;
+  val->sda_pull_up  = if_ctrl.sda_pu_en;
 
   return ret;
 }
@@ -463,8 +482,8 @@ int32_t lps28dfw5_pin_conf_get(stmdev_ctx_t *ctx, lps28dfw5_pin_conf_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_all_sources_get(stmdev_ctx_t *ctx,
-                                 lps28dfw5_all_sources_t *val)
+int32_t lps28dfw5_all_sources_get(const stmdev_ctx_t *ctx,
+                                  lps28dfw5_all_sources_t *val)
 {
   lps28dfw5_fifo_status2_t fifo_status2;
   lps28dfw5_int_source_t int_source;
@@ -475,12 +494,12 @@ int32_t lps28dfw5_all_sources_get(stmdev_ctx_t *ctx,
   if (ret == 0)
   {
     ret = lps28dfw5_read_reg(ctx, LPS28DFW5_INT_SOURCE,
-                            (uint8_t *)&int_source, 1);
+                             (uint8_t *)&int_source, 1);
   }
   if (ret == 0)
   {
     ret = lps28dfw5_read_reg(ctx, LPS28DFW5_FIFO_STATUS2,
-                            (uint8_t *)&fifo_status2, 1);
+                             (uint8_t *)&fifo_status2, 1);
   }
 
   val->drdy_pres        = status.p_da;
@@ -504,7 +523,7 @@ int32_t lps28dfw5_all_sources_get(stmdev_ctx_t *ctx,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
+int32_t lps28dfw5_mode_set(const stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
 {
   lps28dfw5_ctrl_reg1_t ctrl_reg1;
   lps28dfw5_ctrl_reg2_t ctrl_reg2;
@@ -522,10 +541,10 @@ int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
     ctrl_reg1.odr = (uint8_t)val->odr;
     ctrl_reg1.avg = (uint8_t)val->avg;
     ctrl_reg2.en_lpfp = (uint8_t)val->lpf & 0x01U;
-    ctrl_reg2.lfpf_cfg = ((uint8_t)val->lpf & 0x02U) >> 2;
+    ctrl_reg2.lfpf_cfg = ((uint8_t)val->lpf & 0x02U) >> 1;
     ctrl_reg2.fs_mode = (uint8_t)val->fs;
 
-    lps28dfw5_read_reg(ctx, LPS28DFW5_ID_FS, &rev, 1);
+    lps28dfw5_read_reg(ctx, 0x70, &rev, 1);
     switch (rev & 0x3)
     {
       case 0x1: /* bit1 == 0, bit0 == 1 */
@@ -554,7 +573,9 @@ int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
           gain = (12.0f + pag) * dgain * 0.000000004293f * 1350.0f;
           knl2 = -0.0000004321f * gain + 0.000003764f;
           knl3 = -0.0000000004234f * gain + 0.000000003720f;
-        } else {
+        }
+        else
+        {
           knl2 = -0.000001521f;
           knl3 = -0.00000000007694f;
         }
@@ -578,7 +599,7 @@ int32_t lps28dfw5_mode_set(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_mode_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
+int32_t lps28dfw5_mode_get(const stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
 {
   lps28dfw5_ctrl_reg1_t ctrl_reg1;
   lps28dfw5_ctrl_reg2_t ctrl_reg2;
@@ -685,6 +706,7 @@ int32_t lps28dfw5_mode_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
         val->lpf = LPS28DFW5_LPF_DISABLE;
         break;
     }
+
   }
   return ret;
 }
@@ -697,7 +719,7 @@ int32_t lps28dfw5_mode_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_trigger_sw(stmdev_ctx_t *ctx, lps28dfw5_md_t *md)
+int32_t lps28dfw5_trigger_sw(const stmdev_ctx_t *ctx, lps28dfw5_md_t *md)
 {
   lps28dfw5_ctrl_reg2_t ctrl_reg2;
   int32_t ret = 0;
@@ -715,7 +737,7 @@ int32_t lps28dfw5_trigger_sw(stmdev_ctx_t *ctx, lps28dfw5_md_t *md)
 }
 
 /**
-  * @brief  Software trigger for One-Shot.[get]
+  * @brief  Retrieve sensor data.[get]
   *
   * @param  ctx   communication interface handler.(ptr)
   * @param  md    the sensor conversion parameters.(ptr)
@@ -723,8 +745,8 @@ int32_t lps28dfw5_trigger_sw(stmdev_ctx_t *ctx, lps28dfw5_md_t *md)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_data_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *md,
-                          lps28dfw5_data_t *data)
+int32_t lps28dfw5_data_get(const stmdev_ctx_t *ctx, lps28dfw5_md_t *md,
+                           lps28dfw5_data_t *data)
 {
   uint8_t buff[5];
   int32_t ret;
@@ -759,6 +781,48 @@ int32_t lps28dfw5_data_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *md,
 }
 
 /**
+  * @brief  Pressure output value.[get]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  buff     buffer that stores data read
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t lps28dfw5_pressure_raw_get(const stmdev_ctx_t *ctx, uint32_t *buff)
+{
+  int32_t ret;
+  uint8_t reg[3];
+
+  ret =  lps28dfw5_read_reg(ctx, LPS28DFW5_PRESS_OUT_XL, reg, 3);
+  *buff = reg[2];
+  *buff = (*buff * 256U) + reg[1];
+  *buff = (*buff * 256U) + reg[0];
+  *buff *= 256U;
+
+  return ret;
+}
+
+/**
+  * @brief  Temperature output value.[get]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  buff     buffer that stores data read
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t lps28dfw5_temperature_raw_get(const stmdev_ctx_t *ctx, int16_t *buff)
+{
+  int32_t ret;
+  uint8_t reg[2];
+
+  ret =  lps28dfw5_read_reg(ctx, LPS28DFW5_TEMP_OUT_L, reg, 2);
+  *buff = (int16_t)reg[1];
+  *buff = (*buff * 256) + (int16_t)reg[0];
+
+  return ret;
+}
+
+/**
   * @}
   *
   */
@@ -779,7 +843,7 @@ int32_t lps28dfw5_data_get(stmdev_ctx_t *ctx, lps28dfw5_md_t *md,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_fifo_mode_set(stmdev_ctx_t *ctx, lps28dfw5_fifo_md_t *val)
+int32_t lps28dfw5_fifo_mode_set(const stmdev_ctx_t *ctx, lps28dfw5_fifo_md_t *val)
 {
   lps28dfw5_fifo_ctrl_t fifo_ctrl;
   lps28dfw5_fifo_wtm_t fifo_wtm;
@@ -822,7 +886,7 @@ int32_t lps28dfw5_fifo_mode_set(stmdev_ctx_t *ctx, lps28dfw5_fifo_md_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_fifo_mode_get(stmdev_ctx_t *ctx, lps28dfw5_fifo_md_t *val)
+int32_t lps28dfw5_fifo_mode_get(const stmdev_ctx_t *ctx, lps28dfw5_fifo_md_t *val)
 {
   lps28dfw5_fifo_ctrl_t fifo_ctrl;
   lps28dfw5_fifo_wtm_t fifo_wtm;
@@ -873,13 +937,13 @@ int32_t lps28dfw5_fifo_mode_get(stmdev_ctx_t *ctx, lps28dfw5_fifo_md_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_fifo_level_get(stmdev_ctx_t *ctx, uint8_t *val)
+int32_t lps28dfw5_fifo_level_get(const stmdev_ctx_t *ctx, uint8_t *val)
 {
   lps28dfw5_fifo_status1_t fifo_status1;
   int32_t ret;
 
   ret = lps28dfw5_read_reg(ctx, LPS28DFW5_FIFO_STATUS1,
-                          (uint8_t *)&fifo_status1, 1);
+                           (uint8_t *)&fifo_status1, 1);
 
   *val = fifo_status1.fss;
 
@@ -897,8 +961,8 @@ int32_t lps28dfw5_fifo_level_get(stmdev_ctx_t *ctx, uint8_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_fifo_data_get(stmdev_ctx_t *ctx, uint8_t samp,
-                               lps28dfw5_md_t *md, lps28dfw5_fifo_data_t *data)
+int32_t lps28dfw5_fifo_data_get(const stmdev_ctx_t *ctx, uint8_t samp,
+                                lps28dfw5_md_t *md, lps28dfw5_fifo_data_t *data)
 {
   uint8_t fifo_data[3];
   uint8_t i;
@@ -924,7 +988,6 @@ int32_t lps28dfw5_fifo_data_get(stmdev_ctx_t *ctx, uint8_t samp,
         data[i].hpa = 0.0f;
         break;
     }
-
   }
 
   return ret;
@@ -951,8 +1014,8 @@ int32_t lps28dfw5_fifo_data_get(stmdev_ctx_t *ctx, uint8_t samp,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_interrupt_mode_set(stmdev_ctx_t *ctx,
-                                    lps28dfw5_int_mode_t *val)
+int32_t lps28dfw5_interrupt_mode_set(const stmdev_ctx_t *ctx,
+                                     lps28dfw5_int_mode_t *val)
 {
   lps28dfw5_interrupt_cfg_t interrupt_cfg;
   lps28dfw5_ctrl_reg3_t ctrl_reg3;
@@ -977,13 +1040,13 @@ int32_t lps28dfw5_interrupt_mode_set(stmdev_ctx_t *ctx,
   if (ret == 0)
   {
     ret = lps28dfw5_read_reg(ctx, LPS28DFW5_INTERRUPT_CFG,
-                            (uint8_t *)&interrupt_cfg, 1);
+                             (uint8_t *)&interrupt_cfg, 1);
   }
   if (ret == 0)
   {
     interrupt_cfg.lir = val->int_latched ;
     ret = lps28dfw5_write_reg(ctx, LPS28DFW5_INTERRUPT_CFG,
-                             (uint8_t *)&interrupt_cfg, 1);
+                              (uint8_t *)&interrupt_cfg, 1);
   }
   return ret;
 }
@@ -996,8 +1059,8 @@ int32_t lps28dfw5_interrupt_mode_set(stmdev_ctx_t *ctx,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_interrupt_mode_get(stmdev_ctx_t *ctx,
-                                    lps28dfw5_int_mode_t *val)
+int32_t lps28dfw5_interrupt_mode_get(const stmdev_ctx_t *ctx,
+                                     lps28dfw5_int_mode_t *val)
 {
   lps28dfw5_interrupt_cfg_t interrupt_cfg;
   lps28dfw5_ctrl_reg3_t ctrl_reg3;
@@ -1009,7 +1072,7 @@ int32_t lps28dfw5_interrupt_mode_get(stmdev_ctx_t *ctx,
   if (ret == 0)
   {
     ret = lps28dfw5_read_reg(ctx, LPS28DFW5_INTERRUPT_CFG,
-                            (uint8_t *)&interrupt_cfg, 1);
+                             (uint8_t *)&interrupt_cfg, 1);
   }
 
   bytecpy((uint8_t *)&ctrl_reg3, &reg[0]);
@@ -1030,8 +1093,8 @@ int32_t lps28dfw5_interrupt_mode_get(stmdev_ctx_t *ctx,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_pin_int_route_set(stmdev_ctx_t *ctx,
-                                   lps28dfw5_pin_int_route_t *val)
+int32_t lps28dfw5_pin_int_route_set(const stmdev_ctx_t *ctx,
+                                    lps28dfw5_pin_int_route_t *val)
 {
   lps28dfw5_ctrl_reg4_t ctrl_reg4;
   int32_t ret;
@@ -1066,8 +1129,8 @@ int32_t lps28dfw5_pin_int_route_set(stmdev_ctx_t *ctx,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_pin_int_route_get(stmdev_ctx_t *ctx,
-                                   lps28dfw5_pin_int_route_t *val)
+int32_t lps28dfw5_pin_int_route_get(const stmdev_ctx_t *ctx,
+                                    lps28dfw5_pin_int_route_t *val)
 {
   lps28dfw5_ctrl_reg4_t ctrl_reg4;
   int32_t ret;
@@ -1104,8 +1167,8 @@ int32_t lps28dfw5_pin_int_route_get(stmdev_ctx_t *ctx,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_int_on_threshold_mode_set(stmdev_ctx_t *ctx,
-                                           lps28dfw5_int_th_md_t *val)
+int32_t lps28dfw5_int_on_threshold_mode_set(const stmdev_ctx_t *ctx,
+                                            lps28dfw5_int_th_md_t *val)
 {
   lps28dfw5_interrupt_cfg_t interrupt_cfg;
   lps28dfw5_ths_p_l_t ths_p_l;
@@ -1142,8 +1205,8 @@ int32_t lps28dfw5_int_on_threshold_mode_set(stmdev_ctx_t *ctx,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_int_on_threshold_mode_get(stmdev_ctx_t *ctx,
-                                           lps28dfw5_int_th_md_t *val)
+int32_t lps28dfw5_int_on_threshold_mode_get(const stmdev_ctx_t *ctx,
+                                            lps28dfw5_int_th_md_t *val)
 {
   lps28dfw5_interrupt_cfg_t interrupt_cfg;
   lps28dfw5_ths_p_l_t ths_p_l;
@@ -1186,13 +1249,13 @@ int32_t lps28dfw5_int_on_threshold_mode_get(stmdev_ctx_t *ctx,
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_reference_mode_set(stmdev_ctx_t *ctx, lps28dfw5_ref_md_t *val)
+int32_t lps28dfw5_reference_mode_set(const stmdev_ctx_t *ctx, lps28dfw5_ref_md_t *val)
 {
   lps28dfw5_interrupt_cfg_t interrupt_cfg;
   int32_t ret;
 
   ret = lps28dfw5_read_reg(ctx, LPS28DFW5_INTERRUPT_CFG,
-                          (uint8_t *)&interrupt_cfg, 1);
+                           (uint8_t *)&interrupt_cfg, 1);
   if (ret == 0)
   {
 
@@ -1203,7 +1266,7 @@ int32_t lps28dfw5_reference_mode_set(stmdev_ctx_t *ctx, lps28dfw5_ref_md_t *val)
     interrupt_cfg.reset_arp = ((uint8_t)val->apply_ref & 0x02U) >> 1;
 
     ret = lps28dfw5_write_reg(ctx, LPS28DFW5_INTERRUPT_CFG,
-                            (uint8_t *)&interrupt_cfg, 1);
+                              (uint8_t *)&interrupt_cfg, 1);
   }
   return ret;
 }
@@ -1216,13 +1279,13 @@ int32_t lps28dfw5_reference_mode_set(stmdev_ctx_t *ctx, lps28dfw5_ref_md_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_reference_mode_get(stmdev_ctx_t *ctx, lps28dfw5_ref_md_t *val)
+int32_t lps28dfw5_reference_mode_get(const stmdev_ctx_t *ctx, lps28dfw5_ref_md_t *val)
 {
   lps28dfw5_interrupt_cfg_t interrupt_cfg;
   int32_t ret;
 
   ret = lps28dfw5_read_reg(ctx, LPS28DFW5_INTERRUPT_CFG,
-                          (uint8_t *)&interrupt_cfg, 1);
+                           (uint8_t *)&interrupt_cfg, 1);
 
   switch ((interrupt_cfg.reset_az << 1) |
           interrupt_cfg.autorefp)
@@ -1250,7 +1313,7 @@ int32_t lps28dfw5_reference_mode_get(stmdev_ctx_t *ctx, lps28dfw5_ref_md_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_refp_get(stmdev_ctx_t *ctx, int16_t *val)
+int32_t lps28dfw5_refp_get(const stmdev_ctx_t *ctx, int16_t *val)
 {
   uint8_t reg[2];
   int32_t ret;
@@ -1271,7 +1334,7 @@ int32_t lps28dfw5_refp_get(stmdev_ctx_t *ctx, int16_t *val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_opc_set(stmdev_ctx_t *ctx, int16_t val)
+int32_t lps28dfw5_opc_set(const stmdev_ctx_t *ctx, int16_t val)
 {
   uint8_t reg[2];
   int32_t ret;
@@ -1292,7 +1355,7 @@ int32_t lps28dfw5_opc_set(stmdev_ctx_t *ctx, int16_t val)
   * @retval       interface status (MANDATORY: return 0 -> no Error)
   *
   */
-int32_t lps28dfw5_opc_get(stmdev_ctx_t *ctx, int16_t *val)
+int32_t lps28dfw5_opc_get(const stmdev_ctx_t *ctx, int16_t *val)
 {
   uint8_t reg[2];
   int32_t ret;
