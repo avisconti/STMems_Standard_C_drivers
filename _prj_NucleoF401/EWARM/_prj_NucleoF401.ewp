@@ -2323,6 +2323,12 @@
             </file>
         </group>
         <group>
+            <name>lps27dewo</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lps27dewo\driver\lps27dewo_reg.c</name>
+            </file>
+        </group>
+        <group>
             <name>lps27hhtw</name>
             <file>
                 <name>$PROJ_DIR$\..\..\lps27hhtw_STdC\driver\lps27hhtw_reg.c</name>
