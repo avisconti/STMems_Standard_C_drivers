@@ -103,18 +103,19 @@
 #define    BOOT_TIME         10 //ms
 
 // SW timer value to assess end of movement [s]
-#define    SW_PRES_TIMER		15
+#define    SW_PRES_TIMER    15
 
 #define MOT_THS_ALGO_MOT   100    // Embedded motion threshold of the motion-based algorithm [LSB]
 #define MOT_THS_ALGO_PRES  200    // Embedded motion threshold of the presence-based algorithm [LSB]
 #define HYST_COEFF         0.2    // Embedded common hysteresis coefficient [-]
 
 /* Private types ---------------------------------------------------------*/
- // Define the State type
- typedef enum {
-     STATE_0,
-     STATE_1
- } State;
+// Define the State type
+typedef enum
+{
+  STATE_0,
+  STATE_1
+} State;
 
 
 /* Private variables ---------------------------------------------------------*/
@@ -138,7 +139,7 @@ static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
                               uint16_t len);
 static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
                              uint16_t len);
-static void tx_com( uint8_t *tx_buffer, uint16_t len );
+static void tx_com(uint8_t *tx_buffer, uint16_t len);
 static void platform_delay(uint32_t ms);
 static void platform_init(void);
 
@@ -148,7 +149,8 @@ static void sths34pf80_tmos_sleep_app_state_1_set(void);
 /* Timer handler  --------------------------------------------------------*/
 void sths34pf80_tmos_sleep_app_handler_timer(void)
 {
-  switch (current_state) {
+  switch (current_state)
+  {
     case STATE_0:
       counter++;
       break;
@@ -160,12 +162,13 @@ void sths34pf80_tmos_sleep_app_handler_timer(void)
 /* Interrupt handler  --------------------------------------------------------*/
 void sths34pf80_tmos_sleep_app_handler_interrupt(void)
 {
-  switch (current_state) {
-	case STATE_1:
+  switch (current_state)
+  {
+    case STATE_1:
       wakeup_thread = 1;
       break;
 
-	default:
+    default:
       break;
   }
 }
@@ -190,7 +193,7 @@ void sths34pf80_tmos_sleep_app(void)
   /* Check device ID */
   sths34pf80_device_id_get(&dev_ctx, &whoami);
   if (whoami != STHS34PF80_ID)
-	while (1);
+    while (1);
 
   /* Set averages (AVG_TAMB = 8, AVG_TMOS = 32) */
   sths34pf80_avg_tobject_num_set(&dev_ctx, STHS34PF80_AVG_TMOS_32);
@@ -200,15 +203,17 @@ void sths34pf80_tmos_sleep_app(void)
   sths34pf80_block_data_update_set(&dev_ctx, 1);
 
   snprintf((char *)tx_buffer, sizeof(tx_buffer),
-  		  "TObj, TAmb, TPres, TMot, Pres_Flag, Mot_Flag, SW_PRES_FLAG, MOT_COUNTER\r\n");
+           "TObj, TAmb, TPres, TMot, Pres_Flag, Mot_Flag, SW_PRES_FLAG, MOT_COUNTER\r\n");
   tx_com(tx_buffer, strlen((char const *)tx_buffer));
   platform_delay(100);
 
   /* Set ODR */
   sths34pf80_odr_set(&dev_ctx, STHS34PF80_ODR_AT_15Hz);
 
-  while (1) {
-    switch (current_state) {
+  while (1)
+  {
+    switch (current_state)
+    {
       case STATE_0:
         sths34pf80_tmos_sleep_app_state_0_run();
         break;
@@ -218,7 +223,7 @@ void sths34pf80_tmos_sleep_app(void)
         break;
 
       default:
-    	break;
+        break;
     }
   }
 }
@@ -233,38 +238,44 @@ static void sths34pf80_tmos_sleep_app_state_0_run(void)
 
   /* Read samples in drdy mode */
   sths34pf80_drdy_status_get(&dev_ctx, &status);
-  if (status.drdy) {
-	int16_t tobject;
-	int16_t tambient;
-	int16_t tpres;
-	int16_t tmot;
+  if (status.drdy)
+  {
+    int16_t tobject;
+    int16_t tambient;
+    int16_t tpres;
+    int16_t tmot;
 
-	sths34pf80_func_status_get(&dev_ctx, &func_status);
-	sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
-	sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
-	sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
-	sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
+    sths34pf80_func_status_get(&dev_ctx, &func_status);
+    sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
+    sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
+    sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
+    sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
 
-	if (func_status.mot_flag) {
-	  motion_flag = 1;
-	}
+    if (func_status.mot_flag)
+    {
+      motion_flag = 1;
+    }
 
-	snprintf((char *)tx_buffer, sizeof(tx_buffer),
-			"%d, %d, %d, %d, %d, %d, %d, %d\r\n",
-	        tobject, tambient, tpres, tmot, func_status.pres_flag, func_status.mot_flag, func_status.mot_flag, counter);
-	tx_com(tx_buffer, strlen((char const *)tx_buffer));
+    snprintf((char *)tx_buffer, sizeof(tx_buffer),
+             "%d, %d, %d, %d, %d, %d, %d, %d\r\n",
+             tobject, tambient, tpres, tmot, func_status.pres_flag, func_status.mot_flag, func_status.mot_flag,
+             counter);
+    tx_com(tx_buffer, strlen((char const *)tx_buffer));
   }
 
-  if (motion_flag == 1) {
-    if (current_state == STATE_0) {
+  if (motion_flag == 1)
+  {
+    if (current_state == STATE_0)
+    {
       counter = 0;
     }
   }
-  else if (counter == SW_PRES_TIMER) {
+  else if (counter == SW_PRES_TIMER)
+  {
     sths34pf80_algo_reset(&dev_ctx);
 
     snprintf((char *)tx_buffer, sizeof(tx_buffer),
-    		"Algo reset performed.\r\n");
+             "Algo reset performed.\r\n");
     tx_com(tx_buffer, strlen((char const *)tx_buffer));
 
     current_state = STATE_1;
@@ -286,33 +297,37 @@ static void sths34pf80_tmos_sleep_app_state_1_set(void)
   sths34pf80_route_int_set(&dev_ctx, STHS34PF80_INT_DRDY);
 
   /* Read samples in drdy handler */
-  while (1) {
-	sths34pf80_func_status_t func_status;
-	sths34pf80_drdy_status_t status;
+  while (1)
+  {
+    sths34pf80_func_status_t func_status;
+    sths34pf80_drdy_status_t status;
 
-	int16_t tobject;
-	int16_t tambient;
-	int16_t tpres;
-	int16_t tmot;
+    int16_t tobject;
+    int16_t tambient;
+    int16_t tpres;
+    int16_t tmot;
 
-	if (wakeup_thread) {
+    if (wakeup_thread)
+    {
       wakeup_thread = 0;
 
       sths34pf80_drdy_status_get(&dev_ctx, &status);
 
-	  if (status.drdy) {
-		sths34pf80_func_status_get(&dev_ctx, &func_status);
-		sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
-		sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
-		sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
-		sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
+      if (status.drdy)
+      {
+        sths34pf80_func_status_get(&dev_ctx, &func_status);
+        sths34pf80_tobject_raw_get(&dev_ctx, &tobject);
+        sths34pf80_tambient_raw_get(&dev_ctx, &tambient);
+        sths34pf80_tpresence_raw_get(&dev_ctx, &tpres);
+        sths34pf80_tmotion_raw_get(&dev_ctx, &tmot);
 
-		snprintf((char *)tx_buffer, sizeof(tx_buffer),
-				"%d, %d, %d, %d, %d, %d, %d, %d\r\n",
-				tobject, tambient, tpres, tmot, func_status.pres_flag, func_status.mot_flag, func_status.pres_flag, counter);
-		tx_com(tx_buffer, strlen((char const *)tx_buffer));
-	  }
-	}
+        snprintf((char *)tx_buffer, sizeof(tx_buffer),
+                 "%d, %d, %d, %d, %d, %d, %d, %d\r\n",
+                 tobject, tambient, tpres, tmot, func_status.pres_flag, func_status.mot_flag, func_status.pres_flag,
+                 counter);
+        tx_com(tx_buffer, strlen((char const *)tx_buffer));
+      }
+    }
   }
 }
 
@@ -344,7 +359,7 @@ static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
 }
 
 #if defined(STEVAL_MKI109V3)
-static void SPI_3W_Read(SPI_HandleTypeDef* xSpiHandle, uint8_t *val)
+static void SPI_3W_Read(SPI_HandleTypeDef *xSpiHandle, uint8_t *val)
 {
   __disable_irq();
 
@@ -366,7 +381,8 @@ static void SPI_3W_Receive(uint8_t *pBuffer, uint16_t nBytesToRead)
   __HAL_SPI_DISABLE(&hspi2);
   SPI_1LINE_RX(&hspi2);
 
-  for(uint16_t i = 0; i < nBytesToRead; i++) {
+  for (uint16_t i = 0; i < nBytesToRead; i++)
+  {
     SPI_3W_Read(&hspi2, pBuffer++);
   }
 

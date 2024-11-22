@@ -120,7 +120,7 @@ static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
                               uint16_t len);
 static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
                              uint16_t len);
-static void tx_com( uint8_t *tx_buffer, uint16_t len );
+static void tx_com(uint8_t *tx_buffer, uint16_t len);
 static void platform_delay(uint32_t ms);
 static void platform_init(void);
 
@@ -151,7 +151,7 @@ void sths34pf80_tmos_tamb_shock_reset(void)
   /* Check device ID */
   sths34pf80_device_id_get(&dev_ctx, &whoami);
   if (whoami != STHS34PF80_ID)
-    while(1);
+    while (1);
 
   /* Set averages (AVG_TAMB = 8, AVG_TMOS = 32) */
   sths34pf80_avg_tobject_num_set(&dev_ctx, STHS34PF80_AVG_TMOS_32);
@@ -164,7 +164,7 @@ void sths34pf80_tmos_tamb_shock_reset(void)
   sths34pf80_lpf_a_t_bandwidth_get(&dev_ctx, &lpf_a_t);
 
   snprintf((char *)tx_buffer, sizeof(tx_buffer),
-          "lpf_m: %02d, lpf_p: %02d, lpf_p_m: %02d, lpf_a_t: %02d\r\n", lpf_m, lpf_p, lpf_p_m, lpf_a_t);
+           "lpf_m: %02d, lpf_p: %02d, lpf_p_m: %02d, lpf_a_t: %02d\r\n", lpf_m, lpf_p, lpf_p_m, lpf_a_t);
   tx_com(tx_buffer, strlen((char const *)tx_buffer));
 
   /* Set BDU */
@@ -189,57 +189,67 @@ void sths34pf80_tmos_tamb_shock_reset(void)
   sths34pf80_odr_set(&dev_ctx, STHS34PF80_ODR_AT_15Hz);
 
   /* Presence event detected in irq handler */
-  while(1) {
+  while (1)
+  {
     sths34pf80_func_status_t func_status;
     uint8_t motion;
     uint8_t presence;
     uint8_t tambshock;
 
     /* handle event in a "thread" alike code */
-    if (wakeup_thread) {
+    if (wakeup_thread)
+    {
       wakeup_thread = 0;
       motion = 0;
       presence = 0;
       tambshock = 0;
 
-      do {
+      do
+      {
         sths34pf80_func_status_get(&dev_ctx, &func_status);
 
-        if (func_status.pres_flag != presence) {
+        if (func_status.pres_flag != presence)
+        {
           presence = func_status.pres_flag;
 
-          if (presence) {
+          if (presence)
+          {
             snprintf((char *)tx_buffer, sizeof(tx_buffer), "Start of Presence\r\n");
             tx_com(tx_buffer, strlen((char const *)tx_buffer));
-          } else {
+          }
+          else
+          {
             snprintf((char *)tx_buffer, sizeof(tx_buffer), "End of Presence\r\n");
             tx_com(tx_buffer, strlen((char const *)tx_buffer));
           }
         }
 
-        if (func_status.mot_flag != motion) {
+        if (func_status.mot_flag != motion)
+        {
           motion = func_status.mot_flag;
 
-          if (motion) {
+          if (motion)
+          {
             snprintf((char *)tx_buffer, sizeof(tx_buffer), "Motion Detected!\r\n");
             tx_com(tx_buffer, strlen((char const *)tx_buffer));
           }
         }
 
-        if (func_status.tamb_shock_flag != tambshock) {
-       	  tambshock = func_status.tamb_shock_flag;
+        if (func_status.tamb_shock_flag != tambshock)
+        {
+          tambshock = func_status.tamb_shock_flag;
 
-		  if (tambshock)
-		  {
-			sprintf((char *)tx_buffer, "TAmbient Shock Detected! Clear FoV for reset operation! \r\n");
-			tx_com(tx_buffer, strlen((char const *)tx_buffer));
+          if (tambshock)
+          {
+            sprintf((char *)tx_buffer, "TAmbient Shock Detected! Clear FoV for reset operation! \r\n");
+            tx_com(tx_buffer, strlen((char const *)tx_buffer));
 
-			platform_delay(5000);
+            platform_delay(5000);
 
-			sths34pf80_algo_reset(&dev_ctx);
+            sths34pf80_algo_reset(&dev_ctx);
 
-			sprintf((char *)tx_buffer, "Emb Algorithm Reset Performed!!\r\n");
-				   tx_com(tx_buffer, strlen((char const *)tx_buffer));
+            sprintf((char *)tx_buffer, "Emb Algorithm Reset Performed!!\r\n");
+            tx_com(tx_buffer, strlen((char const *)tx_buffer));
           }
         }
       } while (func_status.pres_flag);
@@ -275,7 +285,7 @@ static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
 }
 
 #if defined(STEVAL_MKI109V3)
-static void SPI_3W_Read(SPI_HandleTypeDef* xSpiHandle, uint8_t *val)
+static void SPI_3W_Read(SPI_HandleTypeDef *xSpiHandle, uint8_t *val)
 {
   __disable_irq();
 
@@ -297,7 +307,8 @@ static void SPI_3W_Receive(uint8_t *pBuffer, uint16_t nBytesToRead)
   __HAL_SPI_DISABLE(&hspi2);
   SPI_1LINE_RX(&hspi2);
 
-  for(uint16_t i = 0; i < nBytesToRead; i++) {
+  for (uint16_t i = 0; i < nBytesToRead; i++)
+  {
     SPI_3W_Read(&hspi2, pBuffer++);
   }
 
