@@ -4040,6 +4040,9 @@ typedef enum
 int32_t lsm6dsv80x_xl_self_test_set(const stmdev_ctx_t *ctx, lsm6dsv80x_self_test_t val);
 int32_t lsm6dsv80x_xl_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv80x_self_test_t *val);
 
+int32_t lsm6dsv80x_gy_self_test_set(const stmdev_ctx_t *ctx, lsm6dsv80x_self_test_t val);
+int32_t lsm6dsv80x_gy_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv80x_self_test_t *val);
+
 int32_t lsm6dsv80x_hg_xl_self_test_set(const stmdev_ctx_t *ctx, lsm6dsv80x_self_test_t val);
 int32_t lsm6dsv80x_hg_xl_self_test_get(const stmdev_ctx_t *ctx, lsm6dsv80x_self_test_t *val);
 
