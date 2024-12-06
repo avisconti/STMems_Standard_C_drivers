@@ -2929,6 +2929,12 @@
             </file>
         </group>
         <group>
+            <name>lsm6dsv80x</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv80x_STdC\driver\lsm6dsv80x_reg.c</name>
+            </file>
+        </group>
+        <group>
             <name>lsm6dsvd</name>
             <file>
                 <name>$PROJ_DIR$\..\..\lsm6dsvd_STdC\examples\lsm6dsvd_activity.c</name>
