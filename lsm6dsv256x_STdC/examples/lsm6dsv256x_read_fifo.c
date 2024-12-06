@@ -138,8 +138,8 @@ static   uint8_t fifo_thread_run = 0;
 
 static void lsm6dsv256x_fifo_thread(void)
 {
-  float acceleration_mg[3];
-  float angular_rate_mdps[3];
+  float_t acceleration_mg[3];
+  float_t angular_rate_mdps[3];
 
   if (fifo_thread_run) {
     lsm6dsv256x_fifo_status_t fifo_status;
