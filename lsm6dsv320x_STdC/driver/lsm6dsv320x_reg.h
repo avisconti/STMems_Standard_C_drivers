@@ -211,7 +211,8 @@ typedef struct
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
-  uint8_t not_used0                    : 5;
+  uint8_t io_pad_strength              : 2;
+  uint8_t not_used0                    : 3;
   uint8_t ibhr_por_en                  : 1;
   uint8_t sdo_pu_en                    : 1;
   uint8_t ois_pu_dis                   : 1;
@@ -219,7 +220,8 @@ typedef struct
   uint8_t ois_pu_dis                   : 1;
   uint8_t sdo_pu_en                    : 1;
   uint8_t ibhr_por_en                  : 1;
-  uint8_t not_used0                    : 5;
+  uint8_t not_used0                    : 3;
+  uint8_t io_pad_strength              : 2;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_pin_ctrl_t;
 
@@ -5480,10 +5482,10 @@ typedef struct
   } rst_mode;
   enum
   {
-    LSM6DSV320X_IBI_2us  = 0x0,
-    LSM6DSV320X_IBI_50us = 0x1,
+    LSM6DSV320X_IBI_50us = 0x0,
+    LSM6DSV320X_IBI_2us  = 0x1,
     LSM6DSV320X_IBI_1ms  = 0x2,
-    LSM6DSV320X_IBI_25ms = 0x3,
+    LSM6DSV320X_IBI_50ms = 0x3,
   } ibi_time;
 } lsm6dsv320x_i3c_config_t;
 
@@ -5577,6 +5579,15 @@ int32_t lsm6dsv320x_sh_status_get(const stmdev_ctx_t *ctx,
 
 int32_t lsm6dsv320x_ui_sdo_pull_up_set(const stmdev_ctx_t *ctx, uint8_t val);
 int32_t lsm6dsv320x_ui_sdo_pull_up_get(const stmdev_ctx_t *ctx, uint8_t *val);
+
+typedef enum
+{
+  LSM6DSV320X_PAD_LOW_STRENGTH     = 0x1,
+  LSM6DSV320X_PAD_MIDDLE_STRENGTH  = 0x2,
+  LSM6DSV320X_PAD_HIGH_STRENGTH    = 0x4,
+} lsm6dsv320x_pad_strength_t;
+int32_t lsm6dsv320x_pad_strength_set(const stmdev_ctx_t *ctx, lsm6dsv320x_pad_strength_t val);
+int32_t lsm6dsv320x_pad_strength_get(const stmdev_ctx_t *ctx, lsm6dsv320x_pad_strength_t *val);
 
 typedef enum
 {

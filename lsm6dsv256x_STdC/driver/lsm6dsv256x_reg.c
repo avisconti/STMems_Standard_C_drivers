@@ -196,7 +196,7 @@ float_t lsm6dsv256x_from_lsb_to_celsius(int16_t lsb)
 
 uint64_t lsm6dsv256x_from_lsb_to_nsec(uint32_t lsb)
 {
-  return ((uint64_t)lsb * 21750.0f);
+  return ((uint64_t)lsb * 21700);
 }
 
 float_t lsm6dsv256x_from_lsb_to_mv(int16_t lsb)
@@ -638,8 +638,7 @@ int32_t lsm6dsv256x_mem_bank_get(const stmdev_ctx_t *ctx, lsm6dsv256x_mem_bank_t
 }
 
 /**
-  * @brief  Device ID.[get] THis function works also for OIS
-  *        (WHO_AM_I and IF2_WHO_AM_I have same address)
+  * @brief  Device ID.[get]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      Device ID.
@@ -5176,10 +5175,10 @@ int32_t lsm6dsv256x_fifo_batch_counter_threshold_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects the trigger for the internal counter of batch events between the accelerometer, gyroscope and EIS gyroscope.[set]
+  * @brief  Selects the trigger for the internal counter of batch events.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      XL_BATCH_EVENT, GY_BATCH_EVENT, GY_EIS_BATCH_EVENT,
+  * @param  val      lsm6dsv256x_fifo_batch_cnt_event_t struct
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -5200,10 +5199,10 @@ int32_t lsm6dsv256x_fifo_batch_cnt_event_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects the trigger for the internal counter of batch events between the accelerometer, gyroscope and EIS gyroscope.[get]
+  * @brief  Selects the trigger for the internal counter of batch events.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      XL_BATCH_EVENT, GY_BATCH_EVENT, GY_EIS_BATCH_EVENT,
+  * @param  val      lsm6dsv256x_fifo_batch_cnt_event_t struct
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -5985,10 +5984,10 @@ int32_t lsm6dsv256x_filt_gy_lp1_bandwidth_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  It enables gyroscope digital LPF1 filter. If the OIS chain is disabled, the bandwidth can be selected through LPF1_G_BW.[set]
+  * @brief  It enables gyroscope digital LPF1 filter.[set]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      It enables gyroscope digital LPF1 filter. If the OIS chain is disabled, the bandwidth can be selected through LPF1_G_BW.
+  * @param  val      It enables gyroscope digital LPF1 filter.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -6009,10 +6008,10 @@ int32_t lsm6dsv256x_filt_gy_lp1_set(const stmdev_ctx_t *ctx, uint8_t val)
 
 
 /**
-  * @brief  It enables gyroscope digital LPF1 filter. If the OIS chain is disabled, the bandwidth can be selected through LPF1_G_BW.[get]
+  * @brief  It enables gyroscope digital LPF1 filter.[get]
   *
   * @param  ctx      read / write interface definitions
-  * @param  val      It enables gyroscope digital LPF1 filter. If the OIS chain is disabled, the bandwidth can be selected through LPF1_G_BW.
+  * @param  val      It enables gyroscope digital LPF1 filter.
   * @retval          interface status (MANDATORY: return 0 -> no Error)
   *
   */
@@ -9057,24 +9056,24 @@ int32_t lsm6dsv256x_i3c_config_get(const stmdev_ctx_t *ctx,
 
   switch (ctrl5.bus_act_sel)
   {
-    case LSM6DSV256X_IBI_2us:
-      val->ibi_time = LSM6DSV256X_IBI_2us;
-      break;
-
-    case LSM6DSV256X_IBI_50us:
+    case 0:
       val->ibi_time = LSM6DSV256X_IBI_50us;
       break;
 
-    case LSM6DSV256X_IBI_1ms:
+    case 1:
+      val->ibi_time = LSM6DSV256X_IBI_2us;
+      break;
+
+    case 2:
       val->ibi_time = LSM6DSV256X_IBI_1ms;
       break;
 
-    case LSM6DSV256X_IBI_25ms:
-      val->ibi_time = LSM6DSV256X_IBI_25ms;
+    case 3:
+      val->ibi_time = LSM6DSV256X_IBI_50ms;
       break;
 
     default:
-      val->ibi_time = LSM6DSV256X_IBI_2us;
+      val->ibi_time = LSM6DSV256X_IBI_50us;
       break;
   }
 
@@ -9793,6 +9792,62 @@ int32_t lsm6dsv256x_ui_sdo_pull_up_get(const stmdev_ctx_t *ctx, uint8_t *val)
 
   ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
   *val = pin_ctrl.sdo_pu_en;
+
+  return ret;
+}
+
+/**
+  * @brief  Pad strength.[set]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      Pad strength
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t lsm6dsv256x_pad_strength_set(const stmdev_ctx_t *ctx, lsm6dsv256x_pad_strength_t val)
+{
+  lsm6dsv256x_pin_ctrl_t pin_ctrl;
+  int32_t ret;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
+  if (ret == 0)
+  {
+    pin_ctrl.io_pad_strength = val;
+    ret = lsm6dsv256x_write_reg(ctx, LSM6DSV256X_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
+  }
+
+  return ret;
+}
+
+/**
+  * @brief  Pad strength.[get]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      Pad strength
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t lsm6dsv256x_pad_strength_get(const stmdev_ctx_t *ctx, lsm6dsv256x_pad_strength_t *val)
+{
+  lsm6dsv256x_pin_ctrl_t pin_ctrl;
+  int32_t ret;
+
+  ret = lsm6dsv256x_read_reg(ctx, LSM6DSV256X_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
+  switch (pin_ctrl.io_pad_strength)
+  {
+    case 0:
+      *val = LSM6DSV256X_PAD_LOW_STRENGTH;
+      break;
+
+    case 1:
+      *val = LSM6DSV256X_PAD_MIDDLE_STRENGTH;
+      break;
+
+    case 2:
+    default:
+      *val = LSM6DSV256X_PAD_HIGH_STRENGTH;
+      break;
+  }
 
   return ret;
 }
