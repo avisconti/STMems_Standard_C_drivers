@@ -107,7 +107,7 @@
 
 static lis2doc_mode_t pm;
 static int16_t data_raw_acceleration[3];
-static float acceleration_mg[3];
+static float_t acceleration_mg[3];
 static uint8_t whoamI, rst;
 static uint8_t tx_buffer[1000];
 

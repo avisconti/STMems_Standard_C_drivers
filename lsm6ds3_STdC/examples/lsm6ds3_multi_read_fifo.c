@@ -154,8 +154,8 @@ static sensor_lsm6ds3_gy test_6ds3_gyro = {
 };
 
 static uint16_t pattern_len;
-static float acceleration_mg[3];
-static float angular_rate_mdps[3];
+static float_t acceleration_mg[3];
+static float_t angular_rate_mdps[3];
 static axis3bit16_t data_raw_acceleration;
 static axis3bit16_t data_raw_angular_rate;
 static stmdev_ctx_t dev_ctx;

@@ -71,7 +71,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 static int16_t data_raw_angular_rate[3];
-static float angular_rate_mdps[3];
+static float_t angular_rate_mdps[3];
 static l20g20is_dev_status_t reg;
 static uint8_t rst, whoami;
 static uint8_t tx_buffer[1000];

@@ -22,9 +22,9 @@
  * This example was developed using the following STMicroelectronics
  * evaluation boards:
  *
- * - STEVAL_MKI109V3 + 
- * - NUCLEO_F401RE + 
- * - DISCOVERY_SPC584B + 
+ * - STEVAL_MKI109V3 +
+ * - NUCLEO_F401RE +
+ * - DISCOVERY_SPC584B +
  *
  * Used interfaces:
  *
@@ -138,10 +138,10 @@ void lsm6dsvd_self_test(void)
   lsm6dsvd_data_ready_t drdy;
   lsm6dsvd_reset_t rst;
   stmdev_ctx_t dev_ctx;
-  float val_st_off[3];
+  float_t val_st_off[3];
   int16_t data_raw[3];
-  float val_st_on[3];
-  float test_val[3];
+  float_t val_st_on[3];
+  float_t test_val[3];
   uint8_t st_result;
   uint8_t i;
   uint8_t j;
@@ -188,7 +188,7 @@ void lsm6dsvd_self_test(void)
     lsm6dsvd_flag_data_ready_get(&dev_ctx, &drdy);
   } while (!drdy.drdy_xl);
   lsm6dsvd_acceleration_raw_get(&dev_ctx, data_raw);
-  
+
   /* Enable Self Test */
   lsm6dsvd_xl_self_test_set(&dev_ctx, LSM6DSVD_XL_ST_POSITIVE);
   //lsm6dsvd_xl_self_test_set(&dev_ctx, LSM6DSVD_XL_ST_NEGATIVE);
@@ -248,13 +248,13 @@ void lsm6dsvd_self_test(void)
   for (i = 0; i < 3; i++) {
     val_st_off[i] /= 5.0f;
   }
-  
-  
+
+
   /* Calculate the mg values for self test */
   for (i = 0; i < 3; i++) {
-    test_val[i] = fabs((val_st_on[i] - val_st_off[i]));
+    test_val[i] = fabsf((val_st_on[i] - val_st_off[i]));
   }
-  
+
   /* Check self test limit */
   st_result = ST_PASS;
 
@@ -309,13 +309,13 @@ void lsm6dsvd_self_test(void)
   //lsm6dsvd_gy_self_test_set(&dev_ctx, LIS2DH12_GY_ST_NEGATIVE);
   /* Wait stable output */
   platform_delay(100);
-  
+
   /* Read dummy data and discard it */
   do {
     lsm6dsvd_flag_data_ready_get(&dev_ctx, &drdy);
   } while (!drdy.drdy_gy);
   lsm6dsvd_angular_rate_raw_get(&dev_ctx, data_raw);
-  
+
   /* Read 5 sample and get the average vale for each axis */
   memset(val_st_on, 0x00, 3 * sizeof(float));
   for (i = 0; i < 5; i++) {
@@ -336,7 +336,7 @@ void lsm6dsvd_self_test(void)
 
   /* Calculate the mg values for self test */
   for (i = 0; i < 3; i++) {
-    test_val[i] = fabs((val_st_on[i] - val_st_off[i]));
+    test_val[i] = fabsf((val_st_on[i] - val_st_off[i]));
   }
 
   /* Check self test limit */
