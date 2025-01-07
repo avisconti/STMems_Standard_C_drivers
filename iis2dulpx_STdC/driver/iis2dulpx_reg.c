@@ -686,6 +686,43 @@ int32_t iis2dulpx_exit_deep_power_down(const stmdev_ctx_t *ctx)
 }
 
 /**
+  * @brief  Disable hard-reset from CS.[set]
+  *
+  * @param  ctx   communication interface handler.(ptr)
+  * @param  md    0: enable hard-reset from CS, 1: disable hard-reset from CS
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  */
+int32_t iis2dulpx_disable_hard_reset_from_cs_set(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  iis2dulpx_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = iis2dulpx_read_reg(ctx, IIS2DULPX_FIFO_CTRL, (uint8_t *)&fifo_ctrl, 1);
+  fifo_ctrl.dis_hard_rst_cs = (val == 1) ? PROPERTY_ENABLE : PROPERTY_DISABLE;
+  ret += iis2dulpx_write_reg(ctx, IIS2DULPX_FIFO_CTRL, (uint8_t *)&fifo_ctrl, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  Disable hard-reset from CS.[get]
+  *
+  * @param  ctx   communication interface handler.(ptr)
+  * @param  md    0: enable hard-reset from CS, 1: disable hard-reset from CS
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  */
+int32_t iis2dulpx_disable_hard_reset_from_cs_get(const stmdev_ctx_t *ctx, uint8_t *val)
+{
+  iis2dulpx_fifo_ctrl_t fifo_ctrl;
+  int32_t ret;
+
+  ret = iis2dulpx_read_reg(ctx, IIS2DULPX_FIFO_CTRL, (uint8_t *)&fifo_ctrl, 1);
+  *val = fifo_ctrl.dis_hard_rst_cs;
+
+  return ret;
+}
+
+/**
   * @brief  Software trigger for One-Shot.[get]
   *
   * @param  ctx   communication interface handler.(ptr)
@@ -2007,7 +2044,7 @@ int32_t iis2dulpx_fifo_mode_set(const stmdev_ctx_t *ctx, iis2dulpx_fifo_mode_t v
     /* set watermark */
     if (val.watermark > 0U)
     {
-      fifo_ctrl.stop_on_fth = 1;
+      fifo_ctrl.stop_on_fth = (val.fifo_event == IIS2DULPX_FIFO_EV_WTM) ? 1 : 0;
       fifo_wtm.fth = val.watermark;
     }
 
@@ -2137,8 +2174,8 @@ int32_t iis2dulpx_fifo_data_get(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *m
 
   switch (fifo_tag.tag_sensor)
   {
-    case 0x3:
-    case 0x1E:
+    case IIS2DULPX_XL_ONLY_2X_TAG:
+    case IIS2DULPX_XL_ONLY_2X_TAG_2ND:
       /* A FIFO sample consists of 2X 8-bits 3-axis XL at ODR/2 */
       ret = iis2dulpx_fifo_out_raw_get(ctx, fifo_raw);
       for (i = 0; i < 3; i++)
@@ -2147,8 +2184,8 @@ int32_t iis2dulpx_fifo_data_get(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *m
         data->xl[1].raw[i] = (int16_t)fifo_raw[3 + i] * 256;
       }
       break;
-    case 0x1F:
-    case 0x2:
+    case IIS2DULPX_XL_AND_QVAR:
+    case IIS2DULPX_XL_TEMP_TAG:
       ret = iis2dulpx_fifo_out_raw_get(ctx, fifo_raw);
       if (fmd->xl_only == 0x0U)
       {
@@ -2175,11 +2212,11 @@ int32_t iis2dulpx_fifo_data_get(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *m
       {
         /* A FIFO sample consists of 16-bits 3-axis XL at ODR  */
         data->xl[0].raw[0] = (int16_t)fifo_raw[0] + (int16_t)fifo_raw[1] * 256;
-        data->xl[0].raw[1] = (int16_t)fifo_raw[1] + (int16_t)fifo_raw[3] * 256;
-        data->xl[0].raw[2] = (int16_t)fifo_raw[2] + (int16_t)fifo_raw[5] * 256;
+        data->xl[0].raw[1] = (int16_t)fifo_raw[2] + (int16_t)fifo_raw[3] * 256;
+        data->xl[0].raw[2] = (int16_t)fifo_raw[4] + (int16_t)fifo_raw[5] * 256;
       }
       break;
-    case 0x4:
+    case IIS2DULPX_TIMESTAMP_TAG:
       ret = iis2dulpx_fifo_out_raw_get(ctx, fifo_raw);
 
       data->cfg_chg.cfg_change = fifo_raw[0] >> 7;
@@ -2197,7 +2234,7 @@ int32_t iis2dulpx_fifo_data_get(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *m
       data->cfg_chg.timestamp = (data->cfg_chg.timestamp * 256U) +  fifo_raw[2];
       break;
 
-    case 0x12:
+    case IIS2DULPX_STEP_COUNTER_TAG:
       ret = iis2dulpx_fifo_out_raw_get(ctx, fifo_raw);
 
       data->pedo.steps = fifo_raw[1];
@@ -2210,7 +2247,7 @@ int32_t iis2dulpx_fifo_data_get(const stmdev_ctx_t *ctx, const iis2dulpx_md_t *m
 
       break;
 
-    case 0x0:
+    case IIS2DULPX_FIFO_EMPTY:
     default:
       /* do nothing */
       break;
@@ -2555,6 +2592,61 @@ int32_t iis2dulpx_stpcnt_period_get(const stmdev_ctx_t *ctx, uint16_t *val)
                              (uint8_t *)buff, 2);
   *val = buff[1];
   *val = (*val * 256U) + buff[0];
+
+  return ret;
+}
+
+/**
+  * @brief  smart_power functionality configuration.[set]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      iis2dulpx_smart_power_cfg_t structure.
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  */
+int32_t iis2dulpx_smart_power_set(const stmdev_ctx_t *ctx, iis2dulpx_smart_power_cfg_t val)
+{
+  iis2dulpx_ctrl1_t ctrl1;
+  iis2dulpx_smart_power_ctrl_t smart_power_ctrl;
+  int32_t ret;
+
+  ret = iis2dulpx_read_reg(ctx, IIS2DULPX_CTRL1, (uint8_t *)&ctrl1, 1);
+  ctrl1.smart_power_en = val.enable;
+  ret += iis2dulpx_write_reg(ctx, IIS2DULPX_CTRL1, (uint8_t *)&ctrl1, 1);
+
+  if (val.enable == 0)
+  {
+    /* if disabling smart_power no need to set win/dur fields */
+    return ret;
+  }
+
+  smart_power_ctrl.smart_power_ctrl_win = val.window;
+  smart_power_ctrl.smart_power_ctrl_dur = val.duration;
+  ret += iis2dulpx_ln_pg_write(ctx, IIS2DULPX_EMB_ADV_PG_0 + IIS2DULPX_SMART_POWER_CTRL,
+                               (uint8_t *)&smart_power_ctrl, 1);
+
+  return ret;
+}
+
+/**
+  * @brief  smart_power functionality configuration.[get]
+  *
+  * @param  ctx      read / write interface definitions
+  * @param  val      iis2dulpx_smart_power_cfg_t structure.
+  * @retval          interface status (MANDATORY: return 0 -> no Error)
+  */
+int32_t iis2dulpx_smart_power_get(const stmdev_ctx_t *ctx, iis2dulpx_smart_power_cfg_t *val)
+{
+  iis2dulpx_ctrl1_t ctrl1;
+  iis2dulpx_smart_power_ctrl_t smart_power_ctrl;
+  int32_t ret;
+
+  ret = iis2dulpx_read_reg(ctx, IIS2DULPX_CTRL1, (uint8_t *)&ctrl1, 1);
+  val->enable = ctrl1.smart_power_en;
+
+  ret += iis2dulpx_ln_pg_read(ctx, IIS2DULPX_EMB_ADV_PG_0 + IIS2DULPX_SMART_POWER_CTRL,
+                              (uint8_t *)&smart_power_ctrl, 1);
+  val->window = smart_power_ctrl.smart_power_ctrl_win;
+  val->duration = smart_power_ctrl.smart_power_ctrl_dur;
 
   return ret;
 }
