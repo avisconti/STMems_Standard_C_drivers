@@ -116,10 +116,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    DEBUG_MESSAGE("Test MEMS C Drivers on MKI109D board");
+    LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    delay(10);
   }
   /* USER CODE END 3 */
 }

@@ -15,6 +15,7 @@
 #include "version.h"
 
 #define CMD_MAX_SIZE 64
+#define LOG_MESSAGE(fmt, ...) fprintf(stdout, fmt "\n",##__VA_ARGS__)
 #define DEBUG_MESSAGE(fmt, ...) fprintf(stderr, fmt "\n",##__VA_ARGS__)
 #define ATTEMPT_WITH_RETRY(call, result, until, max_retry) do { \
                                                             int32_t retry = max_retry; \
