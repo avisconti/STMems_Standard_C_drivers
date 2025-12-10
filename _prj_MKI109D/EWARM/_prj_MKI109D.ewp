@@ -1122,9 +1122,6 @@
                     <name>$PROJ_DIR$\..\Core\Src\board.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\Core\Src\commands.c</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\Core\Src\dac.c</name>
                 </file>
                 <file>

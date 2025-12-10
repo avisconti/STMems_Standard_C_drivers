@@ -31,7 +31,6 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <string.h>
-#include "commands.h"
 #include "usbd_def.h"
 #include "usb_device.h"
 /* USER CODE END Includes */
@@ -104,7 +103,7 @@ void lsm6dsv16x_wakeup_handler(void);
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
   /* call here the example xxx_handler routine */
-  lsm6dsv16x_sixd_handler();
+  lsm6dsv16x_read_data_irq_handler();
 }
 /* USER CODE END 0 */
 
@@ -163,7 +162,7 @@ int main(void)
     LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
 
     /* call here the example xxx routine */
-    lsm6dsv16x_sixd();
+    lsm6dsv16x_read_data_irq();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
