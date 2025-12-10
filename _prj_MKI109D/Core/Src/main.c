@@ -61,10 +61,51 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+/* lsm6dsv16x test routines */
+void lsm6dsv16x_read_data_polling(void);
+void lsm6dsv16x_read_data_irq(void);
+void lsm6dsv16x_read_data_irq_handler(void);
+void lsm6dsv16x_fifo(void);
+void lsm6dsv16x_fifo_irq(void);
+void lsm6dsv16x_fifo_irq_handler(void);
+void lsm6dsv16x_fifo_emb_functions(void);
+void lsm6dsv16x_fifo_emb_functions_handler(void);
+void lsm6dsv16x_free_fall(void);
+void lsm6dsv16x_free_fall_handler(void);
+void lsm6dsv16x_fsm_fourd(void);
+void lsm6dsv16x_fsm_fourd_handler(void);
+void lsm6dsv16x_fsm_glance(void);
+void lsm6dsv16x_fsm_glance_handler(void);
+void lsm6dsv16x_mlc_gym(void);
+void lsm6dsv16x_mlc_gym_handler(void);
+void lsm6dsv16x_pedometer(void);
+void lsm6dsv16x_pedometer_handler(void);
+void lsm6dsv16x_qvar_read_data_polling(void);
+void lsm6dsv16x_self_test(void);
+void lsm6dsv16x_sensor_fusion(void);
+void lsm6dsv16x_sensor_hub(void);
+void lsm6dsv16x_sensor_hub_handler(void);
+void lsm6dsv16x_sig_mot(void);
+void lsm6dsv16x_sig_mot_handler(void);
+void lsm6dsv16x_single_double_tap(void);
+void lsm6dsv16x_single_double_tap_handler(void);
+void lsm6dsv16x_sixd(void);
+void lsm6dsv16x_sixd_handler(void);
+void lsm6dsv16x_tilt(void);
+void lsm6dsv16x_tilt_handler(void);
+void lsm6dsv16x_wakeup(void);
+void lsm6dsv16x_wakeup_handler(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/* overwrite default interrupt callback */
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+{
+  /* call here the example xxx_handler routine */
+  lsm6dsv16x_sixd_handler();
+}
 /* USER CODE END 0 */
 
 /**
@@ -106,6 +147,9 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   MX_USB_DEVICE_Init();
+  set_vdd(0.0f);
+  set_vddio(0.0f);
+
   // Start measurements timer
   HAL_TIM_Base_Start(&htim5);
   // Start delay us timer
@@ -117,6 +161,9 @@ int main(void)
   while (1)
   {
     LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
+
+    /* call here the example xxx routine */
+    lsm6dsv16x_sixd();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -193,7 +193,7 @@
                 <option>
                     <name>TrustZoneModes</name>
                     <version>0</version>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>OGAarch64Abi</name>
@@ -229,6 +229,7 @@
                     <name>CCDefines</name>
                     <state>USE_HAL_DRIVER</state>
                     <state>STM32H563xx</state>
+                    <state>STEVAL_MKI109D</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
@@ -358,6 +359,12 @@
                     <state>$PROJ_DIR$/../Middleware/USB/stm32-mw-usb-device/Class/CDC/Inc</state>
                     <state>$PROJ_DIR$/../Middleware/USB/Device/Core/Inc</state>
                     <state>$PROJ_DIR$/../Middleware/USB/Device/Class/CDC/Inc</state>
+                    <state>C:\Users\visconta\Projects\STdC\lsm6dsv16x_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\st-mems-finite-state-machine\examples\glance_detection\lsm6dsv16x</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\st-mems-finite-state-machine\examples\fourd_orientation_detection\lsm6dsv16x</state>
+                    <state>C:\Users\visconta\Projects\STdC\_resources\st-mems-machine-learning-core\examples\gym_activity_recognition\lsm6dsv16x</state>
+                    <state>C:\Users\visconta\Projects\STdC\lis2mdl_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\lps22df_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1264,6 +1271,72 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\STM32H5xx_HAL_Driver\Src\stm32h5xx_util_i3c.c</name>
+            </file>
+        </group>
+    </group>
+    <group>
+        <name>mems-drivers</name>
+        <group>
+            <name>lsm6dsv16x</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fifo_irq.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fifo_stepcnt.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_free_fall.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fsm_fourd.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_fsm_glance.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_mlc_gym.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_pedometer.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_qvar_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_read_data_irq.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\driver\lsm6dsv16x_reg.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_self_test.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_sensor_fusion.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_sensor_hub.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_sig_mot.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_single_double_tap.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_six_d_position.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_tilt.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\lsm6dsv16x_STdC\examples\lsm6dsv16x_wakeup.c</name>
             </file>
         </group>
     </group>
