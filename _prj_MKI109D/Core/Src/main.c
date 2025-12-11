@@ -95,6 +95,12 @@ void lsm6dsv16x_tilt_handler(void);
 void lsm6dsv16x_wakeup(void);
 void lsm6dsv16x_wakeup_handler(void);
 
+/* iis3dwb test routines */
+void iis3dwb_read_data_polling(void);
+void iis3dwb_fifo(void);
+void iis3dwb_self_test(void);
+void iis3dwb_wake_up(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -162,7 +168,7 @@ int main(void)
     LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
 
     /* call here the example xxx routine */
-    lsm6dsv16x_read_data_irq();
+    iis3dwb_self_test();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

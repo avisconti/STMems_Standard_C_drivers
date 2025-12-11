@@ -365,6 +365,7 @@
                     <state>C:\Users\visconta\Projects\STdC\_resources\st-mems-machine-learning-core\examples\gym_activity_recognition\lsm6dsv16x</state>
                     <state>C:\Users\visconta\Projects\STdC\lis2mdl_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\lps22df_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\iis3dwb_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1273,6 +1274,24 @@
     </group>
     <group>
         <name>mems-drivers</name>
+        <group>
+            <name>iis3dwb</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\iis3dwb_STdC\examples\iis3dwb_fifo.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\iis3dwb_STdC\examples\iis3dwb_read_data_polling.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\iis3dwb_STdC\driver\iis3dwb_reg.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\iis3dwb_STdC\examples\iis3dwb_self_test.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\iis3dwb_STdC\examples\iis3dwb_wake_up.c</name>
+            </file>
+        </group>
         <group>
             <name>lsm6dsv16x</name>
             <file>
