@@ -53,6 +53,7 @@ void MX_SAI1_Init(void)
   hsai_BlockB1.Init.NoDivider = SAI_MASTERDIVIDER_DISABLE;
   hsai_BlockB1.Init.FIFOThreshold = SAI_FIFOTHRESHOLD_EMPTY;
   hsai_BlockB1.Init.AudioFrequency = SAI_AUDIO_FREQUENCY_MCKDIV;
+  hsai_BlockB1.Init.Mckdiv = 0;
   hsai_BlockB1.Init.SynchroExt = SAI_SYNCEXT_DISABLE;
   hsai_BlockB1.Init.MckOutput = SAI_MCK_OUTPUT_DISABLE;
   hsai_BlockB1.Init.MonoStereoMode = SAI_STEREOMODE;
@@ -126,7 +127,7 @@ void HAL_SAI_MspInit(SAI_HandleTypeDef* saiHandle)
     PeriphClkInitStruct.PLL2.PLL2R = 2;
     PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2_VCIRANGE_2;
     PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2_VCORANGE_WIDE;
-    PeriphClkInitStruct.PLL2.PLL2FRACN = 0.0;
+    PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
     PeriphClkInitStruct.PLL2.PLL2ClockOut = RCC_PLL2_DIVP;
     PeriphClkInitStruct.Sai1ClockSelection = RCC_SAI1CLKSOURCE_PLL2P;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)

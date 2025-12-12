@@ -32,6 +32,8 @@ extern "C" {
 
 /* USER CODE END Includes */
 
+extern PCD_HandleTypeDef hpcd_USB_DRD_FS;
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

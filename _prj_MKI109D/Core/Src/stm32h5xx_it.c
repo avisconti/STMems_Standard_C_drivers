@@ -115,7 +115,7 @@ void MemManage_Handler(void)
 }
 
 /**
-  * @brief This function handles Prefetch fault, memory access fault.
+  * @brief This function handles Pre-fetch fault, memory access fault.
   */
 void BusFault_Handler(void)
 {
@@ -317,7 +317,7 @@ void SAI1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles I3C1 event interrupt.
+  * @brief This function handles I3C1 Event interrupt.
   */
 void I3C1_EV_IRQHandler(void)
 {
