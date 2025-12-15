@@ -2,7 +2,7 @@
 <project>
     <fileVersion>4</fileVersion>
     <configuration>
-        <name>_prj_MKI109D</name>
+        <name>_prj_STEVAL_MKI109D</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
@@ -16,23 +16,23 @@
                 <debug>1</debug>
                 <option>
                     <name>BrowseInfoPath</name>
-                    <state>_prj_MKI109D\BrowseInfo</state>
+                    <state>_prj_STEVAL_MKI109D\BrowseInfo</state>
                 </option>
                 <option>
                     <name>BuildFilesPath</name>
-                    <state>_prj_MKI109D\</state>
+                    <state>_prj_STEVAL_MKI109D\</state>
                 </option>
                 <option>
                     <name>ExePath</name>
-                    <state>_prj_MKI109D/Exe</state>
+                    <state>_prj_STEVAL_MKI109D/Exe</state>
                 </option>
                 <option>
                     <name>ObjPath</name>
-                    <state>_prj_MKI109D/Obj</state>
+                    <state>_prj_STEVAL_MKI109D/Obj</state>
                 </option>
                 <option>
                     <name>ListPath</name>
-                    <state>_prj_MKI109D/List</state>
+                    <state>_prj_STEVAL_MKI109D/List</state>
                 </option>
                 <option>
                     <name>GEndianMode</name>
@@ -679,7 +679,7 @@
                 </option>
                 <option>
                     <name>OOCOutputFile</name>
-                    <state>_prj_MKI109D.bin</state>
+                    <state>_prj_STEVAL_MKI109D.bin</state>
                 </option>
                 <option>
                     <name>OOCCommandLineProducer</name>
@@ -718,7 +718,7 @@
                 </option>
                 <option>
                     <name>IlinkOutputFile</name>
-                    <state>_prj_MKI109D.out</state>
+                    <state>_prj_STEVAL_MKI109D.out</state>
                 </option>
                 <option>
                     <name>IlinkDebugInfoEnable</name>
@@ -1015,7 +1015,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>_prj_MKI109D_import_lib.o</state>
+                    <state>_prj_STEVAL_MKI109D_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>

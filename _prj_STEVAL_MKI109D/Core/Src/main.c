@@ -168,7 +168,7 @@ int main(void)
     LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
 
     /* call here the example xxx routine */
-    iis3dwb_self_test();
+    iis3dwb_fifo();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

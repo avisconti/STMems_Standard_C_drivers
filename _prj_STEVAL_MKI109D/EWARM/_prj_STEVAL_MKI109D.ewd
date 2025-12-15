@@ -2,7 +2,7 @@
 <project>
     <fileVersion>4</fileVersion>
     <configuration>
-        <name>_prj_MKI109D</name>
+        <name>_prj_STEVAL_MKI109D</name>
         <toolchain>
             <name>ARM</name>
         </toolchain>
