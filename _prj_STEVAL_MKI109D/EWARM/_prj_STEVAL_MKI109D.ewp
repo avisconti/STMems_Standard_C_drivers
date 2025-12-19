@@ -366,6 +366,8 @@
                     <state>C:\Users\visconta\Projects\STdC\lis2mdl_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\lps22df_STdC\driver</state>
                     <state>C:\Users\visconta\Projects\STdC\iis3dwb_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\asm9g300b_STdC\driver</state>
+                    <state>C:\Users\visconta\Projects\STdC\asm330ab1_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1274,6 +1276,27 @@
     </group>
     <group>
         <name>mems-drivers</name>
+        <group>
+            <name>asm330ab1</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\asm330ab1_STdC\examples\asm330ab1_read.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\asm330ab1_STdC\examples\asm330ab1_read_safespi.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\asm330ab1_STdC\driver\asm330ab1_reg.c</name>
+            </file>
+        </group>
+        <group>
+            <name>asm9g300b</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\asm9g300b_STdC\examples\asm9g300b_read.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\asm9g300b_STdC\driver\asm9g300b_reg.c</name>
+            </file>
+        </group>
         <group>
             <name>iis3dwb</name>
             <file>

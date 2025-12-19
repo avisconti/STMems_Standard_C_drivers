@@ -101,6 +101,12 @@ void iis3dwb_fifo(void);
 void iis3dwb_self_test(void);
 void iis3dwb_wake_up(void);
 
+void asm9g300b_read(void);
+
+void asm330ab1_read_handler(void);
+void asm330ab1_read(void);
+void asm330ab1_read_safespi(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -109,7 +115,7 @@ void iis3dwb_wake_up(void);
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
   /* call here the example xxx_handler routine */
-  lsm6dsv16x_read_data_irq_handler();
+  asm330ab1_read_handler();
 }
 /* USER CODE END 0 */
 
@@ -168,7 +174,7 @@ int main(void)
     LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
 
     /* call here the example xxx routine */
-    iis3dwb_fifo();
+    asm330ab1_read();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
