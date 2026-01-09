@@ -110,6 +110,7 @@ static uint8_t tx_buffer[1000];
 static int16_t data_raw[3];
 static float_t acceleration_mg[3];
 static float_t rotation_mdps[3];
+static double_t temperature_degC;
 
 /* Extern variables ----------------------------------------------------------*/
 
@@ -178,6 +179,16 @@ static void asm330ab1_thread(stmdev_ctx_t *ctx)
       tx_p += snprintf((char *)tx_p, sizeof(tx_buffer),
               "Amgular rate [mdps]:%4.2f\t%4.2f\t%4.2f\r\n",
               rotation_mdps[0], rotation_mdps[1], rotation_mdps[2]);
+    }
+
+    if (status.gda) {
+      /* Read Temperature field data */
+      memset(data_raw, 0x00, sizeof(int16_t));
+      asm330ab1_temperature_raw_get(ctx, data_raw);
+      temperature_degC = asm330ab1_from_lsb_to_celsius(data_raw[0]);
+
+      tx_p += snprintf((char *)tx_p, sizeof(tx_buffer),
+              "Temperature [C]:%6.2f\r\n", temperature_degC);
     }
 
     if (tx_p > tx_buffer)

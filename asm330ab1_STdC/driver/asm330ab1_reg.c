@@ -362,6 +362,11 @@ float_t asm330ab1_from_fs2000_to_mdps(int16_t lsb)
   return ((float_t)lsb) * 70.0f;
 }
 
+float_t asm330ab1_from_lsb_to_celsius(int16_t lsb)
+{
+  return (((float_t)lsb / 256.0f) + 25.0f);
+}
+
 /**
   * @}
   *
