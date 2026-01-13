@@ -860,6 +860,22 @@ int32_t asm330ab1_pin_int2_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_
 int32_t asm330ab1_pin_int3_route_set(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val);
 int32_t asm330ab1_pin_int3_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val);
 
+typedef struct
+{
+  enum
+  {
+    ASM330AB1_DRDY_LATCHED = 0x0,
+    ASM330AB1_DRDY_PULSED  = 0x1,
+  } mode;
+  enum
+  {
+    ASM330AB1_DRDY_NOT_MASKED = 0x0,
+    ASM330AB1_DRDY_MASKED     = 0x1,
+  } mask;
+} asm330ab1_data_ready_mode_t;
+int32_t asm330ab1_data_ready_mode_set(const stmdev_ctx_t *ctx, asm330ab1_data_ready_mode_t val);
+int32_t asm330ab1_data_ready_mode_get(const stmdev_ctx_t *ctx, asm330ab1_data_ready_mode_t *val);
+
 int32_t asm330ab1_temperature_raw_get(const stmdev_ctx_t *ctx, int16_t *val);
 
 int32_t asm330ab1_angular_rate_raw_get(const stmdev_ctx_t *ctx, int16_t *val);

@@ -1111,6 +1111,14 @@ int32_t asm330ab1_gy_full_scale_get(const stmdev_ctx_t *ctx, asm330ab1_gy_full_s
   return ret;
 }
 
+/**
+  * @brief   Select the signals that need to be routed on int1 pad.[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy event to route on int1 pin.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
 int32_t asm330ab1_pin_int1_route_set(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val)
 {
   asm330ab1_int1_ctrl_t           int1_ctrl;
@@ -1130,6 +1138,14 @@ int32_t asm330ab1_pin_int1_route_set(const stmdev_ctx_t *ctx, asm330ab1_pin_int_
   return asm330ab1_write_reg(ctx, ASM330AB1_INT1_CTRL, (uint8_t *)&int1_ctrl, 1);
 }
 
+/**
+  * @brief   Select the signals that need to be routed on int1 pad.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy event to route on int1 pin.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
 int32_t asm330ab1_pin_int1_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val)
 {
   asm330ab1_int1_ctrl_t           int1_ctrl;
@@ -1145,6 +1161,14 @@ int32_t asm330ab1_pin_int1_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_
   return ret;
 }
 
+/**
+  * @brief   Select the signals that need to be routed on int2 pad.[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy event to route on int2 pin.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
 int32_t asm330ab1_pin_int2_route_set(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val)
 {
   asm330ab1_int2_ctrl_t           int2_ctrl;
@@ -1166,6 +1190,14 @@ int32_t asm330ab1_pin_int2_route_set(const stmdev_ctx_t *ctx, asm330ab1_pin_int_
   return asm330ab1_write_reg(ctx, ASM330AB1_INT2_CTRL, (uint8_t *)&int2_ctrl, 1);
 }
 
+/**
+  * @brief   Select the signals that need to be routed on int2 pad.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy event to route on int2 pin.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
 int32_t asm330ab1_pin_int2_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val)
 {
   asm330ab1_int2_ctrl_t           int2_ctrl;
@@ -1183,6 +1215,14 @@ int32_t asm330ab1_pin_int2_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_
   return ret;
 }
 
+/**
+  * @brief   Select the signals that need to be routed on int3 pad.[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy event to route on int3 pin.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
 int32_t asm330ab1_pin_int3_route_set(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val)
 {
   asm330ab1_int3_ctrl_t           int3_ctrl;
@@ -1202,6 +1242,14 @@ int32_t asm330ab1_pin_int3_route_set(const stmdev_ctx_t *ctx, asm330ab1_pin_int_
   return asm330ab1_write_reg(ctx, ASM330AB1_INT3_CTRL, (uint8_t *)&int3_ctrl, 1);
 }
 
+/**
+  * @brief   Select the signals that need to be routed on int3 pad.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy event to route on int3 pin.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
 int32_t asm330ab1_pin_int3_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_route_t *val)
 {
   asm330ab1_int3_ctrl_t           int3_ctrl;
@@ -1215,6 +1263,75 @@ int32_t asm330ab1_pin_int3_route_get(const stmdev_ctx_t *ctx, asm330ab1_pin_int_
   val->drdy_fusa = int3_ctrl.int3_drdy_fusa;
 
   return ret;
+}
+
+/**
+  * @brief   Data ready configuration.[set]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy mode structure.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t asm330ab1_data_ready_mode_set(const stmdev_ctx_t *ctx, asm330ab1_data_ready_mode_t val)
+{
+  asm330ab1_ctrl4_t           ctrl4;
+  int32_t ret;
+
+  ret = asm330ab1_read_reg(ctx, ASM330AB1_CTRL4, (uint8_t *)&ctrl4, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  ctrl4.drdy_pulsed = val.mode;
+  ctrl4.drdy_mask   = val.mask;
+
+  return asm330ab1_write_reg(ctx, ASM330AB1_CTRL4, (uint8_t *)&ctrl4, 1);
+}
+
+/**
+  * @brief   Data ready configuration.[get]
+  *
+  * @param  ctx    Read / write interface definitions.(ptr)
+  * @param  val    the drdy mode structure.
+  * @retval        Interface status (MANDATORY: return 0 -> no Error).
+  *
+  */
+int32_t asm330ab1_data_ready_mode_get(const stmdev_ctx_t *ctx, asm330ab1_data_ready_mode_t *val)
+{
+  asm330ab1_ctrl4_t           ctrl4;
+  int32_t ret;
+
+  ret = asm330ab1_read_reg(ctx, ASM330AB1_CTRL4, (uint8_t *)&ctrl4, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  switch (ctrl4.drdy_pulsed)
+  {
+    case 1:
+      val->mode = ASM330AB1_DRDY_PULSED;
+      break;
+    default:
+    case 0:
+      val->mode = ASM330AB1_DRDY_LATCHED;
+      break;
+  }
+
+  switch (ctrl4.drdy_mask)
+  {
+    case 1:
+      val->mode = ASM330AB1_DRDY_MASKED;
+      break;
+    default:
+    case 0:
+      val->mode = ASM330AB1_DRDY_NOT_MASKED;
+      break;
+  }
+
+  return 0;
 }
 
 /**
@@ -1462,9 +1579,13 @@ int32_t asm330ab1_sensor_power_down(const stmdev_ctx_t *ctx)
   uint8_t reg_tmp, val;
   int32_t ret;
 
+  /* set power down */
+  ret = asm330ab1_xl_data_rate_set(ctx, ASM330AB1_HA00_ODR_POWER_DOWN);
+  ret += asm330ab1_gy_data_rate_set(ctx, ASM330AB1_HA00_ODR_POWER_DOWN);
+
   /* Step 2.2 */
   val = 0xC3;
-  ret = asm330ab1_write_reg(ctx, 0x06, &val, 1);
+  ret += asm330ab1_write_reg(ctx, 0x06, &val, 1);
 
   /* Step 2.3 */
   val = 0x75;
