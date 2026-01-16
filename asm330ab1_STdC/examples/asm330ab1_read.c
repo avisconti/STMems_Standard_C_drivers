@@ -7,13 +7,12 @@
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; Copyright (c) 2025 STMicroelectronics.
- * All rights reserved.</center></h2>
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
  *
- * This software component is licensed by ST under BSD 3-Clause license,
- * the "License"; You may not use this file except in compliance with the
- * License. You may obtain a copy of the License at:
- *                        opensource.org/licenses/BSD-3-Clause
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
  *
  ******************************************************************************
  */
@@ -277,11 +276,16 @@ void asm330ab1_read(void)
     goto error;
   }
 
-  /* Check if boot has been performed correctly and if sensor started up */
-  asm330ab1_device_status_get(&dev_ctx, &status);
-  if (status.boot_check != 0 || status.xl_startup != 1 || status.gy_startup != 1)
+  /* Check if sensors started up */
+  while(1)
   {
-    goto error;
+    platform_delay(10); /* wait 10ms */
+
+    asm330ab1_device_status_get(&dev_ctx, &status);
+    if (status.xl_startup == 0 && status.gy_startup == 0)
+    {
+      break;
+    }
   }
 
   /* lock pages */
@@ -295,6 +299,8 @@ void asm330ab1_read(void)
   if (ret != 0) {
     goto error;
   }
+
+  asm330ab1_check_faults(&dev_ctx);
 
   while (1)
   {
