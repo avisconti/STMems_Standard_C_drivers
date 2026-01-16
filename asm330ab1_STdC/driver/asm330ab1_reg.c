@@ -1323,11 +1323,11 @@ int32_t asm330ab1_data_ready_mode_get(const stmdev_ctx_t *ctx, asm330ab1_data_re
   switch (ctrl4.drdy_mask)
   {
     case 1:
-      val->mode = ASM330AB1_DRDY_MASKED;
+      val->mask = ASM330AB1_DRDY_MASKED;
       break;
     default:
     case 0:
-      val->mode = ASM330AB1_DRDY_NOT_MASKED;
+      val->mask = ASM330AB1_DRDY_NOT_MASKED;
       break;
   }
 
@@ -1335,7 +1335,7 @@ int32_t asm330ab1_data_ready_mode_get(const stmdev_ctx_t *ctx, asm330ab1_data_re
 }
 
 /**
-  * @brief  Temperature data output register[get]
+  * @brief  Temperature data output register.[get]
   *
   * @param  ctx      read / write interface definitions
   * @param  val      Temperature data output register
@@ -1650,6 +1650,138 @@ int32_t asm330ab1_sensor_start_up(const stmdev_ctx_t *ctx)
   val = 0x0;
   ret += asm330ab1_write_reg(ctx, 0x36, &val, 1);
 
+  return ret;
+}
+
+/**
+  * @brief  Check device initialization faults
+  *
+  * @param  ctx   communication interface handler.(ptr)
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_check_faults(const stmdev_ctx_t *ctx)
+{
+  uint8_t status;
+  uint8_t retry = 0;
+  int32_t ret = 0;
+
+  if (ctx->mdelay == NULL)
+  {
+    ret = -1;
+    goto exit;
+  }
+
+  /* Step 11 */
+  asm330ab1_fusa_fault_clear(ctx, 7);
+
+  /* Check FUSA_STATUS */
+  do
+  {
+    ctx->mdelay(10);
+
+    ret += asm330ab1_read_reg(ctx, ASM330AB1_FUSA_STATUS, &status, 1);
+    if (ret != 0)
+    {
+      goto exit;
+    }
+  } while (status != 0xFF && retry++ < 3);
+
+  ret = (status == 0xFF) ? 0 : -1;
+
+exit:
+  return ret;
+}
+
+/**
+  * @}
+  *
+  */
+
+/**
+  * @defgroup  Fu.Sa. page handling
+  * @brief     This section groups all the functions concerning
+  *            Fu.Sa. page
+  * @{
+  *
+  */
+
+/**
+  * @brief  Clear faults belonging to a specific group
+  *
+  * @param  ctx   communication interface handler.(ptr)
+  * @param  group group selector
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_fusa_fault_clear(const stmdev_ctx_t *ctx, uint8_t group)
+{
+  asm330ab1_clear_t clear;
+  int32_t ret;
+
+  ret = asm330ab1_page_sel_set(ctx, ASM330AB1_FUSA_PAGE);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  clear.group = group;
+  ret = asm330ab1_write_reg(ctx, ASM330AB1_CLEAR, (uint8_t *)&clear, 1);
+
+  ret += asm330ab1_page_sel_set(ctx, ASM330AB1_MAIN_PAGE);
+
+exit:
+  return ret;
+}
+
+/**
+  * @brief  Read the Fu.Sa. fault status details
+  *
+  * @param  ctx    communication interface handler.(ptr)
+  * @param  status fault status details
+  * @retval        interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_fusa_status_read(const stmdev_ctx_t *ctx, asm330ab1_fusa_faults_t *status)
+{
+  asm330ab1_sum_status_t sum_status;
+  asm330ab1_sum_range_t sum_range;
+  uint8_t reg[2];
+  int32_t ret;
+
+  ret = asm330ab1_page_sel_set(ctx, ASM330AB1_FUSA_PAGE);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  ret = asm330ab1_read_reg(ctx, ASM330AB1_SUM_STATUS, reg, 2);
+
+  bytecpy((uint8_t *)&sum_status, &reg[0]);
+  bytecpy((uint8_t *)&sum_range, &reg[1]);
+
+  ret += asm330ab1_page_sel_set(ctx, ASM330AB1_MAIN_PAGE);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  status->xl_status_x = sum_status.xl_status_x;
+  status->xl_status_y = sum_status.xl_status_y;
+  status->xl_status_z = sum_status.xl_status_z;
+  status->gy_status_x = sum_status.gy_status_x;
+  status->gy_status_y = sum_status.gy_status_y;
+  status->gy_status_z = sum_status.gy_status_z;
+  status->if_status   = sum_status.if_status;
+  status->com_status  = sum_status.com_status;
+  status->xl_range_x  = sum_range.xl_range_x;
+  status->xl_range_y  = sum_range.xl_range_y;
+  status->xl_range_z  = sum_range.xl_range_z;
+  status->gy_range_x  = sum_range.gy_range_x;
+  status->gy_range_y  = sum_range.gy_range_y;
+  status->gy_range_z  = sum_range.gy_range_z;
+
+exit:
   return ret;
 }
 

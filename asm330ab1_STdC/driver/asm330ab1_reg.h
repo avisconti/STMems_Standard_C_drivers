@@ -687,6 +687,64 @@ typedef struct
   */
 #define ASM330AB1_FUSA_PAGE                            0x7
 
+#define ASM330AB1_CLEAR                                0x32
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t group                    : 3;
+  uint8_t not_used                 : 5;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t not_used                 : 5;
+  uint8_t group                    : 3;
+#endif /* DRV_BYTE_ORDER */
+} asm330ab1_clear_t;
+
+#define ASM330AB1_SUM_STATUS                           0x33
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t xl_status_x              : 1;
+  uint8_t xl_status_y              : 1;
+  uint8_t xl_status_z              : 1;
+  uint8_t gy_status_x              : 1;
+  uint8_t gy_status_y              : 1;
+  uint8_t gy_status_z              : 1;
+  uint8_t if_status                : 1;
+  uint8_t com_status               : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t com_status               : 1;
+  uint8_t if_status                : 1;
+  uint8_t gy_status_z              : 1;
+  uint8_t gy_status_y              : 1;
+  uint8_t gy_status_x              : 1;
+  uint8_t xl_status_z              : 1;
+  uint8_t xl_status_y              : 1;
+  uint8_t xl_status_x              : 1;
+#endif /* DRV_BYTE_ORDER */
+} asm330ab1_sum_status_t;
+
+#define ASM330AB1_SUM_RANGE                            0x34
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t xl_range_x               : 1;
+  uint8_t xl_range_y               : 1;
+  uint8_t xl_range_z               : 1;
+  uint8_t gy_range_x               : 1;
+  uint8_t gy_range_y               : 1;
+  uint8_t gy_range_z               : 1;
+  uint8_t not_used                 : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t not_used                 : 2;
+  uint8_t gy_range_z               : 1;
+  uint8_t gy_range_y               : 1;
+  uint8_t gy_range_x               : 1;
+  uint8_t xl_range_z               : 1;
+  uint8_t xl_range_y               : 1;
+  uint8_t xl_range_x               : 1;
+#endif /* DRV_BYTE_ORDER */
+} asm330ab1_sum_range_t;
+
 #define ASM330AB1_RESERVED_PAGE_1                      0x01
 #define ASM330AB1_RESERVED_PAGE_16                     0x10
 /**
@@ -740,6 +798,29 @@ int32_t asm330ab1_pages_lock(const stmdev_ctx_t *ctx, uint8_t val);
 
 int32_t asm330ab1_sensor_power_down(const stmdev_ctx_t *ctx);
 int32_t asm330ab1_sensor_start_up(const stmdev_ctx_t *ctx);
+
+int32_t asm330ab1_check_faults(const stmdev_ctx_t *ctx);
+
+int32_t asm330ab1_fusa_fault_clear(const stmdev_ctx_t *ctx, uint8_t group);
+
+typedef struct
+{
+  uint16_t xl_status_x                 : 1;
+  uint16_t xl_status_y                 : 1;
+  uint16_t xl_status_z                 : 1;
+  uint16_t gy_status_x                 : 1;
+  uint16_t gy_status_y                 : 1;
+  uint16_t gy_status_z                 : 1;
+  uint16_t if_status                   : 1;
+  uint16_t com_status                  : 1;
+  uint16_t xl_range_x                  : 1;
+  uint16_t xl_range_y                  : 1;
+  uint16_t xl_range_z                  : 1;
+  uint16_t gy_range_x                  : 1;
+  uint16_t gy_range_y                  : 1;
+  uint16_t gy_range_z                  : 1;
+} asm330ab1_fusa_faults_t;
+int32_t asm330ab1_fusa_status_read(const stmdev_ctx_t *ctx, asm330ab1_fusa_faults_t *status);
 
 typedef enum
 {
