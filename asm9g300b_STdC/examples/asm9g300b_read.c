@@ -449,8 +449,8 @@ static void tx_com(uint8_t *tx_buffer, uint16_t len)
  */
 static void platform_delay(uint32_t ms)
 {
-#if defined(STEVAL_MKI109V3)
-  HAL_Delay(ms);
+#if defined(STEVAL_MKI109D)
+  delay(ms);
 #elif defined(NUCLEO_F411RE) | defined(STEVAL_MKI109V3)
   HAL_Delay(ms);
 #elif defined(SPC584B_DIS)
