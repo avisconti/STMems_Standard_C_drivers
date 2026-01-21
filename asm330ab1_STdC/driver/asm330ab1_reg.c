@@ -1580,7 +1580,8 @@ int32_t asm330ab1_sensor_power_down(const stmdev_ctx_t *ctx)
   int32_t ret;
 
   /* set power down */
-  ret = asm330ab1_xl_data_rate_set(ctx, ASM330AB1_HA00_ODR_POWER_DOWN);
+  ret = asm330ab1_page_sel_set(ctx, ASM330AB1_MAIN_PAGE);
+  ret += asm330ab1_xl_data_rate_set(ctx, ASM330AB1_HA00_ODR_POWER_DOWN);
   ret += asm330ab1_gy_data_rate_set(ctx, ASM330AB1_HA00_ODR_POWER_DOWN);
 
   /* Step 2.2 */
@@ -1780,6 +1781,120 @@ int32_t asm330ab1_fusa_status_read(const stmdev_ctx_t *ctx, asm330ab1_fusa_fault
   status->gy_range_x  = sum_range.gy_range_x;
   status->gy_range_y  = sum_range.gy_range_y;
   status->gy_range_z  = sum_range.gy_range_z;
+
+exit:
+  return ret;
+}
+
+/**
+  * @brief  Set the XL/GY data_n_dump for self-test
+  *
+  * @param  ctx    communication interface handler.(ptr)
+  * @param  ndump  XL/GY data_n_dump value
+  * @retval        interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_data_n_dump_set(const stmdev_ctx_t *ctx, asm330ab1_data_n_dump_t ndump)
+{
+  asm330ab1_st_auto_cfg_t st_auto_cfg = { 0 };
+  int32_t ret;
+
+  ret = asm330ab1_page_sel_set(ctx, ASM330AB1_FUSA_PAGE);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  st_auto_cfg.gy_data_n_dump = ndump.gy_data_n_dump;
+  st_auto_cfg.xl_data_n_dump = ndump.xl_data_n_dump;
+  ret = asm330ab1_write_reg(ctx, ASM330AB1_ST_AUTO_CFG, (uint8_t *)&st_auto_cfg, 1);
+
+  ret += asm330ab1_page_sel_set(ctx, ASM330AB1_MAIN_PAGE);
+
+exit:
+  return ret;
+}
+
+/**
+  * @brief  Start/Stop GY self-test automatic procedure
+  *
+  * @param  ctx    communication interface handler.(ptr)
+  * @param  val    0: stop, 1: start
+  * @retval        interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_st_auto_gy_start(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  asm330ab1_st_auto_cfg_t st_auto_cfg = { 0 };
+  int32_t ret;
+
+  ret = asm330ab1_page_sel_set(ctx, ASM330AB1_FUSA_PAGE);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  ret = asm330ab1_read_reg(ctx, ASM330AB1_ST_AUTO_CFG, (uint8_t *)&st_auto_cfg, 1);
+  st_auto_cfg.st_auto_gy_start = val;
+  ret += asm330ab1_write_reg(ctx, ASM330AB1_ST_AUTO_CFG, (uint8_t *)&st_auto_cfg, 1);
+
+  ret += asm330ab1_page_sel_set(ctx, ASM330AB1_MAIN_PAGE);
+
+exit:
+  return ret;
+}
+
+/**
+  * @brief  Start/Stop XL self-test automatic procedure
+  *
+  * @param  ctx    communication interface handler.(ptr)
+  * @param  val    0: stop, 1: start
+  * @retval        interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_st_auto_xl_start(const stmdev_ctx_t *ctx, uint8_t val)
+{
+  asm330ab1_st_auto_cfg_t st_auto_cfg = { 0 };
+  int32_t ret;
+
+  ret = asm330ab1_page_sel_set(ctx, ASM330AB1_FUSA_PAGE);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  ret = asm330ab1_read_reg(ctx, ASM330AB1_ST_AUTO_CFG, (uint8_t *)&st_auto_cfg, 1);
+  st_auto_cfg.st_auto_xl_start = val;
+  ret += asm330ab1_write_reg(ctx, ASM330AB1_ST_AUTO_CFG, (uint8_t *)&st_auto_cfg, 1);
+
+  ret += asm330ab1_page_sel_set(ctx, ASM330AB1_MAIN_PAGE);
+
+exit:
+  return ret;
+}
+
+/**
+  * @brief  Get self-test auto sum_status register
+  *
+  * @param  ctx         communication interface handler.(ptr)
+  * @param  sum_status  sum_status register
+  * @retval             interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_st_auto_sum_status_get(const stmdev_ctx_t *ctx,
+                                         asm330ab1_st_auto_sum_status_t *sum_status)
+{
+  int32_t ret;
+
+  ret = asm330ab1_page_sel_set(ctx, ASM330AB1_FUSA_PAGE);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  ret = asm330ab1_read_reg(ctx, ASM330AB1_ST_AUTO_SUM_STATUS, (uint8_t *)sum_status, 1);
+
+  ret += asm330ab1_page_sel_set(ctx, ASM330AB1_MAIN_PAGE);
 
 exit:
   return ret;
