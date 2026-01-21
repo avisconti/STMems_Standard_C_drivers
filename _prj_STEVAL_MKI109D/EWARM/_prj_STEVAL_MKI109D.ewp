@@ -1287,6 +1287,9 @@
             <file>
                 <name>$PROJ_DIR$\..\..\asm330ab1_STdC\driver\asm330ab1_reg.c</name>
             </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\asm330ab1_STdC\examples\asm330ab1_self_test.c</name>
+            </file>
         </group>
         <group>
             <name>asm9g300b</name>

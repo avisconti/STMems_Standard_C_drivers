@@ -169,12 +169,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
   while (1)
   {
-    LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
-
     /* call here the example xxx routine */
-    asm330ab1_read();
+    //asm330ab1_read();
+    asm330ab1_self_test();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
