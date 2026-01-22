@@ -69,7 +69,8 @@ typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint32_t crc3   :  3;
-  uint32_t data   : 16;
+  uint32_t data   :  8;
+  uint32_t xxx    :  8;
   uint32_t unused :  1;
   uint32_t cap    :  1;
   uint32_t rw     :  1;
@@ -79,7 +80,8 @@ typedef struct
   uint32_t rw     :  1;
   uint32_t cap    :  1;
   uint32_t unused :  1;
-  uint32_t data   : 16;
+  uint32_t xxx    :  8;
+  uint32_t data   :  8;
   uint32_t crc3   :  3;
 #endif /* DRV_BYTE_ORDER */
 } safespi_mosi_frame_t;
@@ -87,13 +89,13 @@ typedef struct
 /*
  * Generate SafeSPI MOSI frame
  *
- * 31                22  21 20  19  18                             3 2     0
- * +-------------------+---+---+---+--------------------------------+------+
- * |      TA9:0        |RW |CAP| 0 |           DATAI15:0            | C2:0 |
- * +-------------------+---+---+---+--------------------------------+------+
+ * 31                22  21 20  19  18            11 10            3 2     0
+ * +-------------------+---+---+---+----------------+---------------+------+
+ * |      TA9:0        |RW |CAP| 0 |      XXX       |   DATAI7:0    | C2:0 |
+ * +-------------------+---+---+---+----------------+---------------+------+
  *
  */
-static uint32_t asm330ab1_gen_mosi_frame(uint8_t ta, uint8_t rw, uint16_t data)
+static uint32_t asm330ab1_gen_mosi_frame(uint16_t ta, uint8_t rw, uint16_t data)
 {
   uint32_t frame = 0;
   safespi_mosi_frame_t *fp = (safespi_mosi_frame_t *)&frame;
@@ -194,13 +196,20 @@ static int32_t asm330ab1_send_req_frame(const stmdev_ctx_t *ctx, uint8_t rw, uin
                                         uint16_t data)
 {
   uint32_t fr;
+  uint16_t ta = reg;
+  asm330ab1_priv_t *priv = ctx->priv_data;
 
   if (ctx == NULL)
   {
     return -1;
   }
 
-  fr = asm330ab1_gen_mosi_frame(reg, rw, data);
+  if (priv && priv->ta9 == 1)
+  {
+    ta |= 0x200;
+  }
+
+  fr = asm330ab1_gen_mosi_frame(ta, rw, data);
 
   /* send frame. Pls note that 'reg' is already incapsulated in frame */
   return ctx->write_reg(ctx->handle, 0, (uint8_t *)&fr, 1);
@@ -658,6 +667,42 @@ exit:
 }
 
 /**
+  * @brief  Check  communication on SPI bus
+  *
+  * @param  ctx   communication interface handler.(ptr)
+  * @retval       interface status (MANDATORY: return 0 -> no Error)
+  *
+  */
+int32_t asm330ab1_check_spi_communication(const stmdev_ctx_t *ctx)
+{
+  int32_t ret;
+  uint16_t val1, val2 = 0;
+  uint8_t reg = 0;
+
+  val1 = 0xAB;
+
+  ret = asm330ab1_send_req_frame(ctx, 1, ASM330AB1_TEST_IF, val1);
+  if (ret == -1)
+  {
+    return -1;
+  }
+
+  val2 = 0;
+  ret = asm330ab1_recv_rsp_frame(ctx, &reg, (uint8_t *)&val2);
+  if (ret == -1)
+  {
+    return -1;
+  }
+
+  if (val1 != val2)
+  {
+    return -1;
+  }
+
+  return ret;
+}
+
+/**
   * @brief  Configure PIN characteristics.[set]
   *
   * @param  ctx    Read / write interface definitions.(ptr)
@@ -825,38 +870,98 @@ int32_t asm330ab1_xl_data_rate_get(const stmdev_ctx_t *ctx, asm330ab1_odr_t *val
   /* build up the asm330ab1_odr_t value */
   switch ((cfg << 4) | ctrl1.odr_xl)
   {
-    case 0x00: *val = ASM330AB1_HA00_ODR_POWER_DOWN; break;
-    case 0x03: *val = ASM330AB1_HA00_ODR_AT_15Hz;    break;
-    case 0x04: *val = ASM330AB1_HA00_ODR_AT_30Hz;    break;
-    case 0x05: *val = ASM330AB1_HA00_ODR_AT_60Hz;    break;
-    case 0x06: *val = ASM330AB1_HA00_ODR_AT_120Hz;   break;
-    case 0x07: *val = ASM330AB1_HA00_ODR_AT_240Hz;   break;
-    case 0x08: *val = ASM330AB1_HA00_ODR_AT_480Hz;   break;
-    case 0x09: *val = ASM330AB1_HA00_ODR_AT_960Hz;   break;
-    case 0x0A: *val = ASM330AB1_HA00_ODR_AT_1920Hz;  break;
-    case 0x0B: *val = ASM330AB1_HA00_ODR_AT_3840Hz;  break;
+    case 0x00:
+      *val = ASM330AB1_HA00_ODR_POWER_DOWN;
+      break;
+    case 0x03:
+      *val = ASM330AB1_HA00_ODR_AT_15Hz;
+      break;
+    case 0x04:
+      *val = ASM330AB1_HA00_ODR_AT_30Hz;
+      break;
+    case 0x05:
+      *val = ASM330AB1_HA00_ODR_AT_60Hz;
+      break;
+    case 0x06:
+      *val = ASM330AB1_HA00_ODR_AT_120Hz;
+      break;
+    case 0x07:
+      *val = ASM330AB1_HA00_ODR_AT_240Hz;
+      break;
+    case 0x08:
+      *val = ASM330AB1_HA00_ODR_AT_480Hz;
+      break;
+    case 0x09:
+      *val = ASM330AB1_HA00_ODR_AT_960Hz;
+      break;
+    case 0x0A:
+      *val = ASM330AB1_HA00_ODR_AT_1920Hz;
+      break;
+    case 0x0B:
+      *val = ASM330AB1_HA00_ODR_AT_3840Hz;
+      break;
 
-    case 0x20: *val = ASM330AB1_HA02_ODR_POWER_DOWN; break;
-    case 0x23: *val = ASM330AB1_HA02_ODR_AT_12Hz5;   break;
-    case 0x24: *val = ASM330AB1_HA02_ODR_AT_25Hz;    break;
-    case 0x25: *val = ASM330AB1_HA02_ODR_AT_50Hz;    break;
-    case 0x26: *val = ASM330AB1_HA02_ODR_AT_100Hz;   break;
-    case 0x27: *val = ASM330AB1_HA02_ODR_AT_200Hz;   break;
-    case 0x28: *val = ASM330AB1_HA02_ODR_AT_400Hz;   break;
-    case 0x29: *val = ASM330AB1_HA02_ODR_AT_800Hz;   break;
-    case 0x2A: *val = ASM330AB1_HA02_ODR_AT_1600Hz;  break;
-    case 0x2B: *val = ASM330AB1_HA02_ODR_AT_3200Hz;  break;
+    case 0x20:
+      *val = ASM330AB1_HA02_ODR_POWER_DOWN;
+      break;
+    case 0x23:
+      *val = ASM330AB1_HA02_ODR_AT_12Hz5;
+      break;
+    case 0x24:
+      *val = ASM330AB1_HA02_ODR_AT_25Hz;
+      break;
+    case 0x25:
+      *val = ASM330AB1_HA02_ODR_AT_50Hz;
+      break;
+    case 0x26:
+      *val = ASM330AB1_HA02_ODR_AT_100Hz;
+      break;
+    case 0x27:
+      *val = ASM330AB1_HA02_ODR_AT_200Hz;
+      break;
+    case 0x28:
+      *val = ASM330AB1_HA02_ODR_AT_400Hz;
+      break;
+    case 0x29:
+      *val = ASM330AB1_HA02_ODR_AT_800Hz;
+      break;
+    case 0x2A:
+      *val = ASM330AB1_HA02_ODR_AT_1600Hz;
+      break;
+    case 0x2B:
+      *val = ASM330AB1_HA02_ODR_AT_3200Hz;
+      break;
 
-    case 0x30: *val = ASM330AB1_HA03_ODR_POWER_DOWN; break;
-    case 0x33: *val = ASM330AB1_HA03_ODR_AT_13Hz;    break;
-    case 0x34: *val = ASM330AB1_HA03_ODR_AT_26Hz;    break;
-    case 0x35: *val = ASM330AB1_HA03_ODR_AT_52Hz;    break;
-    case 0x36: *val = ASM330AB1_HA03_ODR_AT_104Hz;   break;
-    case 0x37: *val = ASM330AB1_HA03_ODR_AT_208Hz;   break;
-    case 0x38: *val = ASM330AB1_HA03_ODR_AT_417Hz;   break;
-    case 0x39: *val = ASM330AB1_HA03_ODR_AT_833Hz;   break;
-    case 0x3A: *val = ASM330AB1_HA03_ODR_AT_1667Hz;  break;
-    case 0x3B: *val = ASM330AB1_HA03_ODR_AT_3333Hz;  break;
+    case 0x30:
+      *val = ASM330AB1_HA03_ODR_POWER_DOWN;
+      break;
+    case 0x33:
+      *val = ASM330AB1_HA03_ODR_AT_13Hz;
+      break;
+    case 0x34:
+      *val = ASM330AB1_HA03_ODR_AT_26Hz;
+      break;
+    case 0x35:
+      *val = ASM330AB1_HA03_ODR_AT_52Hz;
+      break;
+    case 0x36:
+      *val = ASM330AB1_HA03_ODR_AT_104Hz;
+      break;
+    case 0x37:
+      *val = ASM330AB1_HA03_ODR_AT_208Hz;
+      break;
+    case 0x38:
+      *val = ASM330AB1_HA03_ODR_AT_417Hz;
+      break;
+    case 0x39:
+      *val = ASM330AB1_HA03_ODR_AT_833Hz;
+      break;
+    case 0x3A:
+      *val = ASM330AB1_HA03_ODR_AT_1667Hz;
+      break;
+    case 0x3B:
+      *val = ASM330AB1_HA03_ODR_AT_3333Hz;
+      break;
 
     default:
       ret = -1;
@@ -920,38 +1025,98 @@ int32_t asm330ab1_gy_data_rate_get(const stmdev_ctx_t *ctx, asm330ab1_odr_t *val
   /* build up the asm330ab1_odr_t value */
   switch ((cfg << 4) | ctrl2.odr_g)
   {
-    case 0x00: *val = ASM330AB1_HA00_ODR_POWER_DOWN; break;
-    case 0x03: *val = ASM330AB1_HA00_ODR_AT_15Hz;    break;
-    case 0x04: *val = ASM330AB1_HA00_ODR_AT_30Hz;    break;
-    case 0x05: *val = ASM330AB1_HA00_ODR_AT_60Hz;    break;
-    case 0x06: *val = ASM330AB1_HA00_ODR_AT_120Hz;   break;
-    case 0x07: *val = ASM330AB1_HA00_ODR_AT_240Hz;   break;
-    case 0x08: *val = ASM330AB1_HA00_ODR_AT_480Hz;   break;
-    case 0x09: *val = ASM330AB1_HA00_ODR_AT_960Hz;   break;
-    case 0x0A: *val = ASM330AB1_HA00_ODR_AT_1920Hz;  break;
-    case 0x0B: *val = ASM330AB1_HA00_ODR_AT_3840Hz;  break;
+    case 0x00:
+      *val = ASM330AB1_HA00_ODR_POWER_DOWN;
+      break;
+    case 0x03:
+      *val = ASM330AB1_HA00_ODR_AT_15Hz;
+      break;
+    case 0x04:
+      *val = ASM330AB1_HA00_ODR_AT_30Hz;
+      break;
+    case 0x05:
+      *val = ASM330AB1_HA00_ODR_AT_60Hz;
+      break;
+    case 0x06:
+      *val = ASM330AB1_HA00_ODR_AT_120Hz;
+      break;
+    case 0x07:
+      *val = ASM330AB1_HA00_ODR_AT_240Hz;
+      break;
+    case 0x08:
+      *val = ASM330AB1_HA00_ODR_AT_480Hz;
+      break;
+    case 0x09:
+      *val = ASM330AB1_HA00_ODR_AT_960Hz;
+      break;
+    case 0x0A:
+      *val = ASM330AB1_HA00_ODR_AT_1920Hz;
+      break;
+    case 0x0B:
+      *val = ASM330AB1_HA00_ODR_AT_3840Hz;
+      break;
 
-    case 0x20: *val = ASM330AB1_HA02_ODR_POWER_DOWN; break;
-    case 0x23: *val = ASM330AB1_HA02_ODR_AT_12Hz5;   break;
-    case 0x24: *val = ASM330AB1_HA02_ODR_AT_25Hz;    break;
-    case 0x25: *val = ASM330AB1_HA02_ODR_AT_50Hz;    break;
-    case 0x26: *val = ASM330AB1_HA02_ODR_AT_100Hz;   break;
-    case 0x27: *val = ASM330AB1_HA02_ODR_AT_200Hz;   break;
-    case 0x28: *val = ASM330AB1_HA02_ODR_AT_400Hz;   break;
-    case 0x29: *val = ASM330AB1_HA02_ODR_AT_800Hz;   break;
-    case 0x2A: *val = ASM330AB1_HA02_ODR_AT_1600Hz;  break;
-    case 0x2B: *val = ASM330AB1_HA02_ODR_AT_3200Hz;  break;
+    case 0x20:
+      *val = ASM330AB1_HA02_ODR_POWER_DOWN;
+      break;
+    case 0x23:
+      *val = ASM330AB1_HA02_ODR_AT_12Hz5;
+      break;
+    case 0x24:
+      *val = ASM330AB1_HA02_ODR_AT_25Hz;
+      break;
+    case 0x25:
+      *val = ASM330AB1_HA02_ODR_AT_50Hz;
+      break;
+    case 0x26:
+      *val = ASM330AB1_HA02_ODR_AT_100Hz;
+      break;
+    case 0x27:
+      *val = ASM330AB1_HA02_ODR_AT_200Hz;
+      break;
+    case 0x28:
+      *val = ASM330AB1_HA02_ODR_AT_400Hz;
+      break;
+    case 0x29:
+      *val = ASM330AB1_HA02_ODR_AT_800Hz;
+      break;
+    case 0x2A:
+      *val = ASM330AB1_HA02_ODR_AT_1600Hz;
+      break;
+    case 0x2B:
+      *val = ASM330AB1_HA02_ODR_AT_3200Hz;
+      break;
 
-    case 0x30: *val = ASM330AB1_HA03_ODR_POWER_DOWN; break;
-    case 0x33: *val = ASM330AB1_HA03_ODR_AT_13Hz;    break;
-    case 0x34: *val = ASM330AB1_HA03_ODR_AT_26Hz;    break;
-    case 0x35: *val = ASM330AB1_HA03_ODR_AT_52Hz;    break;
-    case 0x36: *val = ASM330AB1_HA03_ODR_AT_104Hz;   break;
-    case 0x37: *val = ASM330AB1_HA03_ODR_AT_208Hz;   break;
-    case 0x38: *val = ASM330AB1_HA03_ODR_AT_417Hz;   break;
-    case 0x39: *val = ASM330AB1_HA03_ODR_AT_833Hz;   break;
-    case 0x3A: *val = ASM330AB1_HA03_ODR_AT_1667Hz;  break;
-    case 0x3B: *val = ASM330AB1_HA03_ODR_AT_3333Hz;  break;
+    case 0x30:
+      *val = ASM330AB1_HA03_ODR_POWER_DOWN;
+      break;
+    case 0x33:
+      *val = ASM330AB1_HA03_ODR_AT_13Hz;
+      break;
+    case 0x34:
+      *val = ASM330AB1_HA03_ODR_AT_26Hz;
+      break;
+    case 0x35:
+      *val = ASM330AB1_HA03_ODR_AT_52Hz;
+      break;
+    case 0x36:
+      *val = ASM330AB1_HA03_ODR_AT_104Hz;
+      break;
+    case 0x37:
+      *val = ASM330AB1_HA03_ODR_AT_208Hz;
+      break;
+    case 0x38:
+      *val = ASM330AB1_HA03_ODR_AT_417Hz;
+      break;
+    case 0x39:
+      *val = ASM330AB1_HA03_ODR_AT_833Hz;
+      break;
+    case 0x3A:
+      *val = ASM330AB1_HA03_ODR_AT_1667Hz;
+      break;
+    case 0x3B:
+      *val = ASM330AB1_HA03_ODR_AT_3333Hz;
+      break;
 
     default:
       ret = -1;

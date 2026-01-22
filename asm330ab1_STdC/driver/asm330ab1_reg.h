@@ -106,7 +106,8 @@ typedef struct
 typedef struct
 {
   uint8_t use_safespi_bus               : 1;
-  uint8_t reserved_1                    : 7;
+  uint8_t ta9                           : 1;
+  uint8_t reserved_1                    : 6;
 } asm330ab1_priv_t;
 
 /**
@@ -202,6 +203,8 @@ typedef struct
   uint8_t crc_r                        : 8;
 #endif /* DRV_BYTE_ORDER */
 } asm330ab1_crc_r_t;
+
+#define ASM330AB1_TEST_IF                              0x07U
 
 #define ASM330AB1_INT3_CTRL                            0x0CU
 typedef struct
@@ -835,6 +838,8 @@ int32_t asm330ab1_page_sel_get(const stmdev_ctx_t *ctx, uint8_t *page);
 
 int32_t asm330ab1_eoi_set(const stmdev_ctx_t *ctx);
 int32_t asm330ab1_pages_lock(const stmdev_ctx_t *ctx, uint8_t val);
+
+int32_t asm330ab1_check_spi_communication(const stmdev_ctx_t *ctx);
 
 int32_t asm330ab1_sensor_power_down(const stmdev_ctx_t *ctx);
 int32_t asm330ab1_sensor_start_up(const stmdev_ctx_t *ctx);
