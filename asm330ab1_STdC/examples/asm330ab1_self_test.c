@@ -126,6 +126,181 @@ static void platform_delay(uint32_t ms);
 static void platform_init(void);
 
 /* Main Example --------------------------------------------------------------*/
+
+enum sens_type {
+  SENS_XL,
+  SENS_GY
+};
+
+static int asm330ab1_run_self_test(stmdev_ctx_t *ctx, enum sens_type sensor)
+{
+  asm330ab1_device_status_t dev_status;
+  asm330ab1_st_auto_sum_status_t sum_status;
+  asm330ab1_status_t status;
+  asm330ab1_data_n_dump_t ndump = { 0 };
+  asm330ab1_pin_int_route_t int_route = {0};
+  uint8_t val;
+  int ret;
+
+  /* step 1: turn-off sensors */
+  ret = asm330ab1_sensor_power_down(ctx);
+  if (ret != 0) {
+    return -1;
+  }
+
+  /* temporary setting */
+  val = 0x01;
+  ret += asm330ab1_write_reg(ctx, 0x00, &val, 1);
+
+  val = 0x34;
+  ret += asm330ab1_write_reg(ctx, 0x4a, &val, 1);
+
+  if (sensor == SENS_XL)
+  {
+    val = 0x05;
+    ret += asm330ab1_write_reg(ctx, 0x00, &val, 1);
+
+    val = 0x08;
+    ret += asm330ab1_write_reg(ctx, 0x34, &val, 1);
+
+    val = 0x55;
+    ret += asm330ab1_write_reg(ctx, 0x35, &val, 1);
+  }
+
+  val = 0x00;
+  ret += asm330ab1_write_reg(ctx, 0x00, &val, 1);
+
+  /* sensor configuration */
+
+  if (sensor == SENS_GY)
+  {
+    /* Set GY interrupt */
+    int_route.drdy_g = 1;
+    asm330ab1_pin_int1_route_set(ctx, &int_route);
+
+    //val = 0x84;
+    //ret += asm330ab1_write_reg(ctx, 0x15, &val, 1);
+    /* Set GY full scale */
+    asm330ab1_gy_full_scale_set(ctx, ASM330AB1_2000dps);
+
+    val = 0x05;
+    ret += asm330ab1_write_reg(ctx, 0x16, &val, 1);
+  } else {
+    val = 0x00;
+    ret += asm330ab1_write_reg(ctx, 0x62, &val, 1);
+
+    /* Set XL interrupt */
+    int_route.drdy_xl = 1;
+    asm330ab1_pin_int1_route_set(ctx, &int_route);
+
+    /* Set XL full scale */
+    asm330ab1_xl_full_scale_set(ctx, ASM330AB1_16g);
+  }
+
+  val = 0x00;
+  ret += asm330ab1_write_reg(ctx, 0x19, &val, 1);
+
+  if (sensor == SENS_GY)
+  {
+    /* set GY ndump */
+    ndump.gy_data_n_dump = 4;
+    asm330ab1_data_n_dump_set(ctx, ndump);
+  }
+
+  if (sensor == SENS_GY)
+  {
+    /* step 3: turn-on gyroscope */
+    ret = asm330ab1_sensor_start_up(ctx);
+    if (ret != 0) {
+      goto error;
+    }
+
+    /* Set GY Output Data Rate */
+    asm330ab1_gy_data_rate_set(ctx, ASM330AB1_HA00_ODR_AT_480Hz);
+
+    /* wait for GY start up */
+    do {
+      asm330ab1_device_status_get(ctx, &dev_status);
+    } while (dev_status.gy_startup != 0);
+
+    /* wait for GY valid data */
+    do {
+      asm330ab1_status_get(ctx, &status);
+    } while (status.gda != 1);
+
+    /* GY Turn on automatic self-test */
+    val = 1;
+    asm330ab1_st_auto_gy_start(ctx, val);
+
+    platform_delay(100);
+
+    /* wait for GY auto self-test completion */
+    do {
+      asm330ab1_st_auto_sum_status_get(ctx, &sum_status);
+    } while (sum_status.st_auto_gy_done != 1);
+
+    asm330ab1_st_auto_sum_status_get(ctx, &sum_status);
+
+    if (sum_status.st_auto_ok_neg_gy == 1 && sum_status.st_auto_ok_pos_gy == 1)
+    {
+      sprintf((char *)tx_buffer, "GY self-test PASS\r\n");
+      tx_com(tx_buffer, strlen((char const *)tx_buffer));
+    }
+    else
+    {
+      sprintf((char *)tx_buffer, "GY self-test FAIL\r\n");
+      tx_com(tx_buffer, strlen((char const *)tx_buffer));
+    }
+  } else {
+    /* step 3: turn-on accelerometer */
+    ret = asm330ab1_sensor_start_up(ctx);
+    if (ret != 0) {
+      goto error;
+    }
+
+    /* XL on with ODR=480Hz */
+    val = 0x18;
+    ret += asm330ab1_write_reg(ctx, ASM330AB1_CTRL1, &val, 1);
+
+    /* wait for XL start up */
+    do {
+      asm330ab1_device_status_get(ctx, &dev_status);
+    } while (dev_status.xl_startup != 0);
+
+    /* wait for XL valid data */
+    do {
+      asm330ab1_status_get(ctx, &status);
+    } while (status.xlda != 1);
+
+    /* XL Turn on automatic self-test */
+    val = 1;
+    asm330ab1_st_auto_xl_start(ctx, val);
+
+    platform_delay(100);
+
+    /* wait for XL auto self-test completion */
+    do {
+      asm330ab1_st_auto_sum_status_get(ctx, &sum_status);
+    } while (sum_status.st_auto_xl_done != 1);
+
+    asm330ab1_st_auto_sum_status_get(ctx, &sum_status);
+
+    if (sum_status.st_auto_ok_neg_xl == 1 && sum_status.st_auto_ok_pos_xl == 1)
+    {
+      sprintf((char *)tx_buffer, "XL self-test PASS\r\n");
+      tx_com(tx_buffer, strlen((char const *)tx_buffer));
+    }
+    else
+    {
+      sprintf((char *)tx_buffer, "XL self-test FAIL\r\n");
+      tx_com(tx_buffer, strlen((char const *)tx_buffer));
+    }
+  }
+
+error:
+  return ret;
+}
+
 static asm330ab1_priv_t asm330ab1_config =
   {
     .use_safespi_bus = 0,
@@ -135,12 +310,6 @@ void asm330ab1_self_test(void)
 {
   stmdev_ctx_t dev_ctx;
   uint8_t whoamI;
-  asm330ab1_device_status_t dev_status;
-  asm330ab1_st_auto_sum_status_t sum_status;
-  asm330ab1_status_t status;
-  asm330ab1_data_n_dump_t ndump = { 0 };
-  asm330ab1_pin_int_route_t int_route = {0};
-  uint8_t val;
   int ret;
 
   /* Initialize mems driver interface */
@@ -168,481 +337,8 @@ void asm330ab1_self_test(void)
     goto error;
   }
 
-#if 1
-  /* step 1: turn-off sensors */
-  ret = asm330ab1_sensor_power_down(&dev_ctx);
-  if (ret != 0) {
-    goto error;
-  }
-
-  /* temporary setting */
-  val = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-
-  val = 0x34;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x4a, &val, 1);
-
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-
-  /* sensor configuration */
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x62, &val, 1);
-
-  /* Set GY interrupt */
-  int_route.drdy_g = 1;
-  asm330ab1_pin_int1_route_set(&dev_ctx, &int_route);
-
-  //val = 0x84;
-  //ret += asm330ab1_write_reg(&dev_ctx, 0x15, &val, 1);
-  /* Set GY full scale */
-  asm330ab1_gy_full_scale_set(&dev_ctx, ASM330AB1_2000dps);
-
-  val = 0x05;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x16, &val, 1);
-
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x19, &val, 1);
-
-  /* set GY ndump */
-  ndump.gy_data_n_dump = 4;
-  asm330ab1_data_n_dump_set(&dev_ctx, ndump);
-
-  /* step 3: turn-on gyroscope */
-  ret = asm330ab1_sensor_start_up(&dev_ctx);
-  if (ret != 0) {
-    goto error;
-  }
-
-  /* GY on with ODR=480Hz */
-  val = 0x18;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_CTRL2, &val, 1);
-
-  /* wait for GY start up */
-  do {
-    asm330ab1_device_status_get(&dev_ctx, &dev_status);
-  } while (dev_status.gy_startup != 0);
-
-  /* wait for GY valid data */
-  do {
-    asm330ab1_status_get(&dev_ctx, &status);
-  } while (status.gda != 1);
-
-  /* GY Turn on automatic self-test */
-  val = 1;
-  asm330ab1_st_auto_gy_start(&dev_ctx, val);
-
-  platform_delay(100);
-
-  /* wait for GY auto self-test completion */
-  do {
-    asm330ab1_st_auto_sum_status_get(&dev_ctx, &sum_status);
-  } while (sum_status.st_auto_gy_done != 1);
-
-  asm330ab1_st_auto_sum_status_get(&dev_ctx, &sum_status);
-
-  if (sum_status.st_auto_ok_neg_gy == 1 && sum_status.st_auto_ok_pos_gy == 1)
-  {
-    sprintf((char *)tx_buffer, "GY self-test PASS\r\n");
-    tx_com(tx_buffer, strlen((char const *)tx_buffer));
-  }
-  else
-  {
-    sprintf((char *)tx_buffer, "GY self-test FAIL\r\n");
-    tx_com(tx_buffer, strlen((char const *)tx_buffer));
-  }
-#endif
-
-#if 1
-  /* step 1: turn-off sensors */
-  ret = asm330ab1_sensor_power_down(&dev_ctx);
-  if (ret != 0) {
-    goto error;
-  }
-
-  /* temporary setting */
-  val = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-
-  val = 0x34;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x4a, &val, 1);
-
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-
-  val = 0x05;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-
-  val = 0x08;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x34, &val, 1);
-
-  val = 0x55;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x35, &val, 1);
-
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-
-  /* sensor configuration */
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x62, &val, 1);
-
-  /* Set XL interrupt */
-  int_route.drdy_xl = 1;
-  asm330ab1_pin_int1_route_set(&dev_ctx, &int_route);
-
-  /* Set XL full scale */
-  asm330ab1_xl_full_scale_set(&dev_ctx, ASM330AB1_16g);
-
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x19, &val, 1);
-
-  /* step 3: turn-on accelerometer */
-  ret = asm330ab1_sensor_start_up(&dev_ctx);
-  if (ret != 0) {
-    goto error;
-  }
-
-  /* XL on with ODR=480Hz */
-  val = 0x18;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_CTRL1, &val, 1);
-
-  /* wait for XL start up */
-  do {
-    asm330ab1_device_status_get(&dev_ctx, &dev_status);
-  } while (dev_status.xl_startup != 0);
-
-  /* wait for XL valid data */
-  do {
-    asm330ab1_status_get(&dev_ctx, &status);
-  } while (status.xlda != 1);
-
-  /* XL Turn on automatic self-test */
-  val = 1;
-  asm330ab1_st_auto_xl_start(&dev_ctx, val);
-
-  platform_delay(100);
-
-  /* wait for XL auto self-test completion */
-  do {
-    asm330ab1_st_auto_sum_status_get(&dev_ctx, &sum_status);
-  } while (sum_status.st_auto_xl_done != 1);
-
-  asm330ab1_st_auto_sum_status_get(&dev_ctx, &sum_status);
-
-  if (sum_status.st_auto_ok_neg_xl == 1 && sum_status.st_auto_ok_pos_xl == 1)
-  {
-    sprintf((char *)tx_buffer, "XL self-test PASS\r\n");
-    tx_com(tx_buffer, strlen((char const *)tx_buffer));
-  }
-  else
-  {
-    sprintf((char *)tx_buffer, "XL self-test FAIL\r\n");
-    tx_com(tx_buffer, strlen((char const *)tx_buffer));
-  }
-#endif
-  /* step 1: turn-off sensors */
-  ret = asm330ab1_sensor_power_down(&dev_ctx);
-  if (ret != 0) {
-    goto error;
-  }
-
-  /* temporary setting */
-  val = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-  val = 0x34;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x4a, &val, 1);
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &val, 1);
-
-  /* step 2: initialize the sensor */
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_HAODR_CFG, &val, 1);
-
-  val = 0x02;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_INT1_CTRL, &val, 1);
-
-  val = 0x84;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_CTRL6, &val, 1);
-
-  val = 0x05;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_CTRL7, &val, 1);
-
-  val = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_CTRL10, &val, 1);
-
-  /* set GY ndump */
-  ndump.gy_data_n_dump = 4;
-  asm330ab1_data_n_dump_set(&dev_ctx, ndump);
-
-  /* step 3: turn-on gyroscope */
-  ret = asm330ab1_sensor_start_up(&dev_ctx);
-  if (ret != 0) {
-    goto error;
-  }
-
-  /* GY on with ODR=480Hz */
-  val = 0x18;
-  ret += asm330ab1_write_reg(&dev_ctx, ASM330AB1_CTRL2, &val, 1);
-
-  /* wait for GY start up */
-  do {
-    asm330ab1_device_status_get(&dev_ctx, &dev_status);
-  } while (dev_status.gy_startup != 0);
-
-  /* wait for GY valid data */
-  do {
-    asm330ab1_status_get(&dev_ctx, &status);
-  } while (status.gda != 1);
-
-  /* GY Turn on automatic self-test */
-  val = 1;
-  asm330ab1_st_auto_gy_start(&dev_ctx, val);
-
-  platform_delay(100); /* wait 70 ms */
-
-  /* wait for GY auto self-test completion */
-  do {
-    asm330ab1_st_auto_sum_status_get(&dev_ctx, &sum_status);
-  } while (sum_status.st_auto_gy_done != 1);
-
-  asm330ab1_st_auto_sum_status_get(&dev_ctx, &sum_status);
-  if (sum_status.st_auto_ok_neg_gy == 1 && sum_status.st_auto_ok_pos_gy == 1)
-  {
-    sprintf((char *)tx_buffer, "GY self-test PASS\r\n");
-    tx_com(tx_buffer, strlen((char const *)tx_buffer));
-  }
-  else
-  {
-    sprintf((char *)tx_buffer, "GY self-test FAIL\r\n");
-    tx_com(tx_buffer, strlen((char const *)tx_buffer));
-  }
-#endif
-
-#if 0
-  static uint8_t peppe;
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x10, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x11, &peppe, 1);
-
-  peppe = 0xC3;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x06, &peppe, 1);
-
-  peppe = 0x75;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x36, &peppe, 1);
-
-  peppe = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x34;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x4a, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0xC8;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x76, &peppe, 1);
-
-  peppe = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x60, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x62, &peppe, 1);
-
-  peppe = 0x02;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x0D, &peppe, 1);
-
-  peppe = 0x84;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x15, &peppe, 1);
-
-  peppe = 0x05;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x16, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x19, &peppe, 1);
-
-  peppe = 0x07;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x40;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x5D, &peppe, 1);
-
-  peppe = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x80;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x60, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x76, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x06, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x36, &peppe, 1);
-
-  peppe = 0x18;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x11, &peppe, 1);
-
-  peppe = 0x07;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0;
-  do {
-    ret += asm330ab1_read_reg(&dev_ctx, 0x1a, &peppe, 1);
-  } while ((peppe & 0x2) != 0x00);
-
-  peppe = 0;
-  do {
-    ret += asm330ab1_read_reg(&dev_ctx, 0x1e, &peppe, 1);
-  } while ((peppe & 0x2) != 0x2);
-
-  peppe = 0x07;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0xC0;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x5d, &peppe, 1);
-
-  platform_delay(100);
-
-  peppe = 0;
-  do {
-    ret += asm330ab1_read_reg(&dev_ctx, 0x5e, &peppe, 1);
-  } while ((peppe &= 0x80) != 0x80);
-#endif
-
-#if 0
-  static uint8_t peppe;
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x10, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x11, &peppe, 1);
-
-  peppe = 0xC3;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x06, &peppe, 1);
-
-  peppe = 0x75;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x36, &peppe, 1);
-
-  peppe = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x34;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x4a, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0xC8;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x76, &peppe, 1);
-
-  peppe = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x60, &peppe, 1);
-
-
-
-  peppe = 0x05;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x08;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x34, &peppe, 1);
-
-  peppe = 0x55;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x35, &peppe, 1);
-
-
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x62, &peppe, 1);
-
-  peppe = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x0D, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x11, &peppe, 1);
-
-  peppe = 0x03;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x17, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x19, &peppe, 1);
-
-  peppe = 0x01;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x80;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x60, &peppe, 1);
-
-  peppe = 0x10;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x76, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x06, &peppe, 1);
-
-  peppe = 0x00;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x36, &peppe, 1);
-
-  peppe = 0x18;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x10, &peppe, 1);
-
-  peppe = 0;
-  do {
-    ret += asm330ab1_read_reg(&dev_ctx, 0x1a, &peppe, 1);
-  } while ((peppe & 0x20) != 0x00);
-
-  peppe = 0;
-  do {
-    ret += asm330ab1_read_reg(&dev_ctx, 0x1e, &peppe, 1);
-  } while ((peppe & 0x1) != 0x1);
-
-  peppe = 0x07;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x00, &peppe, 1);
-
-  peppe = 0x08;
-  ret += asm330ab1_write_reg(&dev_ctx, 0x5d, &peppe, 1);
-
-  platform_delay(100);
-
-  peppe = 0;
-  do {
-    ret += asm330ab1_read_reg(&dev_ctx, 0x5e, &peppe, 1);
-  } while ((peppe &= 0x08) != 0x08);
-#endif
+  asm330ab1_run_self_test(&dev_ctx, SENS_GY);
+  asm330ab1_run_self_test(&dev_ctx, SENS_XL);
 
 error:
   return;
