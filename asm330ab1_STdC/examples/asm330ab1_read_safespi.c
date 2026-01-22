@@ -129,6 +129,7 @@ static void platform_init(void);
 static asm330ab1_priv_t asm330ab1_config =
   {
     .use_safespi_bus = 1,
+    .ta9 = 1,
   };
 
 void asm330ab1_read_safespi(void)
@@ -150,6 +151,12 @@ void asm330ab1_read_safespi(void)
   /* Wait sensor boot time */
   platform_delay(BOOT_TIME);
 
+  if (asm330ab1_check_spi_communication(&dev_ctx) < 0)
+  {
+    while(1);
+  }
+  while(1);
+
   static uint8_t test = 0xf1;
   asm330ab1_write_reg(&dev_ctx, 0x7, &test, 1);
   test = 0;
@@ -158,7 +165,7 @@ void asm330ab1_read_safespi(void)
   /* Check device ID */
   asm330ab1_device_id_get(&dev_ctx, &whoamI);
 
-  if (whoamI != 0)
+  if (whoamI != ASM330AB1_ID)
     while (1);
 }
 
