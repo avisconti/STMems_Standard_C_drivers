@@ -177,16 +177,16 @@ void asm330lhh_read_timestamp(void)
 
   /* Read samples in polling mode (no int). */
   while (1) {
-    asm330lhh_reg_t reg;
+    asm330lhh_status_reg_t status_reg;
     uint32_t timestamp;
     /* Read output only if new value is available. */
-    asm330lhh_status_reg_get(&dev_ctx, &reg.status_reg);
+    asm330lhh_status_reg_get(&dev_ctx, &status_reg);
 
-    if (reg.status_reg.xlda || reg.status_reg.gda || reg.status_reg.tda) {
+    if (status_reg.xlda || status_reg.gda || status_reg.tda) {
       asm330lhh_timestamp_raw_get(&dev_ctx, &timestamp);
     }
 
-    if (reg.status_reg.xlda) {
+    if (status_reg.xlda) {
       /* Read acceleration field data */
       memset(data_raw_acceleration, 0x00, 3 * sizeof(int16_t));
       asm330lhh_acceleration_raw_get(&dev_ctx, data_raw_acceleration);
@@ -203,7 +203,7 @@ void asm330lhh_read_timestamp(void)
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
     }
 
-    if (reg.status_reg.gda) {
+    if (status_reg.gda) {
       /* Read angular rate field data */
       memset(data_raw_angular_rate, 0x00, 3 * sizeof(int16_t));
       asm330lhh_angular_rate_raw_get(&dev_ctx, data_raw_angular_rate);
@@ -220,7 +220,7 @@ void asm330lhh_read_timestamp(void)
       tx_com(tx_buffer, strlen((char const *)tx_buffer));
     }
 
-    if (reg.status_reg.tda) {
+    if (status_reg.tda) {
       /* Read temperature data */
       memset(&data_raw_temperature, 0x00, sizeof(int16_t));
       asm330lhh_temperature_raw_get(&dev_ctx, &data_raw_temperature);
