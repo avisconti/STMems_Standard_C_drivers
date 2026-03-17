@@ -148,7 +148,7 @@ void lis2dw12_double_tap(void)
     }
 
   /* Restore default configuration */
-  lis2dw12_reset_set(&dev_ctx, PROPERTY_ENABLE);
+  lis2dw12_reset_set(&dev_ctx);
 
   do {
     lis2dw12_reset_get(&dev_ctx, &rst);

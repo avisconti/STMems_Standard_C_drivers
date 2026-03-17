@@ -172,7 +172,7 @@ static void test_self_test_lis2dw12(stmdev_ctx_t *dev_ctx)
   uint8_t k = 0;
   uint8_t axis;
   /* Restore default configuration */
-  lis2dw12_reset_set(dev_ctx, PROPERTY_ENABLE);
+  lis2dw12_reset_set(dev_ctx);
 
   do {
     lis2dw12_reset_get(dev_ctx, &rst);
