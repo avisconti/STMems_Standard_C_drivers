@@ -172,7 +172,7 @@ static void test_self_test_ais2ih(stmdev_ctx_t *dev_ctx)
   uint8_t k = 0;
   uint8_t axis;
   /* Restore default configuration */
-  ais2ih_reset_set(dev_ctx, PROPERTY_ENABLE);
+  ais2ih_reset_set(dev_ctx);
 
   do {
     ais2ih_reset_get(dev_ctx, &rst);

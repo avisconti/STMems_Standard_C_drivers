@@ -147,7 +147,7 @@ void ais2ih_free_fall(void)
     }
 
   /* Restore default configuration */
-  ais2ih_reset_set(&dev_ctx, PROPERTY_ENABLE);
+  ais2ih_reset_set(&dev_ctx);
 
   do {
     ais2ih_reset_get(&dev_ctx, &rst);
