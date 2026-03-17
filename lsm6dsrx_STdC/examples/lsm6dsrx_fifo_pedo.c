@@ -212,7 +212,7 @@ void lsm6dsrx_fifo_pedo_simple(void)
         lsm6dsrx_fifo_sensor_tag_get(&ag_ctx, &reg_tag);
 
         switch (reg_tag) {
-          case LSM6DSRX_STEP_CPUNTER_TAG:
+          case LSM6DSRX_STEP_COUNTER_TAG:
             lsm6dsrx_fifo_out_raw_get(&ag_ctx, pedo_sample.byte);
             snprintf((char *)tx_buffer, sizeof(tx_buffer), "Step Count :%u T %u\r\n",
                     (unsigned int)pedo_sample.step_count,
