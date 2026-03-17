@@ -170,7 +170,7 @@ static void test_self_test_ais2dw12(stmdev_ctx_t *dev_ctx)
   uint8_t k = 0;
   uint8_t axis;
   /* Restore default configuration */
-  ais2dw12_reset_set(dev_ctx, PROPERTY_ENABLE);
+  ais2dw12_reset_set(dev_ctx);
 
   do {
     ais2dw12_reset_get(dev_ctx, &rst);
@@ -178,7 +178,7 @@ static void test_self_test_ais2dw12(stmdev_ctx_t *dev_ctx)
 
   ais2dw12_block_data_update_set(dev_ctx, PROPERTY_ENABLE);
   ais2dw12_full_scale_set(dev_ctx, AIS2DW12_4g);
-  ais2dw12_power_mode_set(dev_ctx, AIS2DW12_PWR_MD_4);
+  ais2dw12_power_mode_set(dev_ctx, AIS2DW12_CONT_PWR_4);
   ais2dw12_data_rate_set(dev_ctx, AIS2DW12_XL_ODR_50Hz);
   platform_delay(100);
   /* Flush old samples */

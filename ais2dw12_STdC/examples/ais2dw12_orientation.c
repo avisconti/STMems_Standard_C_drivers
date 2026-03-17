@@ -145,7 +145,7 @@ void ais2dw12_orientation(void)
     }
 
   /* Restore default configuration */
-  ais2dw12_reset_set(&dev_ctx, PROPERTY_ENABLE);
+  ais2dw12_reset_set(&dev_ctx);
 
   do {
     ais2dw12_reset_get(&dev_ctx, &rst);
@@ -154,7 +154,7 @@ void ais2dw12_orientation(void)
   /* Set full scale */
   ais2dw12_full_scale_set(&dev_ctx, AIS2DW12_2g);
   /* Configure power mode */
-  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_PWR_MD_12bit);
+  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_CONT_PWR_12bit);
   /* Set threshold to 60 degrees */
   ais2dw12_6d_threshold_set(&dev_ctx, 0x02);
   /* LPF2 on 6D function selection. */

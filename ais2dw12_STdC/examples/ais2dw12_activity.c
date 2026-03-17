@@ -147,7 +147,7 @@ void ais2dw12_activity(void)
     }
 
   /* Restore default configuration */
-  ais2dw12_reset_set(&dev_ctx, PROPERTY_ENABLE);
+  ais2dw12_reset_set(&dev_ctx);
 
   do {
     ais2dw12_reset_get(&dev_ctx, &rst);
@@ -161,7 +161,7 @@ void ais2dw12_activity(void)
   ais2dw12_filter_path_set(&dev_ctx, AIS2DW12_LPF_ON_OUT);
   ais2dw12_filter_bandwidth_set(&dev_ctx, AIS2DW12_ODR_DIV_4);
   /* Configure power mode */
-  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_PWR_MD_12bit);
+  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_CONT_PWR_12bit);
   /* Set wake-up duration
    * Wake up duration event 1LSb = 1 / ODR
    */

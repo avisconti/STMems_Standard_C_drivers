@@ -145,14 +145,14 @@ void ais2dw12_free_fall(void)
     }
 
   /* Restore default configuration */
-  ais2dw12_reset_set(&dev_ctx, PROPERTY_ENABLE);
+  ais2dw12_reset_set(&dev_ctx);
 
   do {
     ais2dw12_reset_get(&dev_ctx, &rst);
   } while (rst);
 
   /* Configure power mode */
-  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_PWR_MD_4);
+  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_CONT_PWR_4);
   /* Set Output Data Rate */
   ais2dw12_data_rate_set(&dev_ctx, AIS2DW12_XL_ODR_100Hz);
   /* Set full scale to 2 g */

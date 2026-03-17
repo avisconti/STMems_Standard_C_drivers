@@ -146,7 +146,7 @@ void ais2dw12_read_data_fifo(void)
     }
 
   /* Restore default configuration */
-  ais2dw12_reset_set(&dev_ctx, PROPERTY_ENABLE);
+  ais2dw12_reset_set(&dev_ctx);
 
   do {
     ais2dw12_reset_get(&dev_ctx, &rst);
@@ -166,7 +166,7 @@ void ais2dw12_read_data_fifo(void)
   ais2dw12_fifo_watermark_set(&dev_ctx, 10);
   ais2dw12_fifo_mode_set(&dev_ctx, AIS2DW12_STREAM_MODE);
   /* Configure power mode */
-  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_PWR_MD_4);
+  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_CONT_PWR_4);
   //ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_CONT_LOW_PWR_LOW_NOISE_12bit);
   /* Set Output Data Rate */
   ais2dw12_data_rate_set(&dev_ctx, AIS2DW12_XL_ODR_25Hz);

@@ -145,7 +145,7 @@ void ais2dw12_wake_up(void)
     }
 
   /* Restore default configuration */
-  ais2dw12_reset_set(&dev_ctx, PROPERTY_ENABLE);
+  ais2dw12_reset_set(&dev_ctx);
 
   do {
     ais2dw12_reset_get(&dev_ctx, &rst);
@@ -155,7 +155,7 @@ void ais2dw12_wake_up(void)
    */
   ais2dw12_full_scale_set(&dev_ctx, AIS2DW12_2g);
   /* Configure power mode */
-  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_PWR_MD_12bit);
+  ais2dw12_power_mode_set(&dev_ctx, AIS2DW12_CONT_PWR_12bit);
   /* Set Output Data Rate */
   ais2dw12_data_rate_set(&dev_ctx, AIS2DW12_XL_ODR_100Hz);
   /* Apply high-pass digital filter on Wake-Up function */
