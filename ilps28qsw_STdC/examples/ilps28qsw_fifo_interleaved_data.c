@@ -181,8 +181,10 @@ void ilps28qsw_fifo_interleaved_data(void)
   while(1)
   {
     uint8_t level, i;
+    ilps28qsw_fifo_status_t status;
 
-    ilps28qsw_fifo_level_get(&dev_ctx, &level);
+    ilps28qsw_fifo_status_get(&dev_ctx, &status);
+    level = status.fifo_level;
 
     /* Read output when level is reached */
     if (level >= 32) {

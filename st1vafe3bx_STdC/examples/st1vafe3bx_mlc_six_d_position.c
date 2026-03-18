@@ -91,7 +91,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "st1vafe3bx_six_d_position.h"
+#include "st1vafe3bx_6d_position_recognition.h"
 #include "st1vafe3bx_reg.h"
 
 #if defined(NUCLEO_F401RE)
@@ -168,16 +168,19 @@ void st1vafe3bx_mlc_six_d_position(void)
 
   /* Restore default configuration */
   st1vafe3bx_sw_reset(&dev_ctx);
+  do {
+    st1vafe3bx_status_get(&dev_ctx, &rst);
+  } while (rst.sw_reset);
 
   /* Start Machine Learning Core configuration */
-  for ( i = 0; i < (sizeof(st1vafe3bx_six_d_position_conf_0) / sizeof(struct mems_conf_op) ); i++ ) {
-    switch(st1vafe3bx_six_d_position_conf_0[i].type) {
+  for ( i = 0; i < (sizeof(st1vafe3bx_6d_position_recognition_conf_0) / sizeof(struct mems_conf_op) ); i++ ) {
+    switch(st1vafe3bx_6d_position_recognition_conf_0[i].type) {
     case MEMS_CONF_OP_TYPE_DELAY:
-      platform_delay(st1vafe3bx_six_d_position_conf_0[i].data);
+      platform_delay(st1vafe3bx_6d_position_recognition_conf_0[i].data);
       break;
     case MEMS_CONF_OP_TYPE_WRITE:
-      st1vafe3bx_write_reg(&dev_ctx, st1vafe3bx_six_d_position_conf_0[i].address,
-                           (uint8_t *)&st1vafe3bx_six_d_position_conf_0[i].data, 1);
+      st1vafe3bx_write_reg(&dev_ctx, st1vafe3bx_6d_position_recognition_conf_0[i].address,
+                           (uint8_t *)&st1vafe3bx_6d_position_recognition_conf_0[i].data, 1);
       break;
     }
   }

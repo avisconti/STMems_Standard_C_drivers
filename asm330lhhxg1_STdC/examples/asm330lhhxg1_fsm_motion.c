@@ -89,7 +89,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "asm330lhhxg1_motion_stationary.h"
+#include "asm330lhhxg1_motion_stationary_detection.h"
 #include "asm330lhhxg1_reg.h"
 
 #if defined(NUCLEO_F401RE)
@@ -165,10 +165,10 @@ void asm330lhhxg1_fsm_motion(void)
   } while (rst);
 
   /* Start FSM configuration */
-    for ( i = 0; i < (sizeof(asm330lhhxg1_motion_stationary_conf_0) /
+    for ( i = 0; i < (sizeof(asm330lhhxg1_motion_stationary_detection_conf_0) /
                     sizeof(struct mems_conf_op) ); i++ ) {
-    asm330lhhxg1_write_reg(&dev_ctx, asm330lhhxg1_motion_stationary_conf_0[i].address,
-                       (uint8_t *)&asm330lhhxg1_motion_stationary_conf_0[i].data, 1);
+    asm330lhhxg1_write_reg(&dev_ctx, asm330lhhxg1_motion_stationary_detection_conf_0[i].address,
+                       (uint8_t *)&asm330lhhxg1_motion_stationary_detection_conf_0[i].data, 1);
   }
 
   asm330lhhxg1_int_notification_set(&dev_ctx,

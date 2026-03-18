@@ -178,11 +178,11 @@ void ais2dw12_read_data_polling(void)
       /* Read acceleration data */
       memset(data_raw_acceleration, 0x00, 3 * sizeof(int16_t));
       ais2dw12_acceleration_raw_get(&dev_ctx, data_raw_acceleration);
-      acceleration_mg[0] = ais2dw12_from_fs2_12bit_to_mg(
+      acceleration_mg[0] = ais2dw12_from_fs2_pw1_to_mg(
                              data_raw_acceleration[0]);
-      acceleration_mg[1] = ais2dw12_from_fs2_12bit_to_mg(
+      acceleration_mg[1] = ais2dw12_from_fs2_pw1_to_mg(
                              data_raw_acceleration[1]);
-      acceleration_mg[2] = ais2dw12_from_fs2_12bit_to_mg(
+      acceleration_mg[2] = ais2dw12_from_fs2_pw1_to_mg(
                              data_raw_acceleration[2]);
       snprintf((char *)tx_buffer, sizeof(tx_buffer),
               "Acceleration [mg]:%4.2f\t%4.2f\t%4.2f\r\n",

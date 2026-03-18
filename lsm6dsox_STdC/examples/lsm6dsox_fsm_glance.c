@@ -89,7 +89,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "lsm6dsox_glance.h"
+#include "lsm6dsox_glance_detection.h"
 #include "lsm6dsox_reg.h"
 
 #if defined(NUCLEO_F401RE)
@@ -168,10 +168,10 @@ void lsm6dsox_fsm_glance(void)
   lsm6dsox_i3c_disable_set(&dev_ctx, LSM6DSOX_I3C_DISABLE);
 
   /* Start Machine Learning Core configuration */
-  for ( i = 0; i < (sizeof(lsm6dsox_glance_conf_0) /
+  for ( i = 0; i < (sizeof(lsm6dsox_glance_detection_conf_0) /
                     sizeof(struct mems_conf_op) ); i++ ) {
-    lsm6dsox_write_reg(&dev_ctx, lsm6dsox_glance_conf_0[i].address,
-                       (uint8_t *)&lsm6dsox_glance_conf_0[i].data, 1);
+    lsm6dsox_write_reg(&dev_ctx, lsm6dsox_glance_detection_conf_0[i].address,
+                       (uint8_t *)&lsm6dsox_glance_detection_conf_0[i].data, 1);
   }
 
   /* Route signals on interrupt pin 1 */

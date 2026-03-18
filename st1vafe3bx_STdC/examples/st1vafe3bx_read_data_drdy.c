@@ -168,6 +168,9 @@ void st1vafe3bx_read_data_drdy(void)
 
   /* Restore default configuration */
   st1vafe3bx_sw_reset(&dev_ctx);
+  do {
+    st1vafe3bx_status_get(&dev_ctx, &status);
+  } while (status.sw_reset);
 
   /* Enable ENG (fully differential, gain 2, Zin 100Mohm) */
   cfg.mode = ST1VAFE3BX_DIFFERENTIAL_MODE;

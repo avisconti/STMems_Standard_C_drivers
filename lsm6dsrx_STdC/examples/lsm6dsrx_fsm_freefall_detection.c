@@ -89,7 +89,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "lsm6dsrx_free_fall.h"
+#include "lsm6dsrx_free_fall_detection.h"
 #include "lsm6dsrx_reg.h"
 
 #if defined(NUCLEO_F401RE)
@@ -165,10 +165,10 @@ void lsm6dsrx_fsm_freefall_detection(void)
   } while (rst);
 
   /* Start Machine Learning Core configuration */
-  for ( i = 0; i < (sizeof(lsm6dsrx_free_fall_conf_0) /
+  for ( i = 0; i < (sizeof(lsm6dsrx_free_fall_detection_conf_0) /
                     sizeof(struct mems_conf_op) ); i++ ) {
-    lsm6dsrx_write_reg(&dev_ctx, lsm6dsrx_free_fall_conf_0[i].address,
-                       (uint8_t *)&lsm6dsrx_free_fall_conf_0[i].data, 1);
+    lsm6dsrx_write_reg(&dev_ctx, lsm6dsrx_free_fall_detection_conf_0[i].address,
+                       (uint8_t *)&lsm6dsrx_free_fall_detection_conf_0[i].data, 1);
   }
 
   /* Route signals on interrupt pin 1 */

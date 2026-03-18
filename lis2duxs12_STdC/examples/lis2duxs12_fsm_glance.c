@@ -78,7 +78,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
 #include <stdio.h>
-#include "lis2duxs12_glance.h"
+#include "lis2duxs12_glance_detection.h"
 #include "lis2duxs12_reg.h"
 
 #if defined(NUCLEO_F401RE)
@@ -179,14 +179,14 @@ void lis2duxs12_fsm_glance(void)
   lis2duxs12_init_set(&dev_ctx);
 
   /* Start Machine Learning Core configuration */
-  for ( i = 0; i < (sizeof(lis2duxs12_glance_conf_0) / sizeof(struct mems_conf_op) ); i++ ) {
-    switch(lis2duxs12_glance_conf_0[i].type) {
+  for ( i = 0; i < (sizeof(lis2duxs12_glance_detection_conf_0) / sizeof(struct mems_conf_op) ); i++ ) {
+    switch(lis2duxs12_glance_detection_conf_0[i].type) {
     case MEMS_CONF_OP_TYPE_DELAY:
-      platform_delay(lis2duxs12_glance_conf_0[i].data);
+      platform_delay(lis2duxs12_glance_detection_conf_0[i].data);
       break;
     case MEMS_CONF_OP_TYPE_WRITE:
-      lis2duxs12_write_reg(&dev_ctx, lis2duxs12_glance_conf_0[i].address,
-                           (uint8_t *)&lis2duxs12_glance_conf_0[i].data, 1);
+      lis2duxs12_write_reg(&dev_ctx, lis2duxs12_glance_detection_conf_0[i].address,
+                           (uint8_t *)&lis2duxs12_glance_detection_conf_0[i].data, 1);
       break;
     }
   }

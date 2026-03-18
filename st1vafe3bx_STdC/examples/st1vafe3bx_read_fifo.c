@@ -175,6 +175,9 @@ void st1vafe3bx_read_fifo(void)
 
   /* Restore default configuration */
   st1vafe3bx_sw_reset(&dev_ctx);
+  do {
+    st1vafe3bx_status_get(&dev_ctx, &status);
+  } while (status.sw_reset);
 
   /* Set FIFO watermark to 32 sample(s) */
   fifo_mode.watermark = NUM_FIFO_ENTRY;

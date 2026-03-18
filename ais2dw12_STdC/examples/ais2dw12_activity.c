@@ -134,10 +134,13 @@ void ais2dw12_activity(void)
   dev_ctx.read_reg = platform_read;
   dev_ctx.mdelay = platform_delay;
   dev_ctx.handle = &SENSOR_BUS;
+
   /* Initialize platform specific hardware */
   platform_init();
+
   /* Wait sensor boot time */
   platform_delay(BOOT_TIME);
+
   /* Check device ID */
   ais2dw12_device_id_get(&dev_ctx, &whoamI);
 

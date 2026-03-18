@@ -161,14 +161,16 @@ void st1vafe3bx_read_data_polling(void)
 
   /* Restore default configuration */
   st1vafe3bx_sw_reset(&dev_ctx);
+  do {
+    st1vafe3bx_status_get(&dev_ctx, &status);
+  } while (status.sw_reset);
 
   /* Enable ENG (fully differential, gain 2, Zin 100Mohm) */
   cfg.mode = ST1VAFE3BX_DIFFERENTIAL_MODE;
   st1vafe3bx_ah_bio_config_set(&dev_ctx, cfg);
 
-  /* Enable AH/vAFE mode */
   st1vafe3bx_enter_vafe_only(&dev_ctx);
-  st1vafe3bx_ah_bio_active(&dev_ctx, 1);
+  st1vafe3bx_ah_bio_active(&dev_ctx, 0); /* lpf0_en is 0, so odr == 800Hz */
 
   /* Set bdu and if_inc recommended for driver usage */
   st1vafe3bx_init_set(&dev_ctx);
