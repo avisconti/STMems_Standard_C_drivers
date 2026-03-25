@@ -359,15 +359,15 @@
                     <state>$PROJ_DIR$/../Middleware/USB/stm32-mw-usb-device/Class/CDC/Inc</state>
                     <state>$PROJ_DIR$/../Middleware/USB/Device/Core/Inc</state>
                     <state>$PROJ_DIR$/../Middleware/USB/Device/Class/CDC/Inc</state>
-                    <state>C:\Users\visconta\Projects\STdC\lsm6dsv16x_STdC\driver</state>
-                    <state>C:\Users\visconta\Projects\STdC\_resources\st-mems-finite-state-machine\examples\glance_detection\lsm6dsv16x</state>
-                    <state>C:\Users\visconta\Projects\STdC\_resources\st-mems-finite-state-machine\examples\fourd_orientation_detection\lsm6dsv16x</state>
-                    <state>C:\Users\visconta\Projects\STdC\_resources\st-mems-machine-learning-core\examples\gym_activity_recognition\lsm6dsv16x</state>
-                    <state>C:\Users\visconta\Projects\STdC\lis2mdl_STdC\driver</state>
-                    <state>C:\Users\visconta\Projects\STdC\lps22df_STdC\driver</state>
-                    <state>C:\Users\visconta\Projects\STdC\iis3dwb_STdC\driver</state>
-                    <state>C:\Users\visconta\Projects\STdC\asm9g300b_STdC\driver</state>
-                    <state>C:\Users\visconta\Projects\STdC\asm330ab1_STdC\driver</state>
+		    <state>$PROJ_DIR$/../../lsm6dsv16x_STdC\driver</state>
+                    <state>$PROJ_DIR$/../../_resources\st-mems-finite-state-machine\examples\glance_detection\lsm6dsv16x</state>
+		    <state>$PROJ_DIR$/../../_resources\st-mems-finite-state-machine\examples\fourd_orientation_detection\lsm6dsv16x</state>
+		    <state>$PROJ_DIR$/../../_resources\st-mems-machine-learning-core\examples\gym_activity_recognition\lsm6dsv16x</state>
+		    <state>$PROJ_DIR$/../../lis2mdl_STdC\driver</state>
+		    <state>$PROJ_DIR$/../../lps22df_STdC\driver</state>
+		    <state>$PROJ_DIR$/../../iis3dwb_STdC\driver</state>
+		    <state>$PROJ_DIR$/../../asm9g300b_STdC\driver</state>
+		    <state>$PROJ_DIR$/../../asm330ab1_STdC\driver</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
