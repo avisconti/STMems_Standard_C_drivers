@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2024 STMicroelectronics.
+  * Copyright (c) 2026 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -60,53 +60,6 @@
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-/* lsm6dsv16x test routines */
-void lsm6dsv16x_read_data_polling(void);
-void lsm6dsv16x_read_data_irq(void);
-void lsm6dsv16x_read_data_irq_handler(void);
-void lsm6dsv16x_fifo(void);
-void lsm6dsv16x_fifo_irq(void);
-void lsm6dsv16x_fifo_irq_handler(void);
-void lsm6dsv16x_fifo_emb_functions(void);
-void lsm6dsv16x_fifo_emb_functions_handler(void);
-void lsm6dsv16x_free_fall(void);
-void lsm6dsv16x_free_fall_handler(void);
-void lsm6dsv16x_fsm_fourd(void);
-void lsm6dsv16x_fsm_fourd_handler(void);
-void lsm6dsv16x_fsm_glance(void);
-void lsm6dsv16x_fsm_glance_handler(void);
-void lsm6dsv16x_mlc_gym(void);
-void lsm6dsv16x_mlc_gym_handler(void);
-void lsm6dsv16x_pedometer(void);
-void lsm6dsv16x_pedometer_handler(void);
-void lsm6dsv16x_qvar_read_data_polling(void);
-void lsm6dsv16x_self_test(void);
-void lsm6dsv16x_sensor_fusion(void);
-void lsm6dsv16x_sensor_hub(void);
-void lsm6dsv16x_sensor_hub_handler(void);
-void lsm6dsv16x_sig_mot(void);
-void lsm6dsv16x_sig_mot_handler(void);
-void lsm6dsv16x_single_double_tap(void);
-void lsm6dsv16x_single_double_tap_handler(void);
-void lsm6dsv16x_sixd(void);
-void lsm6dsv16x_sixd_handler(void);
-void lsm6dsv16x_tilt(void);
-void lsm6dsv16x_tilt_handler(void);
-void lsm6dsv16x_wakeup(void);
-void lsm6dsv16x_wakeup_handler(void);
-
-/* iis3dwb test routines */
-void iis3dwb_read_data_polling(void);
-void iis3dwb_fifo(void);
-void iis3dwb_self_test(void);
-void iis3dwb_wake_up(void);
-
-void asm9g300b_read(void);
-
-void asm330ab1_read_handler(void);
-void asm330ab1_read(void);
-void asm330ab1_read_safespi(void);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -115,7 +68,7 @@ void asm330ab1_read_safespi(void);
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
   /* call here the example xxx_handler routine */
-  asm330ab1_read_handler();
+ 
 }
 /* USER CODE END 0 */
 
@@ -153,32 +106,25 @@ int main(void)
   MX_ICACHE_Init();
   MX_USART2_UART_Init();
   MX_I2C4_Init();
+  MX_USB_PCD_Init();
   MX_TIM5_Init();
   MX_TIM2_Init();
   MX_TIM6_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   MX_USB_DEVICE_Init();
   set_vdd(0.0f);
   set_vddio(0.0f);
 
-  // Start measurements timer
-  HAL_TIM_Base_Start(&htim5);
-  // Start delay us timer
-  HAL_TIM_Base_Start(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  LOG_MESSAGE("Test MEMS C Drivers on MKI109D board");
   while (1)
   {
-    /* call here the example xxx routine */
-    //asm330ab1_read();
-    asm330ab1_self_test();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    delay(10);
   }
   /* USER CODE END 3 */
 }
@@ -279,7 +225,8 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

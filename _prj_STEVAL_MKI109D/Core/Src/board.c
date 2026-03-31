@@ -137,7 +137,7 @@ void spi_init(struct spi_conf *spi_conf)
     interface = SPI;
     break;
   case WIRE_3:
-    MX_SPI1_Init_3W();
+    //MX_SPI1_Init_3W();
     interface = SPI;
     break;
   }
@@ -288,7 +288,7 @@ void spi_aux_init(struct spi_conf *spi_conf)
     MX_SPI6_Init();
     break;
   case WIRE_3:
-    MX_SPI6_Init_3W();
+    //MX_SPI6_Init_3W();
     break;
   }
 }
