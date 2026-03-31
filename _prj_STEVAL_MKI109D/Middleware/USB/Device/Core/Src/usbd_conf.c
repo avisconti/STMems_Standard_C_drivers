@@ -28,7 +28,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
-PCD_HandleTypeDef  hpcd_USB_DRD_FS;
+extern PCD_HandleTypeDef  hpcd_USB_DRD_FS;
 
 /* Private function prototypes -----------------------------------------------*/
 static USBD_StatusTypeDef USBD_Get_USB_Status(HAL_StatusTypeDef hal_status)

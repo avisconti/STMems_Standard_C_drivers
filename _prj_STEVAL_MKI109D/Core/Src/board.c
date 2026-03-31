@@ -28,6 +28,9 @@
 #include "usbd_cdc_if.h"
 #include "queue.h"
 
+extern void MX_SPI1_Init_3W(void);
+extern void MX_SPI6_Init_3W(void);
+
 static msg_queue usb_queue = {{0}, 0, 0};
 static uint8_t usb_tmp_buf[MSG_QUEUE_MAX_CAPACITY];
 
@@ -50,20 +53,6 @@ void usb_cdc_flush(void)
 void usb_cdc_write(void *buff, uint16_t len)
 {
   CDC_Transmit_FS(buff, len);
-}
-
-__ATTRIBUTES size_t __write(int fd, const unsigned char *buf, size_t count)
-{
-  if (fd == fileno(stderr) && count > 0) {
-    HAL_UART_Transmit(&huart2, buf, count, HAL_MAX_DELAY);
-  } else if (fd == fileno(stdout) && count > 0) {
-    if (msg_enqueue(&usb_queue, (uint8_t *)buf, count) != count) {
-      DEBUG_MESSAGE("USB queue is full");
-    }
-    usb_cdc_flush();
-  }
-
-  return count;
 }
 
 void set_vdd(float voltage)
@@ -118,16 +107,6 @@ uint32_t systick(void)
 enum { NOT_VALID, I2C, I3C, SPI };
 
 static uint8_t interface;
-static struct i2c_conf _i2c_conf;
-
-void i2c_init(struct i2c_conf *i2c_conf)
-{
-  _i2c_conf = *i2c_conf;
-  set_sa0(_i2c_conf.sa0);
-  HAL_GPIO_WritePin(I2C_pullups_GPIO_Port, I2C_pullups_Pin, GPIO_PIN_RESET);
-  MX_I2C1_Init();
-  interface = I2C;
-}
 
 void spi_init(struct spi_conf *spi_conf)
 {
@@ -140,6 +119,8 @@ void spi_init(struct spi_conf *spi_conf)
     MX_SPI1_Init_3W();
     interface = SPI;
     break;
+  default:
+    break;
   }
 }
 
@@ -150,120 +131,28 @@ void spi_set_freq(enum spi_freq freq)
   HAL_SPI_Init(&hspi1);
 }
 
-static struct i3c_conf _i3c_conf;
-static I3C_DeviceConfTypeDef target_desc;
-
-void i3c_init(struct i3c_conf *i3c_conf)
-{
-  int32_t res;
-  _i3c_conf = *i3c_conf;
-  set_sa0(_i3c_conf.sa0);
-  HAL_GPIO_WritePin(I2C_pullups_GPIO_Port, I2C_pullups_Pin, GPIO_PIN_SET);
-  MX_I3C1_Init();
-
-  i3c_set_bus_frequency(1000000);
-  res = i3c_rstdaa();
-  if (res != 0) {
-    DEBUG_MESSAGE("Reset dynamic address procedure failed with code 0x%.2x", res);
-    return;
-  }
-
-  res = i3c_setdasa(_i3c_conf.static_address, &_i3c_conf.dynamic_address, 1);
-  if (res != 0) {
-    DEBUG_MESSAGE("Set static address procedure failed with code 0x%.2x", res);
-    return;
-  }
-
-  target_desc.DeviceIndex = 1;
-  target_desc.TargetDynamicAddr = _i3c_conf.dynamic_address >> 1;
-  target_desc.IBIAck = ENABLE;
-  target_desc.IBIPayload = ENABLE;
-  target_desc.CtrlRoleReqAck = ENABLE;
-  target_desc.CtrlStopTransfer = ENABLE;
-
-  if (HAL_I3C_Ctrl_ConfigBusDevices(&hi3c1, &target_desc, 1) != HAL_OK) {
-    DEBUG_MESSAGE("Failed to configure the bus device");
-    return;
-  }
-
-  if(HAL_I3C_ActivateNotification(&hi3c1, NULL, HAL_I3C_IT_IBIIE) != HAL_OK) {
-    DEBUG_MESSAGE("Failed to enable IBI ISR");
-    return;
-  }
-  i3c_set_bus_frequency(_i3c_conf.bus_frequency);
-  interface = I3C;
-}
-
-void get_i3c_ibi_payload(uint32_t *tgt_addr, uint32_t *ibi_payload_size, uint8_t *ibi_payload)
-{
-  I3C_CCCInfoTypeDef CCCInfo;
-  if (HAL_I3C_GetCCCInfo(&hi3c1, EVENT_ID_IBI, &CCCInfo) != HAL_OK)
-  {
-    /* Error_Handler() function is called when error occurs. */
-    Error_Handler();
-  }
-  if (tgt_addr != NULL)
-    *tgt_addr = CCCInfo.IBICRTgtAddr;
-  if (ibi_payload_size != NULL)
-    *ibi_payload_size = CCCInfo.IBITgtNbPayload;
-  if (ibi_payload != NULL) {
-    for (uint32_t i = 0; i < CCCInfo.IBITgtNbPayload; i++) {
-      ibi_payload[i] = ((uint8_t *)&CCCInfo.IBITgtPayload)[i];
-    }
-  }
-
-  return;
-}
-
-__weak void i3c_ibi_callback(void)
-{
-  printf("%u %s\n", HAL_GetTick(), __func__);
-
-  return;
-}
-
-void HAL_I3C_NotifyCallback(I3C_HandleTypeDef *hi3c, uint32_t eventId)
-{
-  if ((eventId & EVENT_ID_IBI) == EVENT_ID_IBI)
-  {
-    i3c_ibi_callback();
-  }
-}
-
-
 void write(uint8_t addr, uint8_t val)
 {
   uint8_t buff[2] = { addr, val };
 
   switch (interface) {
-  case I2C:
-    HAL_I2C_Mem_Write(&hi2c1, _i2c_conf.dev_addr, addr, I2C_MEMADD_SIZE_8BIT, &val, 1, HAL_MAX_DELAY);
-    break;
   case SPI:
     HAL_GPIO_WritePin(SPI1_NSS_GPIO_Port, SPI1_NSS_Pin, GPIO_PIN_RESET);
     HAL_SPI_Transmit(&hspi1, buff, 2, HAL_MAX_DELAY);
     HAL_GPIO_WritePin(SPI1_NSS_GPIO_Port, SPI1_NSS_Pin, GPIO_PIN_SET);
     break;
-  case I3C:
-    i3c_write(_i3c_conf.dynamic_address >> 1, addr, &val, 1);
   }
 }
 
 void read(uint8_t addr, void *val, uint16_t len)
 {
   switch (interface) {
-  case I2C:
-    HAL_I2C_Mem_Read(&hi2c1, _i2c_conf.dev_addr, addr, I2C_MEMADD_SIZE_8BIT, val, len, HAL_MAX_DELAY);
-    break;
   case SPI:
     addr |= 0x80;
     HAL_GPIO_WritePin(SPI1_NSS_GPIO_Port, SPI1_NSS_Pin, GPIO_PIN_RESET);
     HAL_SPI_Transmit(&hspi1, &addr, 1, HAL_MAX_DELAY);
     HAL_SPI_Receive(&hspi1, val, len, HAL_MAX_DELAY);
     HAL_GPIO_WritePin(SPI1_NSS_GPIO_Port, SPI1_NSS_Pin, GPIO_PIN_SET);
-    break;
-  case I3C:
-    i3c_read(_i3c_conf.dynamic_address >> 1, addr, val, len);
     break;
   }
 }
@@ -289,6 +178,8 @@ void spi_aux_init(struct spi_conf *spi_conf)
     break;
   case WIRE_3:
     MX_SPI6_Init_3W();
+    break;
+  default:
     break;
   }
 }
