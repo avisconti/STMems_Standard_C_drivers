@@ -28,6 +28,9 @@
 #include "usbd_cdc_if.h"
 #include "queue.h"
 
+extern void MX_SPI1_Init_3W(void);
+extern void MX_SPI6_Init_3W(void);
+
 static msg_queue usb_queue = {{0}, 0, 0};
 static uint8_t usb_tmp_buf[MSG_QUEUE_MAX_CAPACITY];
 
@@ -112,6 +115,10 @@ void spi_init(struct spi_conf *spi_conf)
     MX_SPI1_Init();
     interface = SPI;
     break;
+  case WIRE_3:
+    MX_SPI1_Init_3W();
+    interface = SPI;
+    break;
   default:
     break;
   }
@@ -168,6 +175,9 @@ void spi_aux_init(struct spi_conf *spi_conf)
   switch (spi_conf->wire) {
   case WIRE_4:
     MX_SPI6_Init();
+    break;
+  case WIRE_3:
+    MX_SPI6_Init_3W();
     break;
   default:
     break;

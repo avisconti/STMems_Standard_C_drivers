@@ -15,6 +15,7 @@ You need to execute following steps in order to get a working project based on y
 ```c
 $STDC_PATH/_prj_MKI109D/Core/Src/board.c
 $STDC_PATH/_prj_MKI109D/Core/Src/queue.c
+$STDC_PATH/_prj_MKI109D/Core/Src/spi_3w.c
 ```
 
 3. Add Middleware source files to the project:
